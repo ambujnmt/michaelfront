@@ -9,7 +9,7 @@ import websiteApi from '@/lib/websiteApi'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 
 function OtherPropertiesSlider({ properties }) {
   useEffect(() => {

@@ -7,7 +7,7 @@ import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 
 export default function Verkauf() {
   const router = useRouter()

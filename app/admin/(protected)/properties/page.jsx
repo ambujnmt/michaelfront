@@ -6,7 +6,7 @@ import adminApi from '@/lib/adminApi'
 import PropertyForm from './PropertyForm'
 import Swal from 'sweetalert2'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 const emptyForm = { title: '', location: '', price: '', size: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false }
 const statusColor = { Active: '#34d399', Sold: '#94a3b8', Pending: '#fbbf24' }
 const thStyle = { padding: '14px 18px', color: '#94a3b8', fontWeight: '700', textAlign: 'left', fontSize: '12px', letterSpacing: '0.8px', textTransform: 'uppercase' }

@@ -8,7 +8,7 @@ import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
 import Newsletter from '@/app/components/website/Newsletter'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 
 const TYPE_MAP = {
   villa:     'filter1',
