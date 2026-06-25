@@ -28,7 +28,9 @@ export default function EditProperty() {
           title: p.title, location: p.location, price: p.price,
           size: p.size, rooms: p.rooms, bedrooms: p.bedrooms || 0,
           bathrooms: p.bathrooms || 0, status: p.status,
+          property_type: p.property_type || 'villa',
           description: p.description || '', image: p.image || '',
+          show_in_sales: p.show_in_sales == 1,
         })
       }
       if (imgRes.success) setExistingGallery(imgRes.data)

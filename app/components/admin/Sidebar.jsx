@@ -1,17 +1,22 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 import Swal from 'sweetalert2'
 
 const menuItems = [
-  { label: 'Dashboard',   path: '/admin/dashboard',   icon: 'fa-tachometer' },
-  { label: 'Properties',  path: '/admin/properties',  icon: 'fa-building' },
-  { label: 'Inquiries',   path: '/admin/inquiries',   icon: 'fa-envelope' },
-  { label: 'Subscribers', path: '/admin/subscribers', icon: 'fa-bell' },
-  { label: 'Settings',    path: '/admin/settings',    icon: 'fa-cog' },
+  { label: 'Dashboard',    path: '/admin/dashboard',    icon: 'fa-tachometer' },
+  { label: 'Properties',   path: '/admin/properties',   icon: 'fa-building' },
+  { label: 'Inquiries',    path: '/admin/inquiries',    icon: 'fa-envelope' },
+  { label: 'Contacts',     path: '/admin/contacts',     icon: 'fa-comment' },
+  { label: 'Slider',       path: '/admin/slider',       icon: 'fa-picture-o' },
+  { label: 'Testimonials', path: '/admin/testimonials', icon: 'fa-star' },
+  { label: 'Blog',         path: '/admin/blog',         icon: 'fa-pencil-square-o' },
+  { label: 'Subscribers',  path: '/admin/subscribers',  icon: 'fa-bell' },
+  { label: 'Settings',     path: '/admin/settings',     icon: 'fa-cog' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }) {
   const router   = useRouter()
   const pathname = usePathname()
 
@@ -38,43 +43,70 @@ export default function Sidebar() {
     <div style={{
       width: '260px', height: '100vh', flexShrink: 0,
       background: '#1a1f2e',
-      borderRight: '1px solid rgba(255,255,255,0.1)',
+      borderRight: '1px solid rgba(255,255,255,0.06)',
       display: 'flex', flexDirection: 'column',
-      padding: '28px 16px',
     }}>
 
-      {/* Logo */}
-      <div style={{ marginBottom: '40px', paddingLeft: '10px' }}>
-        <img src="/assets/img/logo.png" alt="logo" style={{ width: '130px' }} />
+      {/* Logo area */}
+      <div style={{
+        padding: '28px 24px 22px',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <img src="/assets/img/logo.png" alt="logo" style={{ width: '120px', display: 'block' }} />
       </div>
 
-      {/* Label */}
-      <p style={{ color: '#6b7280', fontSize: '11px', fontWeight: '700', letterSpacing: '1.5px', marginBottom: '10px', paddingLeft: '14px' }}>
-        NAVIGATION
-      </p>
-
       {/* Nav */}
-      <nav style={{ flex: 1 }}>
+      <nav className="hide-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 12px' }}>
+
+        <p style={{ color: '#4a5f7a', fontSize: '10px', fontWeight: '800', letterSpacing: '1.8px', margin: '0 0 10px 10px' }}>
+          MENU
+        </p>
+
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {menuItems.map((item) => {
             const isActive = pathname === item.path
             return (
-              <li key={item.label}
-                onClick={() => router.push(item.path)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '14px',
-                  padding: '14px 16px', borderRadius: '12px', marginBottom: '4px',
-                  background: isActive ? '#2563eb' : 'transparent',
-                  color: isActive ? '#ffffff' : '#a0aec0',
-                  fontWeight: isActive ? '700' : '500',
-                  fontSize: '14px', cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#fff' } }}
-                onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#a0aec0' } }}
-              >
-                <i className={`fa ${item.icon}`} style={{ width: '18px', textAlign: 'center', fontSize: '15px', opacity: isActive ? 1 : 0.8 }} />
-                {item.label}
+              <li key={item.label} style={{ marginBottom: '2px' }}>
+                <Link
+                  href={item.path}
+                  onClick={() => !isActive && onNavigate?.()}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '12px',
+                    padding: '11px 14px', borderRadius: '10px',
+                    background: isActive ? 'rgba(37,99,235,0.18)' : 'transparent',
+                    color: isActive ? '#60a5fa' : '#8ea3ba',
+                    fontWeight: isActive ? '700' : '500',
+                    fontSize: '13.5px', textDecoration: 'none',
+                    borderLeft: isActive ? '3px solid #3b82f6' : '3px solid transparent',
+                    transition: 'all 0.18s',
+                    position: 'relative',
+                  }}
+                  onMouseEnter={e => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                      e.currentTarget.style.color = '#94a3b8'
+                      e.currentTarget.style.borderLeft = '3px solid rgba(59,130,246,0.3)'
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'transparent'
+                      e.currentTarget.style.color = '#8ea3ba'
+                      e.currentTarget.style.borderLeft = '3px solid transparent'
+                    }
+                  }}
+                >
+                  {/* Icon box */}
+                  <span style={{
+                    width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
+                    background: isActive ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${isActive ? 'rgba(59,130,246,0.35)' : 'rgba(255,255,255,0.06)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <i className={`fa ${item.icon}`} style={{ fontSize: '13px', color: isActive ? '#60a5fa' : '#6b85a0' }} />
+                  </span>
+                  {item.label}
+                </Link>
               </li>
             )
           })}
@@ -82,20 +114,28 @@ export default function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <button onClick={handleLogout} style={{
-        display: 'flex', alignItems: 'center', gap: '12px',
-        width: '100%', padding: '13px 16px', borderRadius: '12px',
-        background: 'rgba(239,68,68,0.15)',
-        border: '1px solid rgba(239,68,68,0.4)',
-        color: '#fc8181', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
-        transition: 'all 0.2s',
-      }}
-        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.28)'; e.currentTarget.style.color = '#fff' }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.color = '#fc8181' }}
-      >
-        <i className="fa fa-sign-out" style={{ fontSize: '15px' }} />
-        Logout
-      </button>
+      <div style={{ padding: '12px' }}>
+        <button onClick={handleLogout} style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          width: '100%', padding: '11px 14px', borderRadius: '10px',
+          background: 'rgba(239,68,68,0.08)',
+          border: '1px solid rgba(239,68,68,0.2)',
+          color: '#f87171', fontSize: '13.5px', fontWeight: '600', cursor: 'pointer',
+          transition: 'all 0.18s',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.2)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'; e.currentTarget.style.color = '#fff' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'; e.currentTarget.style.color = '#f87171' }}
+        >
+          <span style={{
+            width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
+            background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <i className="fa fa-sign-out" style={{ fontSize: '13px', color: '#f87171' }} />
+          </span>
+          Logout
+        </button>
+      </div>
 
     </div>
   )

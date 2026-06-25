@@ -1,0 +1,302 @@
+/* ============================================================
+   RESPONSIVE CSS — michaelleber
+   Breakpoints:
+   XS  Mobile   : max-width 575px
+   SM  Mobile   : max-width 767px
+   MD  Tablet   : max-width 991px
+   LG  Desktop  : min-width 992px
+   ============================================================ */
+
+/* ── Global ─────────────────────────────────────────────── */
+img { max-width: 100%; height: auto; }
+
+/* ── TYPOGRAPHY ─────────────────────────────────────────── */
+@media (max-width: 991px) {
+  .head-sec h1 { font-size: 36px; line-height: 46px; }
+  .head-sec h3 { font-size: 32px; line-height: 42px; }
+  .head-sec h6 { font-size: 13px; }
+  .p8-sec9 h3  { font-size: 28px; }
+}
+@media (max-width: 767px) {
+  .head-sec h1 { font-size: 26px; line-height: 36px; }
+  .head-sec h3 { font-size: 24px; line-height: 34px; }
+  .btn1        { font-size: 15px; padding: 12px 28px; }
+  p            { font-size: 15px; line-height: 24px; }
+  .p8-sec9 h3  { font-size: 22px; line-height: 32px; }
+}
+
+/* ── HEADER (inner pages) ───────────────────────────────── */
+@media (max-width: 991px) {
+  .site-header { padding-bottom: 10px; }
+  .top-col4-1  { display: none; }
+  .top-lang-col { float: right; margin-top: 0; }
+  .top-lang-col h5 { font-size: 16px; }
+  .logo-header img { max-width: 120px; }
+}
+@media (max-width: 767px) {
+  .top-col1    { display: none; }
+  .logo-header img { max-width: 100px; }
+  .toggle-bar  { margin-left: 16px; }
+  .header-nav  { margin-top: 0; }
+  .header-nav .nav > li { margin: 0; }
+  .sticky-header .main-bar { padding: 8px 0; }
+}
+
+/* ── HOME HEADER ────────────────────────────────────────── */
+@media (max-width: 991px) {
+  .p8-head-col { display: none; }
+}
+@media (max-width: 767px) {
+  .p8-head-col { display: none; }
+  .head-2 .logo-header img { max-width: 100px; }
+  .head-2 .top-lang-col { margin-top: 0; }
+}
+
+/* ── HOME SEC 1 — Wer wir sind ──────────────────────────── */
+@media (max-width: 767px) {
+  .p8-sec1 { margin: 30px 0; }
+  .p8-sec1 .head-sec { text-align: center; }
+}
+
+/* ── HOME SEC 2 — Property Carousel ────────────────────── */
+@media (max-width: 767px) {
+  .p8-sec2 { padding: 40px 0; margin-top: 30px; }
+  .villa-dtl-col h5 { font-size: 17px; }
+  .villa-dtl-col h6 { font-size: 18px; }
+}
+
+/* ── HOME SEC 3 — Video banner ──────────────────────────── */
+@media (max-width: 991px) {
+  .p5-sec3 { height: 50vh; margin-top: 30px; }
+}
+@media (max-width: 767px) {
+  .p5-sec3 { height: 40vh; margin-top: 20px; }
+  .p5-sec3 h3 { font-size: 18px; width: 92%; }
+}
+
+/* ── HOME SEC 4 — Traumimmobilie ────────────────────────── */
+@media (max-width: 991px) {
+  .margin-row { margin-top: 30px; }
+  .p8-sec4-col-img2 { top: 0; }
+  .p8-sec4 .col-lg-4 { margin-top: 30px; }
+}
+@media (max-width: 767px) {
+  .p8-sec4-col-img2 { top: 0; }
+  .margin-row { margin-top: 20px; }
+}
+
+/* ── HOME SEC 5 — Verkauf ───────────────────────────────── */
+@media (max-width: 991px) {
+  .p8-sec5 { padding-top: 80px; margin-top: 0; }
+  .p8-sec5 .head-sec { top: 0; }
+  .michael-img { display: none; }
+}
+@media (max-width: 767px) {
+  .p8-sec5 { padding-top: 60px; padding-bottom: 60px; margin-top: 0; }
+  .p8-sec5 .head-sec { top: 0; text-align: center; }
+  .michael-img { display: none; }
+}
+
+/* ── HOME SEC 7 — Badges + Video ───────────────────────── */
+@media (max-width: 991px) {
+  .p8-sec7-row1 { margin: 30px 0; }
+  .p8-sec7-col-icon1 { justify-content: flex-start; margin-bottom: 20px; }
+  .p8-sec7 .video-wrapper { height: 280px; }
+  .p8-sec7 .video-wrapper video { height: 280px; }
+}
+@media (max-width: 767px) {
+  .p8-sec7-row1 { margin: 20px 0; }
+  .p8-sec7-col-icon1 { justify-content: center; margin-bottom: 16px; }
+  .p8-sec7 .video-wrapper { height: 220px; }
+  .p8-sec7 .video-wrapper video { height: 220px; }
+}
+
+/* ── HOME SEC 8 — Blog ──────────────────────────────────── */
+@media (max-width: 991px) {
+  .p7-sec8.p8-sec8 { margin: 40px 20px 60px; }
+  .blog-col1 { margin-bottom: 24px; }
+}
+@media (max-width: 767px) {
+  .p7-sec8.p8-sec8 { margin: 30px 0 40px; }
+  .blog-col1 { margin-bottom: 20px; }
+  .blog-col1 img { width: 100%; }
+}
+
+/* ── HOME SEC 9 — Contact CTA ───────────────────────────── */
+@media (max-width: 991px) {
+  .michael-img-2 { display: none; }
+  .p8-sec9 .col-lg-3 { margin-top: 16px; }
+}
+@media (max-width: 767px) {
+  .michael-img-2 { display: none; }
+  .p8-sec9 { padding: 30px 0; text-align: center; }
+  .p8-sec9 .col-lg-3 { text-align: center; margin-top: 16px; }
+}
+
+/* ── HOME FOOTER ────────────────────────────────────────── */
+@media (max-width: 991px) {
+  .foot-col5  { margin-left: 0; }
+  .foot-col2  { margin-top: 30px; }
+  .foot-col1 h3 { font-size: 28px; }
+  .copyright-row p { font-size: 13px; }
+}
+@media (max-width: 767px) {
+  .footer-2 { margin-top: 20px; }
+  .foot-col5 { margin-left: 0; }
+  .foot-col2 { margin-top: 20px; }
+  .foot-col1-ul { column-count: 1; }
+  .foot-social-icon2 ul { padding-left: 0; }
+  .copyright-row { text-align: center; }
+  .copyright-row .copyrights-text2 { float: none; display: block; text-align: center; }
+}
+
+/* ── FOOTER (inner pages) ───────────────────────────────── */
+@media (max-width: 991px) {
+  .widget.widget_about { margin-bottom: 20px; }
+  .foot-link-col2 { margin-top: 10px; }
+  .footer-bottom .copyrights-text { text-align: center; }
+  .copyrights-text2 { float: none; display: block; text-align: center; }
+}
+@media (max-width: 767px) {
+  .widget.widget_about img { width: 60%; margin-bottom: 20px; }
+  .foot-social-icons ul { padding-left: 0; }
+  .footer-bottom .copyrights-text { display: flex; justify-content: center; }
+  .copyrights-text2 { float: none; text-align: center; }
+}
+
+/* ── INNER PAGE BANNER ──────────────────────────────────── */
+@media (max-width: 991px) {
+  .inner-page-banner { padding: 60px 0; }
+  .inner-page-banner h1 { font-size: 32px; }
+}
+@media (max-width: 767px) {
+  .inner-page-banner { padding: 40px 0; }
+  .inner-page-banner h1 { font-size: 24px; line-height: 34px; }
+  .inner-page-banner p  { font-size: 14px; }
+}
+
+/* ── PROPERTY LISTING PAGE ──────────────────────────────── */
+@media (max-width: 767px) {
+  .p4-sec1 { margin: 30px 0; }
+  .flip-container { margin-bottom: 24px; }
+  .wt-thum-bx h2 { font-size: 16px; }
+  .flip-col-start h3 { font-size: 17px; }
+}
+
+/* ── PROPERTY DETAIL PAGE ───────────────────────────────── */
+@media (max-width: 991px) {
+  .p3-col-sec { display: none; }
+  .fullscreen-container { height: 60vh !important; }
+  .p3-sec2 { margin-top: 30px; }
+  .p3-sec3 .col-lg-12 { padding: 40px 20px; }
+  .p3-sec3 { margin-top: 30px; }
+  .objekt-section { padding: 30px 16px; }
+  .objekt-section h3 { font-size: 24px; margin-bottom: 40px; }
+  .detail-label { min-width: 160px; }
+  .form-sec1 { margin-left: 0; margin-right: 0; }
+}
+@media (max-width: 767px) {
+  .p3-col-sec { display: none; }
+  .fullscreen-container { height: 50vh !important; }
+  .p3-sec3 .col-lg-12 { padding: 30px 15px; }
+  .detail-label { min-width: 130px; font-size: 13px; }
+  .detail-value { font-size: 13px; }
+  .form-sec1 { margin-left: 0; margin-right: 0; padding-bottom: 30px; }
+  .p3-sec7 { margin-top: 30px; }
+  .p3-sec8 { padding: 40px 0; }
+  .gallery-card img { height: 200px; }
+}
+
+/* ── ABOUT / UBER-UNS PAGE ──────────────────────────────── */
+@media (max-width: 767px) {
+  .section-padding { padding: 40px 0; }
+}
+
+/* ── CONTACT / KONTAKT PAGE ─────────────────────────────── */
+@media (max-width: 767px) {
+  .home-1-form input  { padding: 18px 0; }
+  .home-1-form textarea { padding: 18px 0; }
+}
+
+/* ── IMMOBILIENANFRAGE PAGE ─────────────────────────────── */
+@media (max-width: 767px) {
+  .home-1-form select { padding: 12px 8px; }
+}
+
+/* ── NEWSLETTER SECTION ─────────────────────────────────── */
+@media (max-width: 767px) {
+  .newsletter-sec { padding: 40px 0; }
+  .newsletter-sec .head-sec { margin: 0 15px; }
+  .newsletter-input { display: block; }
+  .newsletter-input input { width: 100%; margin-bottom: 12px; }
+  .news-btn { width: auto; padding: 14px 28px; margin-left: 0; top: 0; }
+  .newsletter-input2 input { padding: 18px 14px; }
+}
+
+/* ── FILTER TABS ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .masonry-filter { flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .masonry-filter li a { font-size: 12px; padding: 6px 10px; }
+}
+
+/* ── TESTIMONIAL ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .p7-sec7 .content-card { width: 95%; padding: 28px 16px; }
+}
+
+/* ── HERO SLIDER ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .forcefullwidth_wrapper_tp_banner { height: 60vh !important; }
+  .tp-splitted.tp-linesplit { font-size: 36px; line-height: 44px; }
+  .tp-parallax-wrap.rev_row_wrap { margin-top: 40px; }
+}
+
+/* ── PROPERTY CAROUSEL CARDS ────────────────────────────── */
+@media (max-width: 767px) {
+  .wt-box img { width: 100%; height: 220px; object-fit: cover; }
+  .villa-dtl-col { padding: 14px; }
+  .villa-dtl-col span { font-size: 13px; }
+}
+
+/* ── BADGE STRIP (SEC 7) ────────────────────────────────── */
+@media (max-width: 767px) {
+  .badge-strip { padding: 30px 0; }
+  .p8-sec7-col-icon1 h5 { font-size: 15px; }
+  .p8-sec7-col-icon1 img { width: 28px; }
+}
+
+/* ── SEC 4 HOME — Images ────────────────────────────────── */
+@media (max-width: 767px) {
+  .p8-sec4-col-img1 img,
+  .p8-sec4-col-img2 img { width: 100%; }
+  .p7-sec5-img-col { margin-bottom: 60px; }
+  .p7-sec5-txt-col { position: static; width: 100%; border-radius: 12px; margin-top: 16px; }
+}
+
+/* ── EXP CIRCLE ─────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .exp-col { display: none; }
+}
+
+/* ── SECTION PADDING ────────────────────────────────────── */
+@media (max-width: 767px) {
+  .section-padding { padding: 40px 0 !important; }
+  .p7-sec3 { margin: 40px 0 10px; }
+  .p7-sec5 { margin-top: 40px; }
+  .p7-sec6 { padding: 50px 0 40px; }
+  .p7-sec8 { margin: 30px 15px 50px; }
+  .p8-sec3 { margin-top: 0; }
+  .p5-sec4 { margin: 40px 0; }
+}
+@media (max-width: 991px) {
+  .p7-sec8 { margin: 40px 30px 60px; }
+}
+
+/* ── MOBILE NAV ─────────────────────────────────────────── */
+@media (max-width: 991px) {
+  .navbar-toggler { display: block; }
+  .header-nav.collapse:not(.show) { display: none; }
+  .header-nav.show { display: block; }
+  .header-nav .nav { flex-direction: column; }
+  .header-nav .nav > li > a { display: block; padding: 10px 16px; }
+}

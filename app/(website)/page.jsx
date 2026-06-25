@@ -1,32 +1,29 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
+import websiteApi from '@/lib/websiteApi'
 
+import Link from 'next/link'
 import HomeHeader from '../components/website/HomeHeader'
 import HeroSlider from '../components/website/HeroSlider'
 import PropertyCarousel from '../components/website/PropertyCarousel'
 import TestimonialSection from '../components/website/TestimonialSection'
 import HomeFooter from '../components/website/HomeFooter'
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7001'
+
 export default function Home() {
   const { lang } = useLanguage()
   const tr = translations.home[lang]
+  const [blogs, setBlogs] = useState([])
 
-  // Update hero slider text when language changes
   useEffect(() => {
-    const el = document.getElementById('slide-407-layer-1')
-    if (!el) return
-    const savedStyle = el.getAttribute('style')
-    el.innerHTML = translations.home[lang].heroText
-    if (savedStyle) {
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        const target = document.getElementById('slide-407-layer-1')
-        if (target) target.setAttribute('style', savedStyle)
-      }))
-    }
-  }, [lang])
+    websiteApi.getBlogs()
+      .then(d => { if (d.success) setBlogs(d.data) })
+      .catch(() => {})
+  }, [])
 
   return (
     <div className="page-wraper">
@@ -74,9 +71,9 @@ export default function Home() {
                 <h3>{tr.sec4Heading}</h3>
                 <div className="mt-5"></div>
                 <div className="villa-dtl-col2">
-                  <a href="#">
+                  <Link href="/immobilienanfrage">
                     <button type="button" className="btn btn1">{tr.sec4Btn}</button>
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="row margin-row">
@@ -110,9 +107,9 @@ export default function Home() {
                 <h3>{tr.sec5Heading}</h3>
                 <h5>{tr.sec5Sub}</h5>
                 <p>{tr.sec5Desc}</p>
-                <a href="#">
+                <Link href="/kontakt">
                   <button type="button" className="btn btn1">{tr.sec5Btn}</button>
-                </a>
+                </Link>
               </div>
             </div>
             <div className="col-lg-5 col-md-5">
@@ -154,7 +151,9 @@ export default function Home() {
               </div>
               <div className="video-wrapper">
                 <video autoPlay muted loop playsInline>
-                  <source src="/assets/img/hero-vdo.mp4" type="video/mp4" />
+                  <source src="/assets/img/
+                  
+                  " type="video/mp4" />
                 </video>
               </div>
             </div>
@@ -171,30 +170,54 @@ export default function Home() {
               <h3>{tr.blogTitle}</h3>
               <p>{tr.blogDesc}</p>
             </div>
-            <div className="col-lg-4 col-md-4 col-12">
-              <div className="blog-col1">
-                <img src="/assets/img/blog1.png" alt="image" />
-                <p><i className="fa fa-calendar"></i> {tr.blog1Date}</p>
-                <h5>{tr.blog1Title}</h5>
-                <a href="#"><button type="button" className="btn btn1">{tr.readMore}</button></a>
-              </div>
-            </div>
-            <div className="col-lg-4 col-md-4 col-12">
-              <div className="blog-col1">
-                <img src="/assets/img/blog2.png" alt="image" />
-                <p><i className="fa fa-calendar"></i> {tr.blog2Date}</p>
-                <h5>{tr.blog2Title}</h5>
-                <a href="#"><button type="button" className="btn btn1">{tr.readMore}</button></a>
-              </div>
-            </div>
-            <div className="col-lg-4 col-md-4 col-12">
-              <div className="blog-col1">
-                <img src="/assets/img/blog3.png" alt="image" />
-                <p><i className="fa fa-calendar"></i> {tr.blog3Date}</p>
-                <h5>{tr.blog3Title}</h5>
-                <a href="#"><button type="button" className="btn btn1">{tr.readMore}</button></a>
-              </div>
-            </div>
+
+            {blogs.length > 0 ? (
+              blogs.slice(0, 3).map((post) => (
+                <div key={post.id} className="col-lg-4 col-md-4 col-12">
+                  <div className="blog-col1">
+                    <img
+                      src={post.image ? `${BASE_URL}${post.image}` : '/assets/img/blog1.png'}
+                      alt={post.title}
+                      style={{ width: '100%', height: '220px', objectFit: 'cover' }}
+                    />
+                    <p>
+                      <i className="fa fa-calendar"></i>{' '}
+                      {new Date(post.created_at).toLocaleDateString(lang === 'de' ? 'de-AT' : 'en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    </p>
+                    <h5>{post.title}</h5>
+                    {post.excerpt && <p style={{ fontSize: '14px', color: '#666', marginBottom: '12px' }}>{post.excerpt}</p>}
+                    <Link href={`/blog/${post.slug}`}><button type="button" className="btn btn1">{tr.readMore}</button></Link>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="col-lg-4 col-md-4 col-12">
+                  <div className="blog-col1">
+                    <img src="/assets/img/blog1.png" alt="image" />
+                    <p><i className="fa fa-calendar"></i> {tr.blog1Date}</p>
+                    <h5>{tr.blog1Title}</h5>
+                    <a href="#"><button type="button" className="btn btn1">{tr.readMore}</button></a>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-md-4 col-12">
+                  <div className="blog-col1">
+                    <img src="/assets/img/blog2.png" alt="image" />
+                    <p><i className="fa fa-calendar"></i> {tr.blog2Date}</p>
+                    <h5>{tr.blog2Title}</h5>
+                    <a href="#"><button type="button" className="btn btn1">{tr.readMore}</button></a>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-md-4 col-12">
+                  <div className="blog-col1">
+                    <img src="/assets/img/blog3.png" alt="image" />
+                    <p><i className="fa fa-calendar"></i> {tr.blog3Date}</p>
+                    <h5>{tr.blog3Title}</h5>
+                    <a href="#"><button type="button" className="btn btn1">{tr.readMore}</button></a>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -209,9 +232,9 @@ export default function Home() {
               </div>
             </div>
             <div className="col-lg-3 col-md-3 col-12">
-              <a href="/kontakt">
+              <Link href="/kontakt">
                 <button type="button" className="btn btn1">{tr.ctaBtn}</button>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

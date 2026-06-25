@@ -1,6 +1,9 @@
 'use client'
 
 import { useRef } from 'react'
+import dynamic from 'next/dynamic'
+
+const QuillEditor = dynamic(() => import('@/app/components/admin/QuillEditor'), { ssr: false })
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
@@ -87,7 +90,7 @@ export default function PropertyForm({
             <label style={labelStyle}>Bathrooms</label>
             <input style={inputStyle} type="number" placeholder="e.g. 2" value={form.bathrooms} onChange={e => setForm({ ...form, bathrooms: e.target.value })} />
           </div>
-          <div className="col-lg-12">
+          <div className="col-lg-6">
             <label style={labelStyle}>Status</label>
             <select style={inputStyle} value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
               <option>Active</option>
@@ -95,9 +98,23 @@ export default function PropertyForm({
               <option>Sold</option>
             </select>
           </div>
+          <div className="col-lg-6">
+            <label style={labelStyle}>Property Type</label>
+            <select style={inputStyle} value={form.property_type || 'villa'} onChange={e => setForm({ ...form, property_type: e.target.value })}>
+              <option value="villa">Villa / House</option>
+              <option value="apartment">Apartment</option>
+              <option value="various">Various</option>
+            </select>
+          </div>
           <div className="col-lg-12">
             <label style={labelStyle}>Description</label>
-            <textarea style={{ ...inputStyle, height: '90px', resize: 'vertical' }} placeholder="Short description..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+            <div style={{ marginBottom: '16px' }}>
+              <QuillEditor
+                value={form.description}
+                onChange={val => setForm({ ...form, description: val })}
+                placeholder="Short description..."
+              />
+            </div>
           </div>
 
           {/* Banner Image */}
@@ -167,6 +184,39 @@ export default function PropertyForm({
               <input ref={galleryInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleGalleryPick} />
               <p style={{ color: '#64748b', fontSize: '12px', margin: '10px 0 0' }}>Click + to add images one by one — JPG, PNG, WEBP, max 5MB each</p>
             </div>
+          </div>
+
+          {/* Sales toggle */}
+          <div className="col-lg-12" style={{ marginBottom: '20px' }}>
+            {(() => {
+              const on = form.show_in_sales == 1 || form.show_in_sales === true
+              return (
+                <div
+                  onClick={() => setForm({ ...form, show_in_sales: !on })}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  <div style={{
+                    width: '44px', height: '24px', borderRadius: '12px', flexShrink: 0,
+                    background: on ? '#2563eb' : 'rgba(255,255,255,0.12)',
+                    border: `1px solid ${on ? '#2563eb' : 'rgba(255,255,255,0.25)'}`,
+                    position: 'relative', transition: 'background 0.2s, border-color 0.2s',
+                  }}>
+                    <div style={{
+                      position: 'absolute', top: '3px',
+                      left: on ? '22px' : '3px',
+                      width: '16px', height: '16px', borderRadius: '50%',
+                      background: '#fff',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
+                      transition: 'left 0.2s',
+                    }} />
+                  </div>
+                  <span style={{ color: '#cbd5e1', fontSize: '14px', fontWeight: '600' }}>
+                    Show in Sales Page
+                    <span style={{ color: '#64748b', fontWeight: '400', fontSize: '12px', marginLeft: '6px' }}>(Verkauf)</span>
+                  </span>
+                </div>
+              )
+            })()}
           </div>
 
           {/* Submit */}

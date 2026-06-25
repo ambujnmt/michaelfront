@@ -1301,7 +1301,7 @@ a.flip-col-btn:hover{
 }
  
     .p7-sec7 .slider-dots {
-      margin-top: 0px;
+      margin-top: 10px;
       display: flex;
       justify-content: center;
       gap: 7px;
@@ -1857,3 +1857,111 @@ a.flip-col-btn:hover{
 /* // Tablet tab */
 /* ==== // Responsive css here ==== */
 
+/* ── Inner Page Banner ──────────────────────────────────── */
+.inner-page-banner {
+    background-color: #fff;
+    padding: 40px 0 60px;
+}
+.inner-page-banner h1 {
+    color: #000;
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+.inner-page-banner p {
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 0;
+}
+
+/* ── Suchagent Page ──────────────────────────────────────── */
+.suchagent-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+    font-family: var(--pera-font);
+}
+.home-1-form select.form-control {
+    border: none;
+    border-radius: 0;
+    padding: 14px 0;
+    font-size: 15px;
+    background: transparent;
+    box-shadow: none;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.home-1-form select.form-control:focus {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+/* ── Impressum Page ──────────────────────────────────────── */
+.imp-card {
+    border: 1px solid #e8e8e8;
+    padding: 32px 28px;
+    height: 100%;
+}
+.imp-card-icon {
+    width: 46px;
+    height: 46px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 18px;
+}
+.imp-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+    color: #000;
+    font-family: var(--head-font);
+}
+.imp-card p {
+    font-size: 15px;
+    color: #444;
+    line-height: 26px;
+    margin-bottom: 4px;
+    font-family: var(--pera-font);
+}
+
+/* ── Contact Page ────────────────────────────────────────── */
+.kontakt-info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+.kontakt-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+}
+.kontakt-icon {
+    width: 46px;
+    height: 46px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.kontakt-info-item p {
+    font-size: 15px;
+    line-height: 24px;
+    color: #333;
+    margin-bottom: 0;
+    font-family: var(--pera-font);
+}

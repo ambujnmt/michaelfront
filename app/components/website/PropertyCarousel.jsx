@@ -1,11 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+
+// Maps property_type value → filter key
+const TYPE_FILTER = { villa: 'villa', apartment: 'apartment', various: 'various' }
 
 function OwlSlider({ tr, properties }) {
   useEffect(() => {
@@ -17,7 +21,7 @@ function OwlSlider({ tr, properties }) {
       const $el = jq('.home-carousel-1')
       if (!$el.length) return
       $el.owlCarousel({
-        loop: true,
+        loop: properties.length > 3,
         margin: 30,
         nav: false,
         dots: true,
@@ -37,6 +41,14 @@ function OwlSlider({ tr, properties }) {
     }
   }, [])
 
+  if (properties.length === 0) {
+    return (
+      <div className="container" style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
+        <p>No properties found in this category.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="container">
       <div className="row">
@@ -44,7 +56,7 @@ function OwlSlider({ tr, properties }) {
           <div className="owl-carousel home-carousel-1 m-b30">
             {properties.map((p) => (
               <div className="item villa-dtl-col2" key={p.id}>
-                <div className="masonry-item cat-filter-1">
+                <div className="masonry-item">
                   <div className="wt-box">
                     <img
                       src={p.image ? `${API}${p.image}` : '/assets/img/p7-villa1.png'}
@@ -57,9 +69,9 @@ function OwlSlider({ tr, properties }) {
                       <span>{tr.roomsLabel} {p.rooms}</span>
                       <span>{tr.bathsLabel} {p.bathrooms}</span>
                       <h6>€ {Number(p.price).toLocaleString()}</h6>
-                      <a href={`/property/${p.slug}`}>
+                      <Link href={`/immobilien/${p.slug}`}>
                         <button type="button" className="btn btn1">{tr.viewBtn}</button>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -76,6 +88,7 @@ export default function PropertyCarousel() {
   const { lang } = useLanguage()
   const tr = translations.home[lang]
   const [properties, setProperties] = useState([])
+  const [activeFilter, setActiveFilter] = useState('villa')
 
   useEffect(() => {
     websiteApi.getProperties().then(res => {
@@ -84,6 +97,14 @@ export default function PropertyCarousel() {
   }, [])
 
   if (properties.length === 0) return null
+
+  const filtered = properties.filter(p => (p.property_type || 'villa') === activeFilter)
+
+  const tabs = [
+    { key: 'villa',     label: tr.filter1 },
+    { key: 'apartment', label: tr.filter2 },
+    { key: 'various',   label: tr.filter3 },
+  ]
 
   return (
     <section className="p4-sec1 p7-sec3 p8-sec2">
@@ -98,15 +119,22 @@ export default function PropertyCarousel() {
         </div>
         <div className="filter-wrap p-a15 our-gallery filter-gallery2">
           <ul className="masonry-filter link-style text-uppercase center-block m-t0">
-            <li className="active"><a data-filter=".cat-filter-1" href="#" onClick={e => e.preventDefault()}>{tr.filter1}</a></li>
-            <li><a data-filter=".cat-filter-2" href="#" onClick={e => e.preventDefault()}>{tr.filter2}</a></li>
-            <li><a data-filter=".cat-filter-3" href="#" onClick={e => e.preventDefault()}>{tr.filter3}</a></li>
+            {tabs.map(tab => (
+              <li key={tab.key} className={activeFilter === tab.key ? 'active' : ''}>
+                <a
+                  href="#"
+                  onClick={e => { e.preventDefault(); setActiveFilter(tab.key) }}
+                >
+                  {tab.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
 
-      {/* key={lang} — language change par slider fresh remount hoga */}
-      <OwlSlider key={lang} tr={tr} properties={properties} />
+      {/* key forces owl carousel to remount when filter or language changes */}
+      <OwlSlider key={`${activeFilter}-${lang}`} tr={tr} properties={filtered} />
 
     </section>
   )

@@ -1,120 +1,230 @@
 'use client'
 
-import { useEffect, memo } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import Link from 'next/link'
+import websiteApi from '@/lib/websiteApi'
 
-const HeroSlider = memo(function HeroSlider() {
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7001'
+
+const DEFAULT_SLIDE = {
+  image: '/assets/img/p8-hero-bg.png',
+  title: null,
+  subtitle: null,
+  btn_text: null,
+  btn_link: null,
+}
+
+export default function HeroSlider() {
+  const [slides, setSlides] = useState([])
+  const [current, setCurrent] = useState(0)
+  const [loaded, setLoaded] = useState(false)
+  const timerRef = useRef(null)
+
   useEffect(() => {
-    let retryTimer = null
-    const tryInit = () => {
-      if (typeof window === 'undefined') return
-      const jq = window.jQuery
-      if (!jq || !jq.fn || !jq.fn.revolution) { retryTimer = setTimeout(tryInit, 500); return }
-      const $el = jq('#rev_slider_149_1')
-      if (!$el.length || $el.hasClass('revslider-initialised')) return
-      $el.show().revolution({
-        sliderType: 'standard',
-        jsFileLocation: '/assets/plugins/revolution/revolution/js/',
-        sliderLayout: 'fullscreen',
-        dottedOverlay: 'none',
-        delay: 9000,
-        navigation: {
-          keyboardNavigation: 'off', keyboard_direction: 'horizontal',
-          mouseScrollNavigation: 'off', mouseScrollReverse: 'default', onHoverStop: 'off',
-          touch: { touchenabled: 'on', swipe_threshold: 75, swipe_min_touches: 1, swipe_direction: 'horizontal', drag_block_vertical: false },
-          arrows: { enable: true, style: 'ares', hide_onmobile: false, hide_onleave: false,
-            left: { h_align: 'left', v_align: 'center', h_offset: 30, v_offset: 0 },
-            right: { h_align: 'right', v_align: 'center', h_offset: 30, v_offset: 0 } },
-          bullets: { enable: false },
-        },
-        responsiveLevels: [1240, 1024, 778, 480], visibilityLevels: [1240, 1024, 778, 480],
-        gridwidth: [1400, 1240, 778, 480], gridheight: [868, 768, 960, 720],
-        lazyType: 'none', shadow: 0, spinner: 'spinner2',
-        stopLoop: 'on', stopAfterLoops: 0, stopAtSlide: 1, shuffle: 'off',
-        autoHeight: 'off', fullScreenAutoWidth: 'off', fullScreenAlignForce: 'off',
-        fullScreenOffsetContainer: '.site-header', fullScreenOffset: '',
-        disableProgressBar: 'on', hideThumbsOnMobile: 'off',
-        hideSliderAtLimit: 0, hideCaptionAtLimit: 0, hideAllCaptionAtLilmit: 0,
-        debugMode: false,
-        fallbacks: { simplifyAll: 'off', nextSlideOnWindowFocus: 'off', disableFocusListener: false },
-      })
-    }
-    const timer = setTimeout(tryInit, 800)
-    return () => { clearTimeout(timer); clearTimeout(retryTimer) }
+    websiteApi.getSliders()
+      .then(d => { setSlides(d.success && d.data.length ? d.data : [DEFAULT_SLIDE]) })
+      .catch(() => { setSlides([DEFAULT_SLIDE]) })
+      .finally(() => setLoaded(true))
   }, [])
 
-  return (
-    <div id="rev_slider_149_1_wrapper" className="rev_slider_wrapper fullscreen-container"
-      data-alias="snowaddon1" data-source="gallery"
-      style={{ backgroundColor: '#2d3032', padding: '0px' }}>
-      <div id="rev_slider_149_1" className="rev_slider fullscreenbanner"
-        style={{ display: 'none' }} data-version="5.4.1">
-        <ul>
-          <li data-index="rs-407" data-transition="fade" data-slotamount="default"
-            data-hideafterloop="0" data-hideslideonmobile="off"
-            data-easein="default" data-easeout="default" data-masterspeed="2000"
-            data-thumb="images/main-slider/slider5/slide1.jpg" data-rotate="0"
-            data-fstransition="fade" data-fsmasterspeed="1000" data-fsslotamount="7"
-            data-saveperformance="off" data-title="One"
-            data-param1="" data-param2="" data-param3="" data-param4="" data-param5=""
-            data-param6="" data-param7="" data-param8="" data-param9="" data-param10=""
-            data-description="">
-            <img src="/assets/img/p8-hero-bg.png" alt="image"
-              data-bgposition="center center" data-kenburns="on" data-duration="20000"
-              data-ease="Linear.easeNone" data-scalestart="130" data-scaleend="100"
-              data-rotatestart="0" data-rotateend="0"
-              data-offsetstart="0 0" data-offsetend="0 0" data-bgparallax="6"
-              className="rev-slidebg" data-no-retina />
-            <div id="rrzm_407" className="rev_row_zone rev_row_zone_middle" style={{ zIndex: 6 }}>
-              <div className="tp-caption" id="slide-407-layer-14"
-                data-x="['left','left','left','left']" data-hoffset="['100','100','100','100']"
-                data-y="['middle','middle','middle','middle']" data-voffset="['0','0','0','0']"
-                data-width="none" data-height="none" data-whitespace="nowrap"
-                data-type="row" data-columnbreak="2" data-basealign="slide"
-                data-responsive_offset="on" data-responsive="off"
-                data-frames='[{"delay":10,"speed":300,"frame":"0","from":"opacity:0;","to":"o:1;","ease":"Power3.easeInOut"},{"delay":"wait","speed":300,"frame":"999","to":"opacity:0;","ease":"Power3.easeInOut"}]'
-                data-margintop="[0,0,0,0]" data-marginright="[0,0,0,0]"
-                data-marginbottom="[0,0,0,0]" data-marginleft="[0,0,0,0]"
-                data-textalign="['inherit','inherit','inherit','inherit']"
-                data-paddingtop="[0,0,0,0]" data-paddingright="[100,50,50,50]"
-                data-paddingbottom="[0,0,0,0]" data-paddingleft="[100,50,50,50]"
-                style={{ zIndex: 6, whiteSpace: 'nowrap', fontSize: '20px', lineHeight: '22px', fontWeight: '400', color: 'rgba(255,255,255,1.00)' }}>
-                <div className="tp-caption" id="slide-407-layer-15"
-                  data-x="['left','left','left','left']" data-hoffset="['100','100','100','100']"
-                  data-y="['top','top','top','top']" data-voffset="['100','100','100','100']"
-                  data-width="none" data-height="none" data-whitespace="nowrap"
-                  data-type="column" data-responsive_offset="on" data-responsive="off"
-                  data-frames='[{"delay":"+0","speed":300,"frame":"0","from":"opacity:0;","to":"o:1;","ease":"Power3.easeInOut"},{"delay":"wait","speed":300,"frame":"999","to":"opacity:0;","ease":"Power3.easeInOut"}]'
-                  data-columnwidth="100%"
-                  data-margintop="[0,0,0,0]" data-marginright="[0,0,0,0]"
-                  data-marginbottom="[0,0,0,0]" data-marginleft="[0,0,0,0]"
-                  data-textalign="['center','center','center','center']"
-                  data-paddingtop="[0,0,0,0]" data-paddingright="[0,0,0,0]"
-                  data-paddingbottom="[0,0,0,0]" data-paddingleft="[0,0,0,0]"
-                  style={{ zIndex: 7, width: '100%' }}>
-                  <div className="tp-caption tp-resizeme" id="slide-407-layer-1"
-                    data-x="['left','left','center','center']" data-hoffset="['0','0','0','0']"
-                    data-y="['top','top','top','top']" data-voffset="['0','0','230','110']"
-                    data-fontsize="['110','90','100','70']" data-lineheight="['100','90','100','70']"
-                    data-width="['none','none','697','399']" data-height="none"
-                    data-whitespace="['nowrap','nowrap','normal','normal']"
-                    data-type="text" data-basealign="slide" data-responsive_offset="on"
-                    data-frames='[{"delay":"+290","split":"chars","splitdelay":0.05,"speed":750,"frame":"0","from":"y:40px;sX:1.5;sY:1.5;opacity:0;fb:20px;","to":"o:1;fb:0;","ease":"Power4.easeOut"},{"delay":"wait","speed":1000,"frame":"999","to":"sX:1;sY:1;opacity:0;fb:10px;","ease":"Power4.easeOut"}]'
-                    data-margintop="[0,0,0,0]" data-marginright="[0,0,0,0]"
-                    data-marginbottom="[30,20,30,30]" data-marginleft="[0,0,0,0]"
-                    data-textalign="['inherit','inherit','center','center']"
-                    data-paddingtop="[0,0,0,0]" data-paddingright="[0,0,40,40]"
-                    data-paddingbottom="[0,0,0,0]" data-paddingleft="[0,0,40,40]"
-                    style={{ zIndex: 8, whiteSpace: 'nowrap', fontWeight: '200', color: '#fff', display: 'inline-block', fontFamily: 'var(--head-font)', letterSpacing: '-5px' }}
-                  />
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
-        <div className="tp-bannertimer" style={{ height: '10px', backgroundColor: 'rgba(255,255,255,0.25)' }}></div>
-      </div>
+  const next = useCallback(() => {
+    setCurrent(p => (p + 1) % slides.length)
+  }, [slides.length])
+
+  const prev = () => setCurrent(p => (p - 1 + slides.length) % slides.length)
+
+  useEffect(() => {
+    if (slides.length <= 1) return
+    timerRef.current = setInterval(next, 12000)
+    return () => clearInterval(timerRef.current)
+  }, [slides.length, next])
+
+  const goTo = (i) => {
+    clearInterval(timerRef.current)
+    setCurrent(i)
+    timerRef.current = setInterval(next, 12000)
+  }
+
+  if (!loaded) return (
+    <div style={{ width: '100%', height: '100vh', background: '#1a1a2e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.2)', borderTop: '3px solid #fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
-}, () => true)
 
-export default HeroSlider
+  const slide = slides[current]
+  const imgSrc = slide.image ? (slide.image.startsWith('/uploads') ? `${BASE_URL}${slide.image}` : slide.image) : DEFAULT_SLIDE.image
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#0f0f1a' }}>
+
+      <style>{`
+        @keyframes kenburns {
+          0%   { transform: scale(1.18) translateX(0px)   translateY(0px); }
+          100% { transform: scale(1.0)  translateX(-12px) translateY(-6px); }
+        }
+        .kb-active { animation: kenburns 12s ease-out forwards; }
+
+        @keyframes charIn {
+          from { opacity: 0; transform: translateY(40px) scale(1.4); filter: blur(8px); }
+          to   { opacity: 1; transform: translateY(0)    scale(1);   filter: blur(0); }
+        }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(22px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-char {
+          display: inline-block;
+          opacity: 0;
+          animation: charIn 0.65s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        .hero-sub {
+          opacity: 0;
+          animation: fadeSlideUp 0.6s ease forwards;
+        }
+        .hero-btn {
+          opacity: 0;
+          animation: fadeSlideUp 0.6s ease forwards;
+        }
+      `}</style>
+
+      {/* Slides */}
+      {slides.map((s, i) => {
+        const src = s.image ? (s.image.startsWith('/uploads') ? `${BASE_URL}${s.image}` : s.image) : DEFAULT_SLIDE.image
+        return (
+          <div key={i} style={{
+            position: 'absolute', inset: 0,
+            opacity: i === current ? 1 : 0,
+            transition: 'opacity 1.2s ease',
+            zIndex: i === current ? 1 : 0,
+            overflow: 'hidden',
+          }}>
+            <img
+              src={src}
+              alt={s.title || ''}
+              className={i === current ? 'kb-active' : ''}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transformOrigin: 'center center' }}
+            />
+          </div>
+        )
+      })}
+
+      {/* Overlay */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%)', zIndex: 2 }} />
+
+      {/* Content — centered */}
+      {(slide.title || slide.subtitle || slide.btn_text) && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 3,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          textAlign: 'center', padding: '0 20px',
+          paddingTop: '12vh',
+        }}>
+          <div key={current} style={{ maxWidth: '800px', width: '100%' }}>
+            {slide.title && (
+              <h1 style={{
+                color: '#fff', fontFamily: 'var(--head-font)',
+                fontSize: 'clamp(36px, 5.5vw, 80px)',
+                fontWeight: '200', lineHeight: '1.1',
+                letterSpacing: '-3px', marginBottom: '24px',
+                overflow: 'hidden',
+              }}>
+                {slide.title.split('').map((char, i) => (
+                  <span
+                    key={i}
+                    className="hero-char"
+                    style={{ animationDelay: `${0.3 + i * 0.045}s` }}
+                  >
+                    {char === ' ' ? ' ' : char}
+                  </span>
+                ))}
+              </h1>
+            )}
+            {slide.subtitle && (
+              <p
+                className="hero-sub"
+                style={{
+                  color: 'rgba(255,255,255,0.85)',
+                  fontSize: 'clamp(15px, 2vw, 20px)',
+                  fontFamily: 'var(--pera-font)',
+                  lineHeight: '1.6',
+                  maxWidth: '560px', margin: '0 auto 36px',
+                  animationDelay: `${0.3 + slide.title.length * 0.045 + 0.2}s`,
+                }}
+              >{slide.subtitle}</p>
+            )}
+            {slide.btn_text && (
+              <div
+                className="hero-btn"
+                style={{ animationDelay: `${0.3 + slide.title.length * 0.045 + 0.5}s` }}
+              >
+                <Link href={slide.btn_link || '#'}>
+                  <button className="btn btn1" style={{ fontSize: '14px', padding: '14px 34px', letterSpacing: '0.05em' }}>
+                    {slide.btn_text}
+                  </button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Arrows */}
+      {slides.length > 1 && (
+        <>
+          <button onClick={prev} style={{
+            position: 'absolute', left: '30px', top: '50%', transform: 'translateY(-50%)',
+            zIndex: 4, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)',
+            color: '#fff', width: '50px', height: '50px', borderRadius: '50%',
+            cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(4px)', transition: 'background 0.2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}>
+            <i className="fa fa-angle-left" />
+          </button>
+          <button onClick={next} style={{
+            position: 'absolute', right: '30px', top: '50%', transform: 'translateY(-50%)',
+            zIndex: 4, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)',
+            color: '#fff', width: '50px', height: '50px', borderRadius: '50%',
+            cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(4px)', transition: 'background 0.2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}>
+            <i className="fa fa-angle-right" />
+          </button>
+        </>
+      )}
+
+      {/* Dots */}
+      {slides.length > 1 && (
+        <div style={{
+          position: 'absolute', bottom: '32px', left: '50%', transform: 'translateX(-50%)',
+          zIndex: 4, display: 'flex', gap: '10px',
+        }}>
+          {slides.map((_, i) => (
+            <button key={i} onClick={() => goTo(i)} style={{
+              width: i === current ? '28px' : '10px', height: '10px',
+              borderRadius: '5px', border: 'none', cursor: 'pointer',
+              background: i === current ? '#fff' : 'rgba(255,255,255,0.4)',
+              transition: 'all 0.3s ease', padding: 0,
+            }} />
+          ))}
+        </div>
+      )}
+
+      {/* Progress bar */}
+      {slides.length > 1 && (
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px', background: 'rgba(255,255,255,0.15)', zIndex: 4 }}>
+          <div key={current} style={{
+            height: '100%', background: 'rgba(255,255,255,0.7)',
+            animation: 'progress 12s linear forwards',
+          }} />
+          <style>{`@keyframes progress { from{width:0%} to{width:100%} }`}</style>
+        </div>
+      )}
+
+    </div>
+  )
+}
