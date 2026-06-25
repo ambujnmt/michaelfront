@@ -52,7 +52,7 @@ export default function Subscribers() {
     <>
       {/* Toolbar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', gap: '12px', flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, maxWidth: '360px' }}>
+        <div style={{ position: 'relative', flex: 1 }}>
           <i className="fa fa-search" style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: '13px' }} />
           <input
             type="text"

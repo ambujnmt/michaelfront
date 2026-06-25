@@ -6,53 +6,57 @@ import { useLanguage } from '@/lib/LanguageContext'
 
 const PAGE_NAMES = {
   de: {
-    '/':                'Home',
-    '/about':           'Über uns',
-    '/property':        'Immobilien',
-    '/kontakt':         'Kontakt',
-    '/verkauf':         'Verkauf',
-    '/team':            'Team',
-    '/impressum':       'Impressum',
-    '/suchagent':       'Suchagent',
-    '/data-protection': 'Datenschutz',
-    '/policy':          'Datenschutzrichtlinie',
+    '/':                        'Home',
+    '/uber-uns':                'Über uns',
+    '/immobilien':              'Immobilien',
+    '/kontakt':                 'Kontakt',
+    '/verkauf':                 'Verkauf',
+    '/team':                    'Team',
+    '/impressum':               'Impressum',
+    '/suchagent':               'Suchagent',
+    '/datenschutz':             'Datenschutz',
+    '/datenschutzrichtlinie':   'Datenschutzrichtlinie',
+    '/immobilienanfrage':       'Immobilienanfrage',
   },
   en: {
-    '/':                'Home',
-    '/about':           'About Us',
-    '/property':        'Properties',
-    '/kontakt':         'Contact',
-    '/verkauf':         'Sales',
-    '/team':            'Team',
-    '/impressum':       'Legal Notice',
-    '/suchagent':       'Search Agent',
-    '/data-protection': 'Data Protection',
-    '/policy':          'Privacy Policy',
+    '/':                        'Home',
+    '/uber-uns':                'About Us',
+    '/immobilien':              'Properties',
+    '/kontakt':                 'Contact',
+    '/verkauf':                 'Sales',
+    '/team':                    'Team',
+    '/impressum':               'Legal Notice',
+    '/suchagent':               'Search Agent',
+    '/datenschutz':             'Data Protection',
+    '/datenschutzrichtlinie':   'Privacy Policy',
+    '/immobilienanfrage':       'Property Inquiry',
   },
 }
 
 const PAGE_ICONS = {
-  '/':                'fa-home',
-  '/about':           'fa-info-circle',
-  '/property':        'fa-building',
-  '/kontakt':         'fa-envelope',
-  '/verkauf':         'fa-tag',
-  '/team':            'fa-users',
-  '/impressum':       'fa-file-text',
-  '/suchagent':       'fa-search',
-  '/data-protection': 'fa-shield',
-  '/policy':          'fa-lock',
+  '/':                        'fa-home',
+  '/uber-uns':                'fa-info-circle',
+  '/immobilien':              'fa-building',
+  '/kontakt':                 'fa-envelope',
+  '/verkauf':                 'fa-tag',
+  '/team':                    'fa-users',
+  '/impressum':               'fa-file-text',
+  '/suchagent':               'fa-search',
+  '/datenschutz':             'fa-shield',
+  '/datenschutzrichtlinie':   'fa-lock',
+  '/immobilienanfrage':       'fa-pencil',
 }
 
 function getPageName(pathname, lang) {
   if (PAGE_NAMES[lang][pathname]) return PAGE_NAMES[lang][pathname]
-  if (pathname.startsWith('/property/')) return lang === 'de' ? 'Immobilien' : 'Properties'
+  if (pathname.startsWith('/immobilien/')) return lang === 'de' ? 'Immobilien' : 'Properties'
+  if (pathname.startsWith('/blog/')) return 'Blog Detail'
   return lang === 'de' ? 'Kontaktieren Sie uns' : 'Contact Us'
 }
 
 function getPageIcon(pathname) {
   if (PAGE_ICONS[pathname]) return PAGE_ICONS[pathname]
-  if (pathname.startsWith('/property/')) return 'fa-building'
+  if (pathname.startsWith('/immobilien/')) return 'fa-building'
   return 'fa-phone'
 }
 
@@ -88,22 +92,14 @@ export default function Header({ className = '' }) {
               <h5>
                 <span
                   onClick={() => setLang('de')}
-                  style={{
-                    cursor: 'pointer',
-                    fontWeight: lang === 'de' ? '900' : '400',
-                    textDecoration: lang === 'de' ? 'underline' : 'none',
-                  }}
+                  style={{ cursor: 'pointer', fontWeight: lang === 'de' ? '900' : '400', textDecoration: 'none' }}
                 >
                   DE
                 </span>
                 &nbsp; | &nbsp;
                 <span
                   onClick={() => setLang('en')}
-                  style={{
-                    cursor: 'pointer',
-                    fontWeight: lang === 'en' ? '900' : '400',
-                    textDecoration: lang === 'en' ? 'underline' : 'none',
-                  }}
+                  style={{ cursor: 'pointer', fontWeight: lang === 'en' ? '900' : '400', textDecoration: 'none' }}
                 >
                   EN
                 </span>
@@ -123,7 +119,7 @@ export default function Header({ className = '' }) {
               <ul className="nav navbar-nav">
 
                 <li>
-                  <Link href="/property">
+                  <Link href="/immobilien">
                     {lang === 'de' ? 'immobilien' : 'properties'}
                   </Link>
                 </li>
@@ -135,7 +131,7 @@ export default function Header({ className = '' }) {
                 </li>
 
                 <li>
-                  <Link href="/about">
+                  <Link href="/uber-uns">
                     {lang === 'de' ? 'unternehmen' : 'about'}
                   </Link>
                 </li>

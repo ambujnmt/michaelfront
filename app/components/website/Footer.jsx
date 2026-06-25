@@ -1,10 +1,37 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useLanguage } from '@/lib/LanguageContext'
+import { useSiteInfo } from '@/lib/SiteInfoContext'
+import translations from '@/lib/translations'
+
+const t = {
+  de: {
+    contactTitle: 'Kontaktieren Sie Uns',
+    col1: ['Über uns', 'Immobilien', 'Verkauf', 'Team'],
+    col2: ['Suchagent', 'Datenschutz', 'Impressum', 'Kontakt'],
+    copyright: '© MICHAELLEBER 2026. ALLE RECHTE VORBEHALTEN',
+  },
+  en: {
+    contactTitle: 'Contact Us',
+    col1: ['About Us', 'Properties', 'Sales', 'Team'],
+    col2: ['Search Agent', 'Data Protection', 'Imprint', 'Contact'],
+    copyright: '© MICHAELLEBER 2026. ALL RIGHTS RESERVED',
+  },
+}
 
 export default function Footer() {
+  const { lang } = useLanguage()
+  const { email, phone } = useSiteInfo()
+  const tr = t[lang]
+  const pathname = usePathname()
+  const isBlogDetail = pathname?.startsWith('/blog/')
+  const contactTitle = isBlogDetail ? translations.blogDetail[lang].pageTitle : tr.contactTitle
+
   return (
     <footer className="site-footer footer-dark">
 
-      {/* FOOTER BLOCKS */}
       <div className="footer-top overlay-wraper">
         <div className="overlay-main"></div>
 
@@ -23,17 +50,17 @@ export default function Footer() {
             {/* CONTACT */}
             <div className="col-lg-4 col-md-6 col-sm-6">
               <div className="widget widget_services">
-                <h4 className="widget-title">Kontaktieren Sie Uns</h4>
+                <h4 className="widget-title">{contactTitle}</h4>
                 <ul>
                   <li>
-                    <a href="mailto:office@michaelleber.at">
-                      <i className="fa fa-envelope"></i> office@michaelleber.at
+                    <a href={`mailto:${email}`}>
+                      <i className="fa fa-envelope"></i> {email}
                     </a>
                   </li>
                   <li>
-                    <a href="tel:+436645475915">
+                    <a href={`tel:${phone.replace(/\s/g, '')}`}>
                       <img src="/assets/img/phone.png" alt="image" className="foot-phone-img" />
-                      {' '}+43 664 547 5915
+                      {' '}{phone}
                     </a>
                   </li>
                 </ul>
@@ -52,10 +79,10 @@ export default function Footer() {
             <div className="col-lg-2 col-md-6 col-sm-6">
               <div className="widget widget_services foot-link-col2">
                 <ul>
-                  <li><Link href="/about">Um</Link></li>
-                  <li><Link href="/property">Eigentum</Link></li>
-                  <li><Link href="/verkauf">Verkauf</Link></li>
-                  <li><Link href="/team">Team</Link></li>
+                  <li><Link href="/uber-uns">{tr.col1[0]}</Link></li>
+                  <li><Link href="/immobilien">{tr.col1[1]}</Link></li>
+                  <li><Link href="/verkauf">{tr.col1[2]}</Link></li>
+                  <li><Link href="/team">{tr.col1[3]}</Link></li>
                 </ul>
               </div>
             </div>
@@ -64,10 +91,10 @@ export default function Footer() {
             <div className="col-lg-3 col-md-6">
               <div className="widget widget_services foot-link-col2">
                 <ul>
-                  <li><Link href="/suchagent">Suchagent</Link></li>
-                  <li><Link href="/data-protection">Data Protection</Link></li>
-                  <li><Link href="/impressum">Impressum</Link></li>
-                  <li><Link href="/kontakt">Kontakt</Link></li>
+                  <li><Link href="/suchagent">{tr.col2[0]}</Link></li>
+                  <li><Link href="/datenschutz">{tr.col2[1]}</Link></li>
+                  <li><Link href="/impressum">{tr.col2[2]}</Link></li>
+                  <li><Link href="/kontakt">{tr.col2[3]}</Link></li>
                 </ul>
               </div>
             </div>
@@ -75,21 +102,17 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* FOOTER COPYRIGHT */}
+        {/* COPYRIGHT */}
         <div className="footer-bottom overlay-wraper">
           <div className="overlay-main"></div>
           <div className="container">
             <div className="row">
               <div className="col-lg-2 col-md-3 col-12"></div>
               <div className="col-lg-7 col-md-12 col-12 text-center">
-                <span className="copyrights-text">
-                  © MICHAELLEBER 2026. ALLE RECHTE VORBEHALTEN
-                </span>
+                <span className="copyrights-text">{tr.copyright}</span>
               </div>
               <div className="col-lg-3 col-md-12 col-12">
-                <span className="copyrights-text copyrights-text2">
-                  Website By: Digital Flavers
-                </span>
+                <span className="copyrights-text copyrights-text2">Website By: Digital Flavers</span>
               </div>
             </div>
           </div>
@@ -97,7 +120,6 @@ export default function Footer() {
 
       </div>
 
-      {/* SCROLL TO TOP */}
       <button className="scroltop">
         <span className="iconmoon-house relative" id="btn-vibrate"></span>
         Top

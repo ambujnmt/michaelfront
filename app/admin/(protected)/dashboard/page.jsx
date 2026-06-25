@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import adminApi from '@/lib/adminApi'
 
 const statCards = (s) => [
@@ -56,7 +57,7 @@ export default function Dashboard() {
         <h3 style={{ color: '#f1f5f9', marginBottom: '20px', fontSize: '16px', fontWeight: '700' }}>Quick Links</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '14px' }}>
           {quickLinks.map((item) => (
-            <a key={item.label} href={item.path} style={{
+            <Link key={item.label} href={item.path} style={{
               display: 'flex', alignItems: 'center', gap: '14px',
               background: item.bg, borderRadius: '14px', padding: '20px',
               color: item.color, fontWeight: '600', fontSize: '14px',
@@ -74,7 +75,7 @@ export default function Dashboard() {
                 <i className={`fa ${item.icon}`} style={{ color: item.color, fontSize: '17px' }} />
               </div>
               {item.label}
-            </a>
+            </Link>
           ))}
         </div>
       </div>

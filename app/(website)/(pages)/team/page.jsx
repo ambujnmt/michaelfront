@@ -1,11 +1,13 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 
 const members = ['Michael Leber', 'Anna Müller', 'Thomas Bauer', 'Sophie Wagner']
 
 export default function Team() {
+  const router = useRouter()
   const { lang } = useLanguage()
   const tr = translations.team[lang]
 
@@ -13,7 +15,13 @@ export default function Team() {
     <>
       <section className="inner-page-banner head-sec">
         <div className="container">
-          <h1>{tr.bannerTitle}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <h1 style={{ margin: 0 }}>{tr.bannerTitle}</h1>
+            <button onClick={() => router.back()} className="btn btn1" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
+              <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
+              {lang === 'de' ? 'Zurück' : 'Back'}
+            </button>
+          </div>
           <p>{tr.bannerSub}</p>
         </div>
       </section>

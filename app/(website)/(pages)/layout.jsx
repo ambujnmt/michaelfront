@@ -1,3 +1,5 @@
+'use client'
+
 import Header from '../../components/website/Header'
 import Footer from '../../components/website/Footer'
 

@@ -20,7 +20,7 @@ export default function Newsletter() {
       if (res.success) {
         setStatus('success')
         setEmail('')
-      } else if (res.message === 'Email already subscribed') {
+      } else if (res.message && res.message.toLowerCase().includes('already')) {
         setStatus('duplicate')
       } else {
         setStatus('error')
@@ -30,6 +30,7 @@ export default function Newsletter() {
     } finally {
       setLoading(false)
     }
+    setTimeout(() => setStatus(null), 4000)
   }
 
   const labels = {
@@ -62,32 +63,33 @@ export default function Newsletter() {
           <div className="head-sec text-center">
             <h3>{t.title}</h3>
 
-            {status === 'success' ? (
-              <div style={{ color: '#34d399', fontWeight: '600', fontSize: '15px', marginTop: '12px' }}>
-                <i className="fa fa-check-circle" style={{ marginRight: '8px' }} />
-                {t.success}
-              </div>
-            ) : (
-              <form className="newsletter-input" onSubmit={handleSubmit}>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder={t.placeholder}
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                />
-                <button type="submit" className="btn news-btn" disabled={loading}>
-                  {loading ? t.sending : t.btn}
-                </button>
-              </form>
-            )}
+            <form className="newsletter-input" onSubmit={handleSubmit}>
+              <input
+                type="email"
+                className="form-control"
+                placeholder={t.placeholder}
+                value={email}
+                onChange={e => { setEmail(e.target.value); setStatus(null) }}
+                disabled={loading}
+                required
+              />
+              <button type="submit" className="btn news-btn" disabled={loading}>
+                {loading ? t.sending : t.btn}
+              </button>
+            </form>
 
-            {(status === 'error' || status === 'duplicate') && (
-              <p style={{ color: '#f87171', fontSize: '13px', marginTop: '10px' }}>
-                {status === 'duplicate' ? t.duplicate : t.error}
-              </p>
-            )}
+            {status && status !== 'loading' && (() => {
+              const cfg = {
+                success:   { icon: 'fa-check-circle',       color: '#16a34a', bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.4)',  msg: t.success },
+                duplicate: { icon: 'fa-exclamation-circle', color: '#b45309', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.4)', msg: t.duplicate },
+                error:     { icon: 'fa-times-circle',        color: '#dc2626', bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.4)',  msg: t.error },
+              }[status]
+              return cfg ? (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '14px', padding: '10px 18px', borderRadius: '8px', background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.color, fontSize: '13px', fontWeight: '600' }}>
+                  <i className={`fa ${cfg.icon}`} />{cfg.msg}
+                </div>
+              ) : null
+            })()}
           </div>
         </div>
       </div>

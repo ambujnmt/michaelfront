@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
+import { useSiteInfo } from '@/lib/SiteInfoContext'
 
 export default function HomeHeader() {
 
   const { lang, setLang } = useLanguage()
+  const { phone } = useSiteInfo()
 
   return (
     <header className="site-header header-style-1 mobile-sider-drawer-menu head-2">
@@ -18,7 +20,7 @@ export default function HomeHeader() {
           <div className="col-lg-4 col-md-4 top-col4-1 p8-head-col">
             <div className="top-col1">
               <img src="/assets/img/phone.png" alt="image" />
-              <h5>+43 664 547 5915</h5>
+              <h5><a href={`tel:${phone.replace(/\s/g, '')}`} style={{ textDecoration: 'none', color: 'inherit' }}>{phone}</a></h5>
             </div>
           </div>
 
@@ -37,14 +39,14 @@ export default function HomeHeader() {
               <h5>
                 <span
                   onClick={() => setLang('de')}
-                  style={{ cursor: 'pointer', fontWeight: lang === 'de' ? '900' : '400', textDecoration: lang === 'de' ? 'underline' : 'none' }}
+                  style={{ cursor: 'pointer', fontWeight: lang === 'de' ? '900' : '400', textDecoration: 'none' }}
                 >
                   DE
                 </span>
                 &nbsp; | &nbsp;
                 <span
                   onClick={() => setLang('en')}
-                  style={{ cursor: 'pointer', fontWeight: lang === 'en' ? '900' : '400', textDecoration: lang === 'en' ? 'underline' : 'none' }}
+                  style={{ cursor: 'pointer', fontWeight: lang === 'en' ? '900' : '400', textDecoration: 'none' }}
                 >
                   EN
                 </span>
