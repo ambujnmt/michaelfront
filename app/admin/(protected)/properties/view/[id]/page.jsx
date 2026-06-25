@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import adminApi from '@/lib/adminApi'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 
 const statusColor = { Active: '#34d399', Sold: '#94a3b8', Pending: '#fbbf24' }
 

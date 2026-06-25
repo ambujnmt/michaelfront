@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 
 const QuillEditor = dynamic(() => import('@/app/components/admin/QuillEditor'), { ssr: false })
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 
 const inputStyle = {
   width: '100%', padding: '12px 14px',

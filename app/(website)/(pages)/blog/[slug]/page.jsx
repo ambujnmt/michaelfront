@@ -7,7 +7,7 @@ import websiteApi from '@/lib/websiteApi'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7001'
+import { BASE_URL } from '@/service/config'
 
 export default function BlogDetail() {
   const { slug } = useParams()

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
 import websiteApi from '@/lib/websiteApi'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7001'
+import { BASE_URL } from '@/service/config'
 
 const FALLBACK = {
   de: [

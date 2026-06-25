@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import adminApi from '@/lib/adminApi'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 const statusColor = { New: '#60a5fa', Replied: '#34d399', Closed: '#94a3b8' }
 const thStyle = { padding: '14px 18px', color: '#94a3b8', fontWeight: '700', textAlign: 'left', fontSize: '12px', letterSpacing: '0.8px', textTransform: 'uppercase' }
 const tdStyle = (extra = {}) => ({ padding: '15px 18px', fontSize: '14px', color: '#cbd5e1', ...extra })

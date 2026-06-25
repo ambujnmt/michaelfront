@@ -12,7 +12,7 @@ import PropertyCarousel from '../components/website/PropertyCarousel'
 import TestimonialSection from '../components/website/TestimonialSection'
 import HomeFooter from '../components/website/HomeFooter'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7001'
+import { BASE_URL } from '@/service/config'
 
 export default function Home() {
   const { lang } = useLanguage()

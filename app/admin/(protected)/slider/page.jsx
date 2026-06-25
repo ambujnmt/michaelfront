@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import adminApi from '@/lib/adminApi'
 import Swal from 'sweetalert2'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7001'
+import { BASE_URL } from '@/service/config'
 
 const thStyle = { padding: '14px 18px', color: '#94a3b8', fontWeight: '700', textAlign: 'left', fontSize: '12px', letterSpacing: '0.8px', textTransform: 'uppercase' }
 const tdStyle = (extra = {}) => ({ padding: '15px 18px', fontSize: '14px', color: '#cbd5e1', ...extra })

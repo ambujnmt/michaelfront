@@ -6,7 +6,7 @@ import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import { API_URL as API } from '@/service/config'
 
 // Maps property_type value → filter key
 const TYPE_FILTER = { villa: 'villa', apartment: 'apartment', various: 'various' }

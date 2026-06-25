@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import websiteApi from '@/lib/websiteApi'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7001'
+import { BASE_URL } from '@/service/config'
 
 const DEFAULT_SLIDE = {
   image: '/assets/img/p8-hero-bg.png',
