@@ -12,6 +12,7 @@ const menuItems = [
   { label: 'Slider',       path: '/admin/slider',       icon: 'fa-picture-o' },
   { label: 'Testimonials', path: '/admin/testimonials', icon: 'fa-star' },
   { label: 'Blog',         path: '/admin/blog',         icon: 'fa-pencil-square-o' },
+  { label: 'Team',         path: '/admin/team',         icon: 'fa-users' },
   { label: 'Subscribers',  path: '/admin/subscribers',  icon: 'fa-bell' },
   { label: 'Settings',     path: '/admin/settings',     icon: 'fa-cog' },
 ]
