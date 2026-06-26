@@ -8707,6 +8707,12 @@ header .logo{
 	transform-style: inherit;
 }
 
+.home-carousel-1.owl-carousel .owl-item img,
+.home-carousel-1 .owl-item img {
+	display: unset;
+	width: unset;
+}
+
 /*-------------------------------------
     1.11 owl slider button
 -------------------------------------*/

@@ -1857,10 +1857,26 @@ a.flip-col-btn:hover{
 /* // Tablet tab */
 /* ==== // Responsive css here ==== */
 
+/* ── Mobile Header Sticky ── */
+@media (max-width: 991px) {
+  .site-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+    width: 100%;
+  }
+  .vdo-header {
+    position: fixed !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+    width: 100%;
+  }
+}
+
 /* ── Inner Page Banner ──────────────────────────────────── */
 .inner-page-banner {
     background-color: #fff;
-    padding: 40px 0 60px;
+    padding: 15px 0 30px;
 }
 .inner-page-banner h1 {
     color: #000;

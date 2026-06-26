@@ -89,6 +89,60 @@ export default function PropertyDetail() {
 
   useEffect(() => {
     if (loading || !property) return
+    let retryTimer = null
+    const tryInit = () => {
+      const jq = window.jQuery
+      if (!jq || !jq.fn || !jq.fn.owlCarousel) { retryTimer = setTimeout(tryInit, 300); return }
+      const $el = jq('.hero-detail-slider')
+      if (!$el.length) { retryTimer = setTimeout(tryInit, 300); return }
+      if ($el.hasClass('owl-loaded')) $el.trigger('destroy.owl.carousel').removeClass('owl-loaded owl-drag')
+      const slides = [heroImg, ...gallery.map(g => `${API}${g.image}`)]
+      $el.owlCarousel({
+        loop: slides.length > 1,
+        items: 1,
+        nav: true,
+        navText: ['<i class="fa fa-chevron-left" style="color:#fff"></i>', '<i class="fa fa-chevron-right" style="color:#fff"></i>'],
+        dots: false,
+        autoplay: slides.length > 1,
+        autoplayTimeout: 4000,
+        autoplaySpeed: 800,
+        autoplayHoverPause: true,
+        mouseDrag: true,
+        touchDrag: true,
+      })
+    }
+    const heroTimer = setTimeout(tryInit, 500)
+    return () => { clearTimeout(heroTimer); clearTimeout(retryTimer) }
+  }, [loading, property, gallery])
+
+  useEffect(() => {
+    if (loading || !property) return
+    const floorTimer = setTimeout(() => {
+      const jq = window.jQuery
+      if (!jq || !jq.fn || !jq.fn.owlCarousel) return
+      const $el = jq('.floor-plan-slider')
+      if (!$el.length) return
+      if ($el.hasClass('owl-loaded')) $el.trigger('destroy.owl.carousel').removeClass('owl-loaded owl-drag')
+      $el.owlCarousel({
+        loop: gallery.length > 3,
+        margin: 16,
+        nav: true,
+        dots: true,
+        autoplay: false,
+        mouseDrag: true,
+        touchDrag: true,
+        responsive: {
+          0:   { items: 1 },
+          768: { items: 2 },
+          1200:{ items: 3 },
+        },
+      })
+    }, 500)
+    return () => clearTimeout(floorTimer)
+  }, [loading, property, gallery])
+
+  useEffect(() => {
+    if (loading || !property) return
     const timer = setTimeout(() => {
       const jq = window.jQuery
       if (!jq) return
@@ -195,19 +249,36 @@ export default function PropertyDetail() {
         </header>
 
         <style>{`
-          @keyframes kenBurns { from { transform: scale(1.3); } to { transform: scale(1.0); } }
-          @keyframes timerBar { from { width: 0%; } to { width: 100%; } }
-          .hero-kenburns { width: 100%; height: 100%; object-fit: cover; display: block; animation: kenBurns 20s linear forwards; transform-origin: center center; }
-          .tp-bannertimer { position: absolute; bottom: 0; left: 0; height: 10px; background: rgba(255,255,255,0.25); z-index: 10; animation: timerBar 20s linear forwards; }
+          .hero-slider-wrap { width: 100%; height: 100vh; position: relative; overflow: hidden; background: #2d3032; }
+          .hero-slider-wrap .owl-carousel,
+          .hero-slider-wrap .owl-stage-outer,
+          .hero-slider-wrap .owl-stage,
+          .hero-slider-wrap .owl-item,
+          .hero-slider-wrap .item { height: 100vh; }
+          .hero-slider-wrap .item img { width: 100%; height: 100vh; object-fit: cover; display: block; }
+          .hero-slider-wrap .owl-dots { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; }
+          .hero-slider-wrap .owl-dot span { background: rgba(255,255,255,0.5) !important; }
+          .hero-slider-wrap .owl-dot.active span { background: #fff !important; }
+          .hero-slider-wrap .owl-nav,
+          .hero-slider-wrap .owl-nav.disabled { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display: flex !important; justify-content: space-between; padding: 0 24px; box-sizing: border-box; z-index: 20; pointer-events: none; }
+          .hero-slider-wrap .owl-nav button { pointer-events: all; background: rgba(255,255,255,0.15) !important; color: #fff !important; width: 50px; height: 50px; border-radius: 50% !important; font-size: 18px !important; border: 2px solid rgba(255,255,255,0.5) !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.2s !important; backdrop-filter: blur(4px); }
+          .hero-slider-wrap .owl-nav button:hover { background: rgba(255,255,255,0.4) !important; border-color: #fff !important; }
+          .hero-slider-wrap .owl-nav button i { color: #fff !important; }
+          .hero-slider-wrap .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); pointer-events: none; z-index: 5; }
         `}</style>
-        <div style={{ width: '100%', height: '100vh', position: 'relative', overflow: 'hidden', background: '#2d3032' }}>
+        <div className="hero-slider-wrap">
           {property && (
             <>
-              <img key={heroImg} src={heroImg} alt={property.title} className="hero-kenburns" />
-              <div className="tp-bannertimer" />
+              <div className="owl-carousel owl-theme hero-detail-slider">
+                {[heroImg, ...gallery.map(g => `${API}${g.image}`)].map((src, i) => (
+                  <div className="item" key={i}>
+                    <img src={src} alt={property.title} />
+                  </div>
+                ))}
+              </div>
+              <div className="overlay" />
             </>
           )}
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }} />
         </div>
       </div>
 
@@ -290,28 +361,24 @@ export default function PropertyDetail() {
               <div className="row">
                 <div className="col-lg-12 col-md-12 head-sec text-center"><h3>{tr.floorPlanTitle}</h3></div>
               </div>
-              {gallery.length > 0 && (
-                <div className="filter-wrap p-a15 our-gallery m-tb30">
-                  <ul className="masonry-filter link-style text-uppercase center-block m-t0">
-                    <li className="active"><a data-filter=".cat-filter-1" href="#" onClick={e => e.preventDefault()}>{tr.floor1}</a></li>
-                    <li><a data-filter=".cat-filter-2" href="#" onClick={e => e.preventDefault()}>{tr.floor2}</a></li>
-                  </ul>
-                </div>
-              )}
-            </div>
-            <div className="portfolio-wrap mfp-gallery no-col-gap clearfix">
-              <div className="container-fluid">
-                <div className="row">
-                  {gallery.length > 0 ? gallery.map((img, i) => (
-                    <div key={img.id} className={`masonry-item ${i % 2 === 0 ? 'cat-filter-1' : 'cat-filter-2'} col-xl-8 col-lg-8 col-md-8 col-12 mx-auto`}>
-                      <div className="wt-box"><div className="wt-thum-bx"><img src={`${API}${img.image}`} alt="gallery" /></div></div>
+              <div className="owl-carousel owl-theme floor-plan-slider mt-4">
+                {gallery.length > 0 ? gallery.map((img) => (
+                  <div className="item" key={img.id}>
+                    <div className="wt-box">
+                      <div className="wt-thum-bx">
+                        <img src={`${API}${img.image}`} alt="gallery" style={{ borderRadius: '6px' }} />
+                      </div>
                     </div>
-                  )) : (
-                    <div className="masonry-item cat-filter-1 col-xl-8 col-lg-8 col-md-8 col-12 mx-auto">
-                      <div className="wt-box"><div className="wt-thum-bx"><img src={heroImg} alt={property.title} /></div></div>
+                  </div>
+                )) : (
+                  <div className="item">
+                    <div className="wt-box">
+                      <div className="wt-thum-bx">
+                        <img src={heroImg} alt={property.title} style={{ borderRadius: '6px' }} />
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

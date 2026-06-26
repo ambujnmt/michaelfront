@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -65,9 +66,47 @@ export default function Header({ className = '' }) {
   const pathname = usePathname()
   const pageName = getPageName(pathname, lang)
   const pageIcon = getPageIcon(pathname)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <header className={`site-header header-style-1 mobile-sider-drawer-menu ${className}`}>
+    <header className={`site-header header-style-1 mobile-sider-drawer-menu ${className}`}
+      style={{ background: scrolled ? '#000' : undefined, transition: 'background 0.3s ease' }}>
+      <style>{`
+        .hh-dropdown { position: relative; }
+        .hh-dropdown .hh-sub {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: #1a1212;
+          min-width: 160px;
+          border-radius: 6px;
+          padding: 6px 0;
+          z-index: 9999;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+          list-style: none;
+          margin: 0;
+        }
+        .hh-dropdown:hover .hh-sub { display: block; }
+        .hh-sub li a {
+          display: block;
+          padding: 10px 18px;
+          color: #ccc !important;
+          font-size: 13px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          text-decoration: none;
+          white-space: nowrap;
+          transition: color 0.2s;
+        }
+        .hh-sub li a:hover { color: #fff !important; }
+      `}</style>
 
       <div className="container">
         <div className="row align-items-center">
@@ -130,10 +169,14 @@ export default function Header({ className = '' }) {
                   </Link>
                 </li>
 
-                <li>
-                  <Link href="/uber-uns">
-                    {lang === 'de' ? 'unternehmen' : 'about'}
-                  </Link>
+                <li className="hh-dropdown">
+                  <a href="#">
+                    {lang === 'de' ? 'unternehmen' : 'company'} <i className="fa fa-chevron-down"></i>
+                  </a>
+                  <ul className="hh-sub">
+                    <li><Link href="/uber-uns">{lang === 'de' ? 'Über Uns' : 'About Us'}</Link></li>
+                    <li><Link href="/team">{lang === 'de' ? 'Unser Team' : 'Our Team'}</Link></li>
+                  </ul>
                 </li>
 
                 <li>
