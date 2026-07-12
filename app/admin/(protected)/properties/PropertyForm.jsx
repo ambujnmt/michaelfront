@@ -62,11 +62,11 @@ export default function PropertyForm({
         <div className="row">
 
           {/* Text Fields */}
-          <div className="col-lg-6">
+          <div className="col-lg-12">
             <label style={labelStyle}>Title *</label>
             <input style={inputStyle} placeholder="e.g. Luxury Villa Wien" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
           </div>
-          <div className="col-lg-6">
+          <div className="col-lg-12">
             <label style={labelStyle}>Location *</label>
             <input style={inputStyle} placeholder="e.g. 1010 Vienna" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} required />
           </div>
@@ -74,36 +74,81 @@ export default function PropertyForm({
             <label style={labelStyle}>Price (€) *</label>
             <input style={inputStyle} placeholder="e.g. 1200000" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required />
           </div>
-          <div className="col-lg-4">
-            <label style={labelStyle}>Size (m²)</label>
-            <input style={inputStyle} type="number" placeholder="e.g. 150" value={form.size} onChange={e => setForm({ ...form, size: e.target.value })} />
+          <div className="col-lg-8">
+            <label style={labelStyle}>Property Type</label>
+            <select style={inputStyle} value={form.property_type || 'villa'} onChange={e => {
+              const property_type = e.target.value
+              // Land Area applies to House & Land/Plot. Living Area / Rooms / Bedrooms /
+              // Bathrooms / Outdoor Area don't apply to a bare Land/Plot listing.
+              const patch = { property_type }
+              if (property_type !== 'villa' && property_type !== 'various') patch.plot_size = ''
+              if (property_type === 'various') {
+                patch.size = ''
+                patch.rooms = ''
+                patch.bedrooms = ''
+                patch.bathrooms = ''
+                patch.outdoor_area = ''
+              }
+              setForm({ ...form, ...patch })
+            }}>
+              <option value="villa">Villa / House</option>
+              <option value="apartment">Apartment</option>
+              <option value="various">Land/Plot</option>
+            </select>
           </div>
-          <div className="col-lg-4">
-            <label style={labelStyle}>Rooms</label>
-            <input style={inputStyle} type="number" placeholder="e.g. 4" value={form.rooms} onChange={e => setForm({ ...form, rooms: e.target.value })} />
-          </div>
-          <div className="col-lg-6">
-            <label style={labelStyle}>Bedrooms</label>
-            <input style={inputStyle} type="number" placeholder="e.g. 3" value={form.bedrooms} onChange={e => setForm({ ...form, bedrooms: e.target.value })} />
-          </div>
-          <div className="col-lg-6">
-            <label style={labelStyle}>Bathrooms</label>
-            <input style={inputStyle} type="number" placeholder="e.g. 2" value={form.bathrooms} onChange={e => setForm({ ...form, bathrooms: e.target.value })} />
-          </div>
-          <div className="col-lg-6">
+
+          {(() => {
+            const type = form.property_type || 'villa'
+            const isLand = type === 'various'
+            const isHouse = type === 'villa'
+
+            if (isLand) {
+              return (
+                <div className="col-lg-4">
+                  <label style={labelStyle}>Land Area (m²)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 800" value={form.plot_size || ''} onChange={e => setForm({ ...form, plot_size: e.target.value })} />
+                </div>
+              )
+            }
+
+            return (
+              <>
+                <div className="col-lg-4">
+                  <label style={labelStyle}>Living Area (m²)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 150" value={form.size} onChange={e => setForm({ ...form, size: e.target.value })} />
+                </div>
+                {isHouse && (
+                  <div className="col-lg-4">
+                    <label style={labelStyle}>Land Area (m²)</label>
+                    <input style={inputStyle} type="number" placeholder="e.g. 400" value={form.plot_size || ''} onChange={e => setForm({ ...form, plot_size: e.target.value })} />
+                  </div>
+                )}
+                <div className="col-lg-4">
+                  <label style={labelStyle}>Outdoor Area (m²)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 25" value={form.outdoor_area || ''} onChange={e => setForm({ ...form, outdoor_area: e.target.value })} />
+                </div>
+                <div className="col-lg-4">
+                  <label style={labelStyle}>Rooms</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 4" value={form.rooms} onChange={e => setForm({ ...form, rooms: e.target.value })} />
+                </div>
+                <div className="col-lg-4">
+                  <label style={labelStyle}>Bedrooms</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 3" value={form.bedrooms} onChange={e => setForm({ ...form, bedrooms: e.target.value })} />
+                </div>
+                <div className="col-lg-4">
+                  <label style={labelStyle}>Bathrooms</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 2" value={form.bathrooms} onChange={e => setForm({ ...form, bathrooms: e.target.value })} />
+                </div>
+              </>
+            )
+          })()}
+
+          <div className="col-lg-8">
             <label style={labelStyle}>Status</label>
             <select style={inputStyle} value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
               <option>Active</option>
               <option>Pending</option>
               <option>Sold</option>
-            </select>
-          </div>
-          <div className="col-lg-6">
-            <label style={labelStyle}>Property Type</label>
-            <select style={inputStyle} value={form.property_type || 'villa'} onChange={e => setForm({ ...form, property_type: e.target.value })}>
-              <option value="villa">Villa / House</option>
-              <option value="apartment">Apartment</option>
-              <option value="various">Various</option>
             </select>
           </div>
           <div className="col-lg-12">

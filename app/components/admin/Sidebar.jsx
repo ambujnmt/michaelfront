@@ -9,6 +9,7 @@ const menuItems = [
   { label: 'Properties',   path: '/admin/properties',   icon: 'fa-building' },
   { label: 'Inquiries',    path: '/admin/inquiries',    icon: 'fa-envelope' },
   { label: 'Contacts',     path: '/admin/contacts',     icon: 'fa-comment' },
+  { label: 'Search Agent', path: '/admin/suchagent',    icon: 'fa-search' },
   { label: 'Slider',       path: '/admin/slider',       icon: 'fa-picture-o' },
   { label: 'Testimonials', path: '/admin/testimonials', icon: 'fa-star' },
   { label: 'Blog',         path: '/admin/blog',         icon: 'fa-pencil-square-o' },

@@ -6,7 +6,7 @@ import adminApi from '@/lib/adminApi'
 import PropertyForm from '../PropertyForm'
 import Swal from 'sweetalert2'
 
-const emptyForm = { title: '', location: '', price: '', size: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false }
+const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false }
 
 export default function CreateProperty() {
   const router = useRouter()

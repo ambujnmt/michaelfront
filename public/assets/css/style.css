@@ -2447,7 +2447,8 @@ ol.list-num-count.list-outline-none > li:before {
 .masonry-filter.link-style > li a {
 	font-size: 18px;
     color: #000;
-    font-family: var(--pera-font);
+    /* font-family: var(--pera-font); */
+	font-family: var(--head-font);
     letter-spacing: 0%;
 }
 
@@ -2455,7 +2456,8 @@ ol.list-num-count.list-outline-none > li:before {
 	color: #000 !important;
 	font-weight: 700;
 	position:relative;
-	font-family: var(--pera-font);
+	/* font-family: var(--pera-font); */
+	font-family: var(--head-font);
 }
 
 .masonry-filter.link-style > .active a:after {
@@ -7304,6 +7306,7 @@ ol.comment-list li.comment .comment-respond .comment-form p {
     padding: 17px 12px;
     cursor: pointer;
     letter-spacing: 12%;
+	font-family: var(--head-font);
 }
 
 .header-nav .nav > li > a:hover {
@@ -9154,6 +9157,7 @@ header .logo{
 	font-size: 16px;
     line-height: 40px;
     letter-spacing: 5%;
+	font-family: var(--head-font);
 }
 
 .footer-dark .footer-top a:active,

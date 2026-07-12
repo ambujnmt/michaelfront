@@ -26,7 +26,7 @@ export default function EditProperty() {
         const p = propRes.data
         setForm({
           title: p.title, location: p.location, price: p.price,
-          size: p.size, rooms: p.rooms, bedrooms: p.bedrooms || 0,
+          size: p.size, plot_size:p.plot_size, outdoor_area:p.outdoor_area, rooms: p.rooms, bedrooms: p.bedrooms || 0,
           bathrooms: p.bathrooms || 0, status: p.status,
           property_type: p.property_type || 'villa',
           description: p.description || '', image: p.image || '',

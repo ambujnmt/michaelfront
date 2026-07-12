@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import adminApi from '@/lib/adminApi'
+import { API_URL as API } from '@/service/config'
 
 const inputStyle = {
   width: '100%', padding: '12px 14px',
@@ -30,20 +31,66 @@ export default function Settings() {
   const [siteMsg,    setSiteMsg]    = useState('')
   const [loading3,   setLoading3]   = useState(false)
 
+  const [newsletterFile,    setNewsletterFile]    = useState(null)
+  const [newsletterSaved,   setNewsletterSaved]   = useState('')   // image actually saved on the server
+  const [newsletterPreview, setNewsletterPreview] = useState('')   // local preview of a newly picked file (not saved yet)
+  const [newsletterMsg,     setNewsletterMsg]      = useState('')
+  const [loading4,          setLoading4]           = useState(false)
+
+  const [socialLinks, setSocialLinks] = useState({ facebook: '', instagram: '', linkedin: '', youtube: '', twitter: '' })
+  const [socialMsg,   setSocialMsg]   = useState('')
+  const [loading5,    setLoading5]    = useState(false)
+
   useEffect(() => {
     const data = localStorage.getItem('adminData')
     if (data) setProfile(JSON.parse(data))
     adminApi.getSiteSettings().then(res => {
-      if (res.success && res.data) setSiteInfo(prev => ({
-        ...prev,
-        site_name:     res.data.site_name     ?? '',
-        email:         res.data.email         ?? '',
-        phone:         res.data.phone         ?? '',
-        address:       res.data.address       ?? '',
-        opening_hours: res.data.opening_hours ?? '',
-      }))
+      if (res.success && res.data) {
+        setSiteInfo(prev => ({
+          ...prev,
+          site_name:     res.data.site_name     ?? '',
+          email:         res.data.email         ?? '',
+          phone:         res.data.phone         ?? '',
+          address:       res.data.address       ?? '',
+          opening_hours: res.data.opening_hours ?? '',
+        }))
+        if (res.data.newsletter_bg) setNewsletterSaved(res.data.newsletter_bg)
+        setSocialLinks(prev => ({
+          ...prev,
+          facebook:  res.data.facebook  ?? '',
+          instagram: res.data.instagram ?? '',
+          linkedin:  res.data.linkedin  ?? '',
+          youtube:   res.data.youtube   ?? '',
+          twitter:   res.data.twitter   ?? '',
+        }))
+      }
     })
   }, [])
+
+  const handleNewsletterFileChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setNewsletterFile(file)
+    setNewsletterPreview(URL.createObjectURL(file))
+    setNewsletterMsg('')
+  }
+
+  const saveNewsletterBg = async (e) => {
+    e.preventDefault()
+    if (!newsletterFile) { setNewsletterMsg('Please choose an image first'); setTimeout(() => setNewsletterMsg(''), 3000); return }
+    setLoading4(true)
+    const formData = new FormData()
+    formData.append('newsletter_bg', newsletterFile)
+    const res = await adminApi.updateNewsletterBackground(formData)
+    setNewsletterMsg(res.message)
+    if (res.success && res.data?.newsletter_bg) {
+      setNewsletterSaved(res.data.newsletter_bg)  // now this is the confirmed saved image
+      setNewsletterFile(null)
+      setNewsletterPreview('')
+    }
+    setLoading4(false)
+    setTimeout(() => setNewsletterMsg(''), 3000)
+  }
 
   const saveProfile = async (e) => {
     e.preventDefault()
@@ -73,6 +120,15 @@ export default function Settings() {
     if (data.success) setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' })
     setLoading2(false)
     setTimeout(() => setPassMsg(''), 3000)
+  }
+
+  const saveSocialLinks = async (e) => {
+    e.preventDefault()
+    setLoading5(true)
+    const res = await adminApi.updateSocialLinks(socialLinks)
+    setSocialMsg(res.message)
+    setLoading5(false)
+    setTimeout(() => setSocialMsg(''), 3000)
   }
 
   return (
@@ -222,6 +278,160 @@ export default function Settings() {
             }}>
               {loading3 ? 'Saving...' : 'Save Website Info'}
             </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Social Media Links */}
+      <div className="col-12">
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
+            <div style={{
+              width: '44px', height: '44px', borderRadius: '12px',
+              background: 'linear-gradient(135deg,#ec4899,#9d174d)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(236,72,153,0.5)',
+            }}>
+              <i className="fa fa-share-alt" style={{ color: '#fff', fontSize: '16px' }} />
+            </div>
+            <div>
+              <h4 style={{ color: '#f1f5f9', margin: 0, fontSize: '16px', fontWeight: '700' }}>Social Media Links</h4>
+              <p style={{ color: '#94a3b8', margin: 0, fontSize: '13px' }}>Shown as icons in the website footer / header</p>
+            </div>
+          </div>
+          <form onSubmit={saveSocialLinks}>
+            <div className="row">
+              <div className="col-md-6">
+                <label style={labelStyle}><i className="fa fa-facebook" style={{ marginRight: '8px', color: '#1877f2' }} />Facebook</label>
+                <input style={inputStyle} placeholder="https://facebook.com/yourpage"
+                  value={socialLinks.facebook} onChange={e => setSocialLinks({ ...socialLinks, facebook: e.target.value })} />
+              </div>
+              <div className="col-md-6">
+                <label style={labelStyle}><i className="fa fa-instagram" style={{ marginRight: '8px', color: '#e1306c' }} />Instagram</label>
+                <input style={inputStyle} placeholder="https://instagram.com/yourpage"
+                  value={socialLinks.instagram} onChange={e => setSocialLinks({ ...socialLinks, instagram: e.target.value })} />
+              </div>
+              <div className="col-md-6">
+                <label style={labelStyle}><i className="fa fa-linkedin" style={{ marginRight: '8px', color: '#0a66c2' }} />LinkedIn</label>
+                <input style={inputStyle} placeholder="https://linkedin.com/company/yourpage"
+                  value={socialLinks.linkedin} onChange={e => setSocialLinks({ ...socialLinks, linkedin: e.target.value })} />
+              </div>
+              <div className="col-md-6">
+                <label style={labelStyle}><i className="fa fa-youtube-play" style={{ marginRight: '8px', color: '#ff0000' }} />YouTube</label>
+                <input style={inputStyle} placeholder="https://youtube.com/@yourchannel"
+                  value={socialLinks.youtube} onChange={e => setSocialLinks({ ...socialLinks, youtube: e.target.value })} />
+              </div>
+              <div className="col-md-6">
+                <label style={labelStyle}><i className="fa fa-twitter" style={{ marginRight: '8px', color: '#1da1f2' }} />Twitter / X</label>
+                <input style={inputStyle} placeholder="https://x.com/yourpage"
+                  value={socialLinks.twitter} onChange={e => setSocialLinks({ ...socialLinks, twitter: e.target.value })} />
+              </div>
+            </div>
+            {socialMsg && (
+              <p style={{ color: '#34d399', fontSize: '13px', marginBottom: '14px', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', padding: '10px 14px', borderRadius: '8px' }}>
+                <i className="fa fa-check" style={{ marginRight: '8px' }} />{socialMsg}
+              </p>
+            )}
+            <button type="submit" disabled={loading5} style={{
+              background: 'rgba(236,72,153,0.15)', color: '#f472b6',
+              border: '1px solid rgba(236,72,153,0.4)',
+              padding: '12px 26px', borderRadius: '12px', fontWeight: '700',
+              fontSize: '14px', cursor: 'pointer', opacity: loading5 ? 0.7 : 1,
+            }}>
+              {loading5 ? 'Saving...' : 'Save Social Links'}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Newsletter Background Image */}
+      <div className="col-12">
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
+            <div style={{
+              width: '44px', height: '44px', borderRadius: '12px',
+              background: 'linear-gradient(135deg,#8b5cf6,#5b21b6)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(139,92,246,0.5)',
+            }}>
+              <i className="fa fa-picture-o" style={{ color: '#fff', fontSize: '16px' }} />
+            </div>
+            <div>
+              <h4 style={{ color: '#f1f5f9', margin: 0, fontSize: '16px', fontWeight: '700' }}>Newsletter Background</h4>
+              <p style={{ color: '#94a3b8', margin: 0, fontSize: '13px' }}>Upload the background image shown behind the newsletter section</p>
+            </div>
+          </div>
+
+          <form onSubmit={saveNewsletterBg}>
+            <div className="row align-items-start">
+
+              <div className="col-md-6">
+                <label style={labelStyle}>Background Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={inputStyle}
+                  onChange={handleNewsletterFileChange}
+                />
+                <p style={{ color: '#64748b', fontSize: '12px', marginTop: '-10px', marginBottom: '16px' }}>
+                  Recommended: wide banner image, JPG or PNG.
+                </p>
+
+                {newsletterMsg && (
+                  <p style={{
+                    color: '#34d399', fontSize: '13px', marginBottom: '14px',
+                    background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)',
+                    padding: '10px 14px', borderRadius: '8px',
+                  }}>
+                    <i className="fa fa-check" style={{ marginRight: '8px' }} />{newsletterMsg}
+                  </p>
+                )}
+
+                <button type="submit" disabled={loading4} style={{
+                  background: 'rgba(139,92,246,0.15)', color: '#a78bfa',
+                  border: '1px solid rgba(139,92,246,0.4)',
+                  padding: '12px 26px', borderRadius: '12px', fontWeight: '700',
+                  fontSize: '14px', cursor: 'pointer', opacity: loading4 ? 0.7 : 1,
+                }}>
+                  {loading4 ? 'Uploading...' : 'Upload Image'}
+                </button>
+              </div>
+
+              <div className="col-md-6">
+                <label style={labelStyle}>
+                  Currently Saved
+                  <span style={{ color: '#64748b', fontWeight: '400', textTransform: 'none', letterSpacing: 0 }}> (live on website)</span>
+                </label>
+                <div style={{
+                  width: '100%', height: '160px', borderRadius: '12px',
+                  border: '1px solid rgba(52,211,153,0.35)',
+                  background: newsletterSaved ? `url(${API}${newsletterSaved}) center/cover no-repeat` : '#0f1623',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: '20px',
+                }}>
+                  {!newsletterSaved && (
+                    <span style={{ color: '#475569', fontSize: '13px' }}>
+                      <i className="fa fa-image" style={{ marginRight: '8px' }} />No image saved yet
+                    </span>
+                  )}
+                </div>
+
+                {newsletterPreview && (
+                  <>
+                    <label style={labelStyle}>
+                      New Selection
+                      <span style={{ color: '#fbbf24', fontWeight: '400', textTransform: 'none', letterSpacing: 0 }}> (not saved yet)</span>
+                    </label>
+                    <div style={{
+                      width: '100%', height: '160px', borderRadius: '12px',
+                      border: '1px dashed rgba(251,191,36,0.6)',
+                      background: `url(${newsletterPreview}) center/cover no-repeat`,
+                    }} />
+                  </>
+                )}
+              </div>
+
+            </div>
           </form>
         </div>
       </div>
