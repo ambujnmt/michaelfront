@@ -12,7 +12,7 @@ const PAGE_NAMES = {
     '/immobilien':              'Immobilien',
     '/kontakt':                 'Kontakt',
     '/verkauf':                 'Verkauf',
-    '/team':                    'Team',
+    '/unternehmen':             'Unternehmen',
     '/impressum':               'Impressum',
     '/suchagent':               'Suchagent',
     '/datenschutz':             'Datenschutz',
@@ -25,7 +25,7 @@ const PAGE_NAMES = {
     '/immobilien':              'Properties',
     '/kontakt':                 'Contact',
     '/verkauf':                 'Sales',
-    '/team':                    'Team',
+    '/unternehmen':             'Company',
     '/impressum':               'Legal Notice',
     '/suchagent':               'Search Agent',
     '/datenschutz':             'Data Protection',
@@ -40,7 +40,7 @@ const PAGE_ICONS = {
   '/immobilien':              'fa-building',
   '/kontakt':                 'fa-envelope',
   '/verkauf':                 'fa-tag',
-  '/team':                    'fa-users',
+  '/unternehmen':             'fa-building',
   '/impressum':               'fa-file-text',
   '/suchagent':               'fa-search',
   '/datenschutz':             'fa-shield',
@@ -153,10 +153,8 @@ export default function Header({ className = '' }) {
       <div className="sticky-header main-bar-wraper">
         <div className="main-bar">
           <div className="container">
-
             <div className="header-nav navbar-collapse collapse">
               <ul className="nav navbar-nav">
-
                 <li>
                   <Link href="/immobilien">
                     {lang === 'de' ? 'immobilien' : 'properties'}
@@ -170,13 +168,9 @@ export default function Header({ className = '' }) {
                 </li>
 
                 <li className="hh-dropdown">
-                  <a href="#">
-                    {lang === 'de' ? 'unternehmen' : 'company'} <i className="fa fa-chevron-down"></i>
-                  </a>
-                  <ul className="hh-sub">
-                    <li><Link href="/uber-uns">{lang === 'de' ? 'Über Uns' : 'About Us'}</Link></li>
-                    <li><Link href="/team">{lang === 'de' ? 'Unser Team' : 'Our Team'}</Link></li>
-                  </ul>
+                    <Link href="/unternehmen">
+                      {lang === 'de' ? 'unternehmen' : 'company'}
+                    </Link>
                 </li>
 
                 <li>
@@ -184,7 +178,6 @@ export default function Header({ className = '' }) {
                     {lang === 'de' ? 'kontakt' : 'contact'}
                   </Link>
                 </li>
-
               </ul>
             </div>
 

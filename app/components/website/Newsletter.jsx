@@ -3,9 +3,12 @@
 import { useState } from 'react'
 import websiteApi from '@/lib/websiteApi'
 import { useLanguage } from '@/lib/LanguageContext'
+import { useSiteInfo } from '@/lib/SiteInfoContext'
+import { API_URL as API } from '@/service/config'
 
 export default function Newsletter() {
   const { lang } = useLanguage()
+  const siteInfo = useSiteInfo()
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState(null) // 'success' | 'error' | 'duplicate' | null
   const [loading, setLoading] = useState(false)
@@ -57,7 +60,15 @@ export default function Newsletter() {
   const t = labels[lang] || labels.de
 
   return (
-    <section className="newsletter-sec">
+    <section
+      className="newsletter-sec"
+      style={siteInfo.newsletter_bg ? {
+        backgroundImage: `url(${API}${siteInfo.newsletter_bg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      } : undefined}
+    >
       <div className="container-fluid p-0">
         <div className="col-lg-8 col-md-10 col-12 mx-auto">
           <div className="head-sec text-center">

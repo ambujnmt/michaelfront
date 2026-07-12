@@ -121,7 +121,6 @@ export default function HomeHeader() {
             <div className="container">
               <div className="header-nav navbar-collapse collapse">
                 <ul className="nav navbar-nav">
-
                   {/* IMMOBILIEN → link to /immobilien */}
                   <li>
                     <Link href="/immobilien">{tr.immobilien}</Link>
@@ -134,20 +133,15 @@ export default function HomeHeader() {
 
                   {/* UNTERNEHMEN → dropdown */}
                   <li className="hh-dropdown">
-                    <a href="#">
-                      {tr.unternehmen} <i className="fa fa-chevron-down"></i>
-                    </a>
-                    <ul className="hh-sub">
-                      <li><Link href="/uber-uns">{tr.aboutUs}</Link></li>
-                      <li><Link href="/team">{tr.ourTeam}</Link></li>
-                    </ul>
+                    <Link href="/unternehmen">
+                      {tr.unternehmen}
+                    </Link>
                   </li>
 
                   {/* KONTAKT */}
                   <li>
                     <Link href="/kontakt">{tr.kontakt}</Link>
                   </li>
-
                 </ul>
               </div>
 

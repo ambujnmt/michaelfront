@@ -7,7 +7,7 @@ import PropertyForm from './PropertyForm'
 import Swal from 'sweetalert2'
 
 import { API_URL as API } from '@/service/config'
-const emptyForm = { title: '', location: '', price: '', size: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false }
+const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false }
 const statusColor = { Active: '#34d399', Sold: '#94a3b8', Pending: '#fbbf24' }
 const thStyle = { padding: '14px 18px', color: '#94a3b8', fontWeight: '700', textAlign: 'left', fontSize: '12px', letterSpacing: '0.8px', textTransform: 'uppercase' }
 const tdStyle = (extra = {}) => ({ padding: '15px 18px', fontSize: '14px', color: '#cbd5e1', ...extra })
@@ -87,7 +87,9 @@ function ViewContent({ property, gallery }) {
                 <p style={valueStyle}>{property.location}</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div><p style={labelStyle}>Size</p><p style={valueStyle}>{property.size ? `${property.size} m²` : '—'}</p></div>
+                <div><p style={labelStyle}>Living Area</p><p style={valueStyle}>{property.size ? `${property.size} m²` : '—'}</p></div>
+                <div><p style={labelStyle}>Land Area</p><p style={valueStyle}>{property.plot_size ? `${property.plot_size} m²` : '—'}</p></div>
+                <div><p style={labelStyle}>Outdoor Area</p><p style={valueStyle}>{property.outdoor_area ? `${property.outdoor_area} m²` : '—'}</p></div>
                 <div><p style={labelStyle}>Rooms</p><p style={valueStyle}>{property.rooms || '—'}</p></div>
                 <div><p style={labelStyle}>Bedrooms</p><p style={valueStyle}>{property.bedrooms || '—'}</p></div>
                 <div><p style={labelStyle}>Bathrooms</p><p style={valueStyle}>{property.bathrooms || '—'}</p></div>
@@ -225,7 +227,7 @@ export default function Properties() {
     const [propRes, imgRes] = await Promise.all([adminApi.getProperty(id), adminApi.getPropertyImages(id)])
     if (propRes.success) {
       const p = propRes.data
-      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1 })
+      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, plot_size: p.plot_size ?? '', outdoor_area: p.outdoor_area ?? '', rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1 })
     }
     if (imgRes.success) setExistingGallery(imgRes.data)
     setModalLoading(false)

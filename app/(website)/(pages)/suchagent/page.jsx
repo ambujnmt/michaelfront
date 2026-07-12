@@ -21,8 +21,7 @@ export default function Suchagent() {
     if (!form.email.trim()) return
     setStatus('loading')
     try {
-      const message = `Typ: ${form.type || '—'} | Standort: ${form.location || '—'} | Min. Größe: ${form.size || '—'} m² | Max. Preis: ${form.price || '—'} €`
-      const res = await websiteApi.submitInquiry({ name: '—', email: form.email, phone: '', message })
+      const res = await websiteApi.submitSuchagent({ type: form.type, location: form.location, size: form.size, price: form.price, email: form.email, phone: form.phone })
       setStatus(res.success ? 'success' : 'error')
       if (res.success) setForm({ type: '', location: '', size: '', price: '', email: '', phone: '' })
     } catch {

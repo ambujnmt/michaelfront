@@ -2,7 +2,7 @@
 
 :root{
 	--head-font: "Playfair Display", serif;
-	--pera-font: "Poppins", sans-serif;
+	--pera-font: "Playfair Display", serif;
 }
 
 .top-col1 img{
@@ -16,6 +16,7 @@
     margin-bottom: 0;
     letter-spacing: 20%;
     font-size: 18px;
+    font-family: var(--head-font);
 }
 
 .top-col1 {
@@ -33,9 +34,10 @@
 }
 
 .top-lang-col h5{
-	color: #fff;
+	color: #c3bfbf;
     font-size: 20px;
-    font-family: var(--pera-font);
+    /* font-family: var(--head-font); */
+    font-family: var(--head-font);
 }
 
 .top-lang-col {
@@ -44,7 +46,7 @@
 }
 
 .widget.widget_about img {
-    width: 75%;
+    width: 55%;
     height: auto;
 }
 
@@ -121,7 +123,8 @@
     border: unset;
     border-bottom: 2px solid #b9b9b9;
     padding: 28px 0px;
-    font-family: var(--pera-font);
+    /* font-family: var(--head-font); */
+    font-family: var(--head-font);
     font-size: 15px;
     color: #464646;
 	font-weight: normal;
@@ -132,7 +135,7 @@
 	border: unset;
     border-bottom: 2px solid #b9b9b9;
     padding: 28px 0px;
-	font-family: var(--pera-font);
+	font-family: var(--head-font);
     font-size: 15px;
     color: #464646;
 }
@@ -148,7 +151,7 @@
     /* font-weight: 500; */
     margin: 20px 0px 40px;
     color: #070606;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     line-height: 25px;
 }
 
@@ -160,7 +163,7 @@
     padding: 15px 40px;
     font-size: 18px;
     transition: 1s ease-in-out;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-weight: normal;
 }
 
@@ -241,7 +244,7 @@
 }
 
 .newsletter-sec{
-	background-image: url(../img/img2.png);
+	/* background-image: url(../img/img2.png); */
 	background-size: cover;
 	background-repeat: no-repeat;
 	position: relative;
@@ -277,7 +280,7 @@
 	padding: 27px 20px;
     border-radius: 10px;
     margin-bottom: 15px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     color: #828282;
     font-size: 15px;
     font-weight: normal;
@@ -286,15 +289,15 @@
 
 .news-btn{
 	width: 32%;
-    background-color: #000;
-    color: #fff;
+    background-color: #fff;
+    color: #000;
     border-radius: 7px;
     margin-left: 20px;
     padding: 15px 0px;
     border: 1px solid #000;
     transition: 1s ease-in-out;
     font-size: 18px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-weight: normal;
 	position: relative;
     top: -9px;
@@ -313,7 +316,7 @@
     line-height: 25px;
     color: #070606;
     letter-spacing: 0%;
-	font-family: var(--pera-font);
+	font-family: var(--head-font);
 }
  
 p{ 
@@ -351,7 +354,7 @@ p{
     font-size: 32px;
     line-height: 50px;
     margin-bottom: 40px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     letter-spacing: 0%;
 }
 
@@ -373,7 +376,7 @@ section.page-2-sec4 {
     line-height: 26px;
     margin-bottom: 30px;
     font-size: 18px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     letter-spacing: 0%;
     color: #000;
 }
@@ -421,7 +424,7 @@ section.page-2-sec4 {
     margin-bottom: 10px;
     line-height: 22px;
     letter-spacing: 5%;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
 }
 
 .p3-col-sec-box1 p{
@@ -501,7 +504,7 @@ section.page-2-sec4 {
     .detail-label {
       min-width: 250px;
     flex-shrink: 0;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-size: 15px;
     font-weight: normal;
     letter-spacing: 0%;
@@ -510,7 +513,7 @@ section.page-2-sec4 {
  
     .detail-value {
       text-align: right;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-size: 15px;
     font-weight: normal;
     letter-spacing: 0%;
@@ -566,7 +569,7 @@ section.page-2-sec4 {
 }
 
 .pera2 p{
-	font-family: var(--pera-font);
+	font-family: var(--head-font);
 	font-size: 15px;
 	font-weight: normal;
 	letter-spacing: 0%;
@@ -575,7 +578,7 @@ section.page-2-sec4 {
 }
 
 .p3-sec7 .home-1-form p {
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-size: 15px;
     font-weight: normal;
     letter-spacing: 0%;
@@ -669,7 +672,7 @@ section.page-2-sec4 {
     font-weight: normal;
     color: #000;
     line-height: 20px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
 }
 
 .filter-wrap.p-a15.our-gallery {
@@ -718,7 +721,7 @@ section.page-2-sec4 {
 .flip-col1 p{
 	color: #000;
     font-weight: 500;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-size: 15px;
     line-height: 22px;
     letter-spacing: 5%;
@@ -843,6 +846,7 @@ a.flip-col-btn:hover{
     height: 100vh;
     overflow: hidden;
     margin-top: 70px;
+    margin-bottom: 10px; /* ya 30px */
 }
 
 .p5-sec3 .background-video{
@@ -996,7 +1000,7 @@ a.flip-col-btn:hover{
     color: #B07E50;
     font-size: 60px;
     line-height: 20px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-weight: bold;
     margin-bottom: 30px;
 }
@@ -1365,7 +1369,7 @@ a.flip-col-btn:hover{
     }
 
     .p7-sec7 .slide-item p{
-        font-family: var(--pera-font);
+        font-family: var(--head-font);
     }
 /* // testimonial css */
 
@@ -1393,7 +1397,7 @@ a.flip-col-btn:hover{
     line-height: 22px;
     color: #474242;
     font-weight: 400;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     margin-bottom: 17px;
 }
 
@@ -1422,7 +1426,7 @@ a.flip-col-btn:hover{
     padding: 27px 20px;
     border-radius: 6px;
     margin-bottom: 15px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     color: #828282;
     font-size: 15px;
     font-weight: normal;
@@ -1438,7 +1442,7 @@ a.flip-col-btn:hover{
     border: 1px solid #000;
     transition: 1s ease-in-out;
     font-size: 16px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-weight: normal;
 }
 
@@ -1480,7 +1484,7 @@ a.flip-col-btn:hover{
 
 .p8-head-col h5{
     letter-spacing: 0;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
 }
 
 .p8-sec1{
@@ -1621,7 +1625,7 @@ a.flip-col-btn:hover{
 .p8-sec7-col-icon1 h5{
     font-size: 20px;
     line-height: 20px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-weight: 600;
     text-transform: uppercase;
     margin-bottom: 0;
@@ -1674,13 +1678,13 @@ a.flip-col-btn:hover{
     font-size: 16px;
     line-height: 26px;
     letter-spacing: 5%;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
 }
 
 .foot-col1 h5{
     font-size: 20px;
     line-height: 32px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     font-weight: 500;
 }
 
@@ -1711,7 +1715,7 @@ a.flip-col-btn:hover{
 .foot-col1 h3{
     font-size: 40px;
     line-height: 32px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     color: #000;
     font-weight: 600;
 }
@@ -1736,7 +1740,7 @@ a.flip-col-btn:hover{
     letter-spacing: 5%;
     font-weight: 600;
     color: #000;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     margin-top: 30px;
 }
 
@@ -1777,7 +1781,7 @@ a.flip-col-btn:hover{
     line-height: 26px;
     letter-spacing: 5%;
     color: #535353;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
     margin-bottom: 0;
 }
 
@@ -1900,7 +1904,7 @@ a.flip-col-btn:hover{
     color: #555;
     margin-bottom: 8px;
     display: block;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
 }
 .home-1-form select.form-control {
     border: none;
@@ -1949,7 +1953,7 @@ a.flip-col-btn:hover{
     color: #444;
     line-height: 26px;
     margin-bottom: 4px;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
 }
 
 /* ── Contact Page ────────────────────────────────────────── */
@@ -1979,5 +1983,5 @@ a.flip-col-btn:hover{
     line-height: 24px;
     color: #333;
     margin-bottom: 0;
-    font-family: var(--pera-font);
+    font-family: var(--head-font);
 }

@@ -76,7 +76,12 @@ export default function PropertyDetail() {
             const imgRes = await websiteApi.getPropertyImages(propRes.data.id)
             if (imgRes.success) setGallery(imgRes.data)
           } catch (_) {}
-          setOthers(allRes.success ? allRes.data.filter(p => p.slug !== slug) : [])
+          if (allRes.success) {
+            const currentType = propRes.data.property_type || 'villa'
+            setOthers(allRes.data.filter(p => p.slug !== slug && (p.property_type || 'villa') === currentType))
+          } else {
+            setOthers([])
+          }
         }
       } catch (e) {
         console.error('Property load error:', e)
@@ -215,6 +220,11 @@ export default function PropertyDetail() {
 
   const heroImg = property?.image ? `${API}${property.image}` : '/assets/img/p3-hero-img.png'
 
+  // ── Property type helpers (mirrors PropertyCard logic on the listing pages) ──
+  const propType = property?.property_type || 'villa'
+  const isLand   = propType === 'various'
+  const isHouse  = propType === 'villa'
+
   return (
     <div className="page-wraper">
 
@@ -225,10 +235,12 @@ export default function PropertyDetail() {
           <div className="container">
             <div className="row align-items-center">
               <div className="col-lg-4 col-md-4 top-col4-1">
+                <Link href="/immobilien">
                 <div className="top-col1">
-                  <i className="fa fa-building" style={{ fontSize: '22px', marginRight: '8px' }}></i>
+                  <i className="fa fa-arrow-left" style={{ fontSize: '22px', marginRight: '8px' }}></i>
                   <h5>{pageName}</h5>
                 </div>
+                </Link>
               </div>
               <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center">
                 <div className="logo-header text-center">
@@ -264,20 +276,18 @@ export default function PropertyDetail() {
           .hero-slider-wrap .owl-nav button { pointer-events: all; background: rgba(255,255,255,0.15) !important; color: #fff !important; width: 50px; height: 50px; border-radius: 50% !important; font-size: 18px !important; border: 2px solid rgba(255,255,255,0.5) !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.2s !important; backdrop-filter: blur(4px); }
           .hero-slider-wrap .owl-nav button:hover { background: rgba(255,255,255,0.4) !important; border-color: #fff !important; }
           .hero-slider-wrap .owl-nav button i { color: #fff !important; }
-          .hero-slider-wrap .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); pointer-events: none; z-index: 5; }
+          .hero-back-btn { position: absolute; top: 100px; left: 24px; z-index: 20; display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.6); border-radius: 30px; font-size: 14px; text-decoration: none; backdrop-filter: blur(4px); transition: background 0.2s; }
+          .hero-back-btn:hover { background: rgba(0,0,0,0.65); color: #fff; }
         `}</style>
         <div className="hero-slider-wrap">
           {property && (
-            <>
-              <div className="owl-carousel owl-theme hero-detail-slider">
-                {[heroImg, ...gallery.map(g => `${API}${g.image}`)].map((src, i) => (
-                  <div className="item" key={i}>
-                    <img src={src} alt={property.title} />
-                  </div>
-                ))}
-              </div>
-              <div className="overlay" />
-            </>
+            <div className="owl-carousel owl-theme hero-detail-slider">
+              {[heroImg, ...gallery.map(g => `${API}${g.image}`)].map((src, i) => (
+                <div className="item" key={i}>
+                  <img src={src} alt={property.title} />
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -293,15 +303,65 @@ export default function PropertyDetail() {
 
       {!loading && property && (<>
 
+        {/* ── Top stats row — field set depends on property type ── */}
         <section className="p3-col-sec">
           <div className="container-fluid p-0">
             <div className="row">
-              <div className="col-lg-2 col-md-3 col-12"><div className="p3-col-sec-box1 text-center"><h5>{tr.bedrooms}</h5><p>{property.bedrooms}</p></div></div>
-              <div className="col-lg-2 col-md-3 col-12"><div className="p3-col-sec-box1 text-center"><h5>{tr.bathrooms}</h5><p>{property.bathrooms}</p></div></div>
-              <div className="col-lg-2 col-md-3 col-12"><div className="p3-col-sec-box1 text-center"><h5>{tr.rooms}</h5><p>{property.rooms}</p></div></div>
-              <div className="col-lg-2 col-md-3 col-12"><div className="p3-col-sec-box1 text-center"><h5>{tr.location}</h5><p>{property.location}</p></div></div>
-              <div className="col-lg-2 col-md-3 col-12"><div className="p3-col-sec-box1 text-center"><h5>{tr.terraceArea}</h5><p>{property.size} M²</p></div></div>
-              <div className="col-lg-2 col-md-3 col-12"><div className="p3-col-sec-box1 text-center"><h5>{tr.purchasePrice}</h5><p>€ {Number(property.price).toLocaleString()}</p></div></div>
+
+              <div className="col-lg-2 col-md-3 col-12">
+                <div className="p3-col-sec-box1 text-center">
+                  <h5>{tr.location}</h5>
+                  <p>{property.location}</p>
+                </div>
+              </div>
+
+              {/* Plot Size — shown for Land/Plot and House */}
+              {(isLand || isHouse) && (
+                <div className="col-lg-2 col-md-3 col-12">
+                  <div className="p3-col-sec-box1 text-center">
+                    <h5>{tr.plotArea || (lang === 'de' ? 'Grundstück' : 'Plot')}</h5>
+                    <p>{property.plot_size ?? property.size} M²</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Living Area — everyone except Land/Plot */}
+              {!isLand && (
+                <div className="col-lg-2 col-md-3 col-12">
+                  <div className="p3-col-sec-box1 text-center">
+                    <h5>{tr.livingArea || (lang === 'de' ? 'Wohnfläche' : 'Living area')}</h5>
+                    <p>{property.size} M²</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Rooms — everyone except Land/Plot */}
+              {!isLand && (
+                <div className="col-lg-2 col-md-3 col-12">
+                  <div className="p3-col-sec-box1 text-center">
+                    <h5>{tr.rooms}</h5>
+                    <p>{property.rooms}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Open/Outdoor Area — everyone except Land/Plot */}
+              {!isLand && (
+                <div className="col-lg-2 col-md-3 col-12">
+                  <div className="p3-col-sec-box1 text-center">
+                    <h5>{tr.openAreas || (lang === 'de' ? 'Freiflächen' : 'Open areas')}</h5>
+                    <p>{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="col-lg-2 col-md-3 col-12">
+                <div className="p3-col-sec-box1 text-center">
+                  <h5>{tr.purchasePrice}</h5>
+                  <p>€ {Number(property.price).toLocaleString()}</p>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
@@ -384,22 +444,76 @@ export default function PropertyDetail() {
           </div>
         </section>
 
+        {/* ── Objektdetails — field set depends on property type ── */}
         <section className="p3-sec6">
           <div className="container">
             <div className="objekt-section">
               <div className="head-sec"><h3>{tr.detailsTitle}</h3></div>
               <div className="row">
                 <div className="col-12 col-md-6">
-                  <div className="detail-row"><span className="detail-label">{tr.locationLabel}</span><span className="detail-value">{property.location}</span></div>
-                  <div className="detail-row"><span className="detail-label">{tr.roomsLabel}</span><span className="detail-value">{property.rooms}</span></div>
-                  <div className="detail-row"><span className="detail-label">{tr.bedroomsLabel}</span><span className="detail-value">{property.bedrooms}</span></div>
-                  <div className="detail-row"><span className="detail-label">{tr.areaLabel}</span><span className="detail-value">{property.size} m²</span></div>
-                  <div className="detail-row"><span className="detail-label">{tr.statusLabel}</span><span className="detail-value">{property.status}</span></div>
+                  <div className="detail-row">
+                    <span className="detail-label">{tr.locationLabel}</span>
+                    <span className="detail-value">{property.location}</span>
+                  </div>
+
+                  {/* Plot Size — Land/Plot and House */}
+                  {(isLand || isHouse) && (
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.plotAreaLabel || (lang === 'de' ? 'Grundstück' : 'Plot')}</span>
+                      <span className="detail-value">{property.plot_size ?? property.size} m²</span>
+                    </div>
+                  )}
+
+                  {!isLand && (
+                    <>
+                      <div className="detail-row">
+                        <span className="detail-label">{tr.areaLabel}</span>
+                        <span className="detail-value">{property.size} m²</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">{tr.roomsLabel}</span>
+                        <span className="detail-value">{property.rooms}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">{tr.openAreasLabel || (lang === 'de' ? 'Freiflächen' : 'Open areas')}</span>
+                        <span className="detail-value">{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'}</span>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="detail-row">
+                    <span className="detail-label">{tr.priceLabel}</span>
+                    <span className="detail-value">€ {Number(property.price).toLocaleString()}</span>
+                  </div>
                 </div>
-                <div className="col-12 col-md-6 ps-md-5">
-                  <div className="detail-row"><span className="detail-label">{tr.bathroomsLabel}</span><span className="detail-value">{property.bathrooms}</span></div>
-                  <div className="detail-row"><span className="detail-label">{tr.priceLabel}</span><span className="detail-value">€ {Number(property.price).toLocaleString()}</span></div>
-                </div>
+
+                {/* Bedrooms / Bathrooms / Status — everyone except Land/Plot */}
+                {!isLand && (
+                  <div className="col-12 col-md-6 ps-md-5">
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.bedroomsLabel}</span>
+                      <span className="detail-value">{property.bedrooms}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.bathroomsLabel}</span>
+                      <span className="detail-value">{property.bathrooms}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.statusLabel}</span>
+                      <span className="detail-value">{property.status}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Status still shown for Land/Plot, just placed in the left column's flow */}
+                {isLand && (
+                  <div className="col-12 col-md-6 ps-md-5">
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.statusLabel}</span>
+                      <span className="detail-value">{property.status}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

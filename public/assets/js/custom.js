@@ -560,7 +560,7 @@ function masonryBox() {
 		popup_vertical_center();
 		
 	// > Main menu sticky on top  when scroll down function by = custom.js		
-		sticky_header(),
+		// sticky_header(),
 	
 	// > page scroll top on button click function by = custom.js	
 		scroll_top(),
@@ -575,7 +575,7 @@ function masonryBox() {
 		set_height(),
 	
 	// > footer fixed on bottom function by = custom.js	
-		footer_fixed(),
+		// footer_fixed(),
 		
 	// > accordion active calss function by = custom.js ========================= //			
 		accordion_active(),
