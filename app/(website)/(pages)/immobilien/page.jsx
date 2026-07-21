@@ -58,7 +58,7 @@ export default function Immobilien() {
       <section className="inner-page-banner head-sec" style={{ paddingTop: '50px' }}>
         <div className="container text-center">
           {/* <h6 style={{ margin: '0 0 8px' }}>{trHome.sec2Sub}</h6> */}
-          <h3 style={{ margin: 0 }}>{trHome.sec2Sub}</h3>
+          <h1 style={{ margin: 0 }}>{trHome.sec2Sub}</h1>
         </div>
       </section>
 

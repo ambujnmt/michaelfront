@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Footer from '@/app/components/website/Footer'
 import Newsletter from '@/app/components/website/Newsletter'
@@ -51,6 +51,7 @@ function OtherPropertiesSlider({ properties }) {
 
 export default function PropertyDetail() {
   const { id: slug } = useParams()
+  const pathname = usePathname()
   const { lang, setLang } = useLanguage()
   const tr = translations.propertyDetail[lang]
   const pageName = lang === 'de' ? 'Immobilien' : 'Properties'
@@ -61,6 +62,13 @@ export default function PropertyDetail() {
   const [form,     setForm]     = useState({ name: '', phone: '', email: '', message: '' })
   const [sent,     setSent]     = useState(false)
   const [sending,  setSending]  = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const navLabels = {
+    de: { immobilien: 'immobilien', verkauf: 'verkauf', unternehmen: 'unternehmen', kontakt: 'kontakt' },
+    en: { immobilien: 'properties', verkauf: 'sales', unternehmen: 'company', kontakt: 'contact' },
+  }
+  const nv = navLabels[lang] || navLabels.de
 
   useEffect(() => {
     const load = async () => {
@@ -91,6 +99,11 @@ export default function PropertyDetail() {
     }
     load()
   }, [slug])
+
+  // Route change hote hi mobile menu hamesha band ho jaye
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
 
   useEffect(() => {
     if (loading || !property) return
@@ -186,9 +199,6 @@ export default function PropertyDetail() {
         })
         ev.stopPropagation()
       })
-      jq('#mobile-side-drawer').off('click.drawer').on('click.drawer', function () {
-        jq('.mobile-sider-drawer-menu').toggleClass('active')
-      })
       jq('button.scroltop').off('click.top').on('click.top', function () {
         jq('html, body').animate({ scrollTop: 0 }, 1000)
         return false
@@ -258,9 +268,85 @@ export default function PropertyDetail() {
               </div>
             </div>
           </div>
+
+          {/* STICKY NAV + MOBILE TOGGLE */}
+          <div className="sticky-header main-bar-wraper">
+            <div className="main-bar">
+              <div className="container">
+                <div
+                  className="header-nav navbar-collapse"
+                  style={{ display: menuOpen ? 'block' : undefined }}
+                >
+                  <ul className="nav navbar-nav">
+                    <li onClick={() => setMenuOpen(false)}>
+                      <Link href="/immobilien">{nv.immobilien}</Link>
+                    </li>
+                    <li onClick={() => setMenuOpen(false)}>
+                      <Link href="/verkauf">{nv.verkauf}</Link>
+                    </li>
+                    <li className="hh-dropdown" onClick={() => setMenuOpen(false)}>
+                      <Link href="/unternehmen">{nv.unternehmen}</Link>
+                    </li>
+                    <li onClick={() => setMenuOpen(false)}>
+                      <Link href="/kontakt">{nv.kontakt}</Link>
+                    </li>
+                  </ul>
+                </div>
+
+                <button
+                  type="button"
+                  className={`navbar-toggler ${menuOpen ? '' : 'collapsed'}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setMenuOpen((prev) => !prev)
+                  }}
+                >
+                  <span className="sr-only">Toggle navigation</span>
+                  <span className="icon-bar icon-bar-first"></span>
+                  <span className="icon-bar icon-bar-two"></span>
+                  <span className="icon-bar icon-bar-three"></span>
+                </button>
+              </div>
+            </div>
+          </div>
         </header>
 
         <style>{`
+          .hh-dropdown { position: relative; }
+          .hh-dropdown .hh-sub {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #1a1212;
+            min-width: 160px;
+            border-radius: 6px;
+            padding: 6px 0;
+            z-index: 9999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            list-style: none;
+            margin: 0;
+          }
+          .hh-dropdown:hover .hh-sub { display: block; }
+          .hh-sub li a {
+            display: block;
+            padding: 10px 18px;
+            color: #ccc !important;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: color 0.2s;
+          }
+          .hh-sub li a:hover { color: #fff !important; }
+
+          @media (max-width: 991px) {
+            .header-nav.navbar-collapse { display: none; }
+            .header-nav.navbar-collapse.show { display: block; }
+          }
+
           .hero-slider-wrap { width: 100%; height: 100vh; position: relative; overflow: hidden; background: #2d3032; }
           .hero-slider-wrap .owl-carousel,
           .hero-slider-wrap .owl-stage-outer,
@@ -278,6 +364,124 @@ export default function PropertyDetail() {
           .hero-slider-wrap .owl-nav button i { color: #fff !important; }
           .hero-back-btn { position: absolute; top: 100px; left: 24px; z-index: 20; display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.6); border-radius: 30px; font-size: 14px; text-decoration: none; backdrop-filter: blur(4px); transition: background 0.2s; }
           .hero-back-btn:hover { background: rgba(0,0,0,0.65); color: #fff; }
+
+          /* ===== RESPONSIVE — TABLET (max-width: 991px) ===== */
+          @media (max-width: 991px) {
+            .hero-slider-wrap,
+            .hero-slider-wrap .owl-carousel,
+            .hero-slider-wrap .owl-stage-outer,
+            .hero-slider-wrap .owl-stage,
+            .hero-slider-wrap .owl-item,
+            .hero-slider-wrap .item,
+            .hero-slider-wrap .item img {
+              height: 70vh;
+            }
+            .hero-slider-wrap .owl-nav button {
+              width: 40px;
+              height: 40px;
+              font-size: 15px !important;
+            }
+            .p3-col-sec-box1 {
+              margin-bottom: 16px;
+            }
+          }
+
+          /* ===== RESPONSIVE — MOBILE (max-width: 767px) ===== */
+          @media (max-width: 767px) {
+            .hero-slider-wrap,
+            .hero-slider-wrap .owl-carousel,
+            .hero-slider-wrap .owl-stage-outer,
+            .hero-slider-wrap .owl-stage,
+            .hero-slider-wrap .owl-item,
+            .hero-slider-wrap .item,
+            .hero-slider-wrap .item img {
+              height: 55vh;
+            }
+            .hero-slider-wrap .owl-nav {
+              padding: 0 12px;
+            }
+            .hero-slider-wrap .owl-nav button {
+              width: 34px;
+              height: 34px;
+              font-size: 13px !important;
+            }
+            .hero-back-btn {
+              top: 80px;
+              left: 12px;
+              padding: 8px 14px;
+              font-size: 12px;
+            }
+
+            .p3-col-sec-box1 {
+              margin-bottom: 14px;
+              padding: 12px 8px;
+            }
+            .p3-col-sec-box1 h5 {
+              font-size: 13px;
+            }
+            .p3-col-sec-box1 p {
+              font-size: 14px;
+            }
+
+            .p3-sec2 .head-sec-page h1,
+            .p3-sec5 .head-sec-page h1,
+            .p3-sec7 .head-sec-page h1 {
+              font-size: 26px;
+              line-height: 1.3;
+            }
+
+            .p3-sec3 .head-sec h3,
+            .p3-sec4 .head-sec h3,
+            .p3-sec6 h1 {
+              font-size: 22px;
+            }
+
+            .objekt-section .detail-row {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 4px;
+              padding: 10px 0;
+            }
+            .objekt-section .col-md-6.ps-md-5 {
+              padding-left: 0 !important;
+              margin-top: 16px;
+            }
+
+            .p3-sec7 .form-sec1 {
+              padding: 0 8px;
+            }
+            .p3-sec7 .form-group {
+              margin-bottom: 14px;
+            }
+
+            .gallery-card img {
+              height: auto;
+            }
+
+            .scroltop {
+              width: 44px;
+              height: 44px;
+              font-size: 12px;
+            }
+          }
+
+          /* ===== RESPONSIVE — SMALL MOBILE (max-width: 480px) ===== */
+          @media (max-width: 480px) {
+            .hero-slider-wrap,
+            .hero-slider-wrap .owl-carousel,
+            .hero-slider-wrap .owl-stage-outer,
+            .hero-slider-wrap .owl-stage,
+            .hero-slider-wrap .owl-item,
+            .hero-slider-wrap .item,
+            .hero-slider-wrap .item img {
+              height: 48vh;
+            }
+            .p3-sec2 .head-sec-page h1,
+            .p3-sec5 .head-sec-page h1,
+            .p3-sec7 .head-sec-page h1 {
+              font-size: 22px;
+            }
+          }
         `}</style>
         <div className="hero-slider-wrap">
           {property && (
@@ -308,7 +512,7 @@ export default function PropertyDetail() {
           <div className="container-fluid p-0">
             <div className="row">
 
-              <div className="col-lg-2 col-md-3 col-12">
+              <div className="col-lg-2 col-md-3 col-6">
                 <div className="p3-col-sec-box1 text-center">
                   <h5>{tr.location}</h5>
                   <p>{property.location}</p>
@@ -317,7 +521,7 @@ export default function PropertyDetail() {
 
               {/* Plot Size — shown for Land/Plot and House */}
               {(isLand || isHouse) && (
-                <div className="col-lg-2 col-md-3 col-12">
+                <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
                     <h5>{tr.plotArea || (lang === 'de' ? 'Grundstück' : 'Plot')}</h5>
                     <p>{property.plot_size ?? property.size} M²</p>
@@ -327,7 +531,7 @@ export default function PropertyDetail() {
 
               {/* Living Area — everyone except Land/Plot */}
               {!isLand && (
-                <div className="col-lg-2 col-md-3 col-12">
+                <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
                     <h5>{tr.livingArea || (lang === 'de' ? 'Wohnfläche' : 'Living area')}</h5>
                     <p>{property.size} M²</p>
@@ -337,7 +541,7 @@ export default function PropertyDetail() {
 
               {/* Rooms — everyone except Land/Plot */}
               {!isLand && (
-                <div className="col-lg-2 col-md-3 col-12">
+                <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
                     <h5>{tr.rooms}</h5>
                     <p>{property.rooms}</p>
@@ -347,7 +551,7 @@ export default function PropertyDetail() {
 
               {/* Open/Outdoor Area — everyone except Land/Plot */}
               {!isLand && (
-                <div className="col-lg-2 col-md-3 col-12">
+                <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
                     <h5>{tr.openAreas || (lang === 'de' ? 'Freiflächen' : 'Open areas')}</h5>
                     <p>{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'}</p>
@@ -355,7 +559,7 @@ export default function PropertyDetail() {
                 </div>
               )}
 
-              <div className="col-lg-2 col-md-3 col-12">
+              <div className="col-lg-2 col-md-3 col-6">
                 <div className="p3-col-sec-box1 text-center">
                   <h5>{tr.purchasePrice}</h5>
                   <p>€ {Number(property.price).toLocaleString()}</p>
@@ -366,18 +570,24 @@ export default function PropertyDetail() {
           </div>
         </section>
 
-        <section className="p3-sec2 mt-5">
+        <section className="p3-sec2 pro-dtl-sec2">
           <div className="container">
             <div className="row">
               <div className="col-lg-11 col-md-12 mx-auto">
-                <div className="head-sec text-center"><h1>{property.title}</h1></div>
+                <div className="head-sec-page text-center"><h1>{property.title}</h1></div>
               </div>
               {property.description && (
                 <div className="col-lg-10 col-md-12 mx-auto">
                   <div className="text-center pera2">
-                    {property.description.split('\n').filter(Boolean).map((para, i) => <p key={i}>{para}</p>)}
+                    <div
+                      dangerouslySetInnerHTML={{ __html: property.description }}
+                    />
                     <div className="mt-5"></div>
-                    <a href="#anfragen"><button type="button" className="btn btn1">{tr.exposeBtn}</button></a>
+                    <a href="#anfragen">
+                      <button type="button" className="btn btn1">
+                        {tr.exposeBtn}
+                      </button>
+                    </a>
                   </div>
                 </div>
               )}
@@ -419,22 +629,46 @@ export default function PropertyDetail() {
           <div className="section-full">
             <div className="container">
               <div className="row">
-                <div className="col-lg-12 col-md-12 head-sec text-center"><h3>{tr.floorPlanTitle}</h3></div>
+                <div className="col-lg-12 col-md-12 head-sec-page text-center"><h3>{tr.floorPlanTitle}</h3></div>
               </div>
               <div className="owl-carousel owl-theme floor-plan-slider mt-4">
                 {gallery.length > 0 ? gallery.map((img) => (
                   <div className="item" key={img.id}>
                     <div className="wt-box">
-                      <div className="wt-thum-bx">
-                        <img src={`${API}${img.image}`} alt="gallery" style={{ borderRadius: '6px' }} />
+                      <div
+                        className="wt-thum-bx"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textAlign: 'center'
+                        }}
+                      >
+                        <img
+                          src={`${API}${img.image}`}
+                          alt="gallery"
+                          style={{ borderRadius: '6px', margin: '0 auto', maxWidth: '100%' }}
+                        />
                       </div>
                     </div>
                   </div>
                 )) : (
                   <div className="item">
                     <div className="wt-box">
-                      <div className="wt-thum-bx">
-                        <img src={heroImg} alt={property.title} style={{ borderRadius: '6px' }} />
+                      <div
+                        className="wt-thum-bx"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textAlign: 'center'
+                        }}
+                      >
+                        <img
+                          src={heroImg}
+                          alt={property.title}
+                          style={{ borderRadius: '6px', margin: '0 auto', maxWidth: '100%' }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -445,10 +679,10 @@ export default function PropertyDetail() {
         </section>
 
         {/* ── Objektdetails — field set depends on property type ── */}
-        <section className="p3-sec6">
+        <section className="p3-sec6" style={{ backgroundColor: '#f7f7f7' }}>
           <div className="container">
             <div className="objekt-section">
-              <div className="head-sec"><h3>{tr.detailsTitle}</h3></div>
+              <div className="head-sec"><h3 className='text-center'>{tr.detailsTitle}</h3></div>
               <div className="row">
                 <div className="col-12 col-md-6">
                   <div className="detail-row">
@@ -489,7 +723,7 @@ export default function PropertyDetail() {
 
                 {/* Bedrooms / Bathrooms / Status — everyone except Land/Plot */}
                 {!isLand && (
-                  <div className="col-12 col-md-6 ps-md-5">
+                  <div className="col-12 col-md-6">
                     <div className="detail-row">
                       <span className="detail-label">{tr.bedroomsLabel}</span>
                       <span className="detail-value">{property.bedrooms}</span>
@@ -523,7 +757,7 @@ export default function PropertyDetail() {
           <div className="container">
             <div className="row">
               <div className="col-lg-8 col-md-9 col-12 mx-auto">
-                <div className="head-sec text-center"><h3>{tr.formTitle}</h3></div>
+                <div className="head-sec-page text-center"><h3>{tr.formTitle}</h3></div>
                 <div className="form-sec1">
                   {sent ? (
                     <div style={{ textAlign: 'center', padding: '40px 0' }}>
@@ -540,7 +774,7 @@ export default function PropertyDetail() {
                         <div className="col-lg-12 col-md-12"><div className="form-group"><input type="email" className="form-control" placeholder={tr.emailPh} required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div></div>
                         <div className="col-lg-12 col-md-12"><div className="form-group"><textarea rows="4" className="form-control" placeholder={tr.messagePh} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} /></div></div>
                         <div className="col-lg-12 col-md-12"><div className="form-txt pera2"><p>{tr.privacyText}</p></div></div>
-                        <div className="col-lg-12 col-md-12 text-center mt-5">
+                        <div className="col-lg-12 col-md-12 text-center sub-btn1">
                           <button type="submit" className="btn btn1" disabled={sending}>{sending ? tr.sendingBtn : tr.submitBtn}</button>
                         </div>
                       </div>

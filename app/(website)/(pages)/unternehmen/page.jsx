@@ -34,7 +34,7 @@ export default function UberUns() {
               {lang === 'de' ? 'Zurück' : 'Back'}
             </button>
           </div>
-          <p>{tr.bannerSub}</p>
+          <h4>{tr.bannerSub}</h4>
         </div>
       </section>
 
@@ -64,8 +64,8 @@ export default function UberUns() {
       {/* ── Team section — appended right below About content ── */}
       <section className="section-padding pt-0">
         <div className="container">
-          <div className="head-sec text-center mb-4">
-            <h3 style={{ margin: 0 }}>{trTeam.bannerTitle}</h3>
+          <div className="head-sec-page text-center m-5">
+            <h1 style={{ margin: 0 }}>{trTeam.bannerTitle}</h1>
             <p>{trTeam.bannerSub}</p>
           </div>
 
@@ -84,12 +84,12 @@ export default function UberUns() {
               {members.map((m) => (
                 <div key={m.id} className="col-lg-3 col-md-6 mb-4 text-center">
                   <div
-                    className="team-card p-4"
+                    className="team-card"
                     style={{
                       background: '#fff',
                       border: '1px solid #ece6db',
                       borderRadius: '10px',
-                      padding: '32px 20px',
+                      overflow: 'hidden',
                       height: '100%',
                       transition: 'box-shadow 0.25s ease, transform 0.25s ease',
                     }}
@@ -98,36 +98,38 @@ export default function UberUns() {
                       ? <img
                           src={`${API}${m.image}`}
                           alt={m.name}
-                          style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 18px', display: 'block', border: '3px solid #ece6db' }}
+                          style={{ width: '100%', height: '320px', borderRadius: '5px', objectFit: 'cover', display: 'block' }}
                         />
-                      : <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#f2efe9', margin: '0 auto 18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>
+                      : <div style={{ width: '100%', height: '320px', borderRadius: '5px', background: '#f2efe9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>
                           👤
                         </div>
                     }
 
-                    {m.name && <h5 style={{ marginBottom: '4px', color: '#1a1a1a', fontWeight: 600 }}>{m.name}</h5>}
-                    {m.position && <p style={{ fontSize: '13px', color: '#8a8a8a', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.position}</p>}
-                    {m.bio && <p style={{ fontSize: '13px', color: '#666', lineHeight: '1.6', marginBottom: '14px' }}>{m.bio}</p>}
+                    <div style={{ padding: '20px' }}>
+                      {m.name && <h5 style={{ marginBottom: '4px', color: '#1a1a1a', fontWeight: 600 }}>{m.name}</h5>}
+                      {m.position && <p style={{ fontSize: '13px', color: '#8a8a8a', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.position}</p>}
+                      {m.bio && <p style={{ fontSize: '13px', color: '#666', lineHeight: '1.6', marginBottom: '14px' }}>{m.bio}</p>}
 
-                    <div style={{ borderTop: '1px solid #ece6db', paddingTop: '14px', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {m.phone && (
-                        <a
-                          href={`tel:${m.phone}`}
-                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#444', fontSize: '13px', textDecoration: 'none' }}
-                        >
-                          <i className="fa fa-phone" style={{ fontSize: '13px', color: '#444' }} />
-                          <span>{m.phone}</span>
-                        </a>
-                      )}
-                      {m.email && (
-                        <a
-                          href={`mailto:${m.email}`}
-                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#444', fontSize: '13px', textDecoration: 'none', wordBreak: 'break-all' }}
-                        >
-                          <i className="fa fa-envelope" style={{ fontSize: '13px', color: '#444' }} />
-                          <span>{m.email}</span>
-                        </a>
-                      )}
+                      <div style={{ borderTop: '1px solid #ece6db', paddingTop: '14px', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {m.phone && (
+                          <a
+                            href={`tel:${m.phone}`}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#444', fontSize: '13px', textDecoration: 'none' }}
+                          >
+                            <i className="fa fa-phone" style={{ fontSize: '13px', color: '#444' }} />
+                            <span>{m.phone}</span>
+                          </a>
+                        )}
+                        {m.email && (
+                          <a
+                            href={`mailto:${m.email}`}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#444', fontSize: '13px', textDecoration: 'none', wordBreak: 'break-all' }}
+                          >
+                            <i className="fa fa-envelope" style={{ fontSize: '13px', color: '#444' }} />
+                            <span>{m.email}</span>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

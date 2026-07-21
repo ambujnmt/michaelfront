@@ -72,7 +72,7 @@ export default function Newsletter() {
       <div className="container-fluid p-0">
         <div className="col-lg-8 col-md-10 col-12 mx-auto">
           <div className="head-sec text-center">
-            <h3>{t.title}</h3>
+            <h1>{t.title}</h1>
 
             <form className="newsletter-input" onSubmit={handleSubmit}>
               <input

@@ -58,18 +58,49 @@ export default function Kontakt() {
               {lang === 'de' ? 'Zurück' : 'Back'}
             </button>
           </div>
-          <p style={{ color: '#666', fontSize: '16px', margin: 0, fontFamily: 'var(--pera-font)' }}>{t.bannerSubtitle}</p>
+          <h4>{t.bannerSubtitle}</h4>
         </div>
       </section>
 
       {/* Content */}
       <section className="section-padding">
         <div className="container">
+
+          {/* Office Photo + Paragraph — full width, above the form */}
+          <div className="row g-5 align-items-center mb-5">
+            <div className="col-lg-7">
+              <img
+                src="/assets/img/p5-right-img.png"
+                alt="Office"
+                className="img-fluid w-100"
+                style={{ borderRadius: '10px', height: '320px', objectFit: 'cover', border: '1px solid #ece6db' }}
+              />
+            </div>
+            <div className="col-lg-5 head-sec">
+              <h2>{t.officeHeading || (lang === 'de' ? 'Unser Büro' : 'Our Office')}</h2>
+              <p>
+                {t.officeP1 || (lang === 'de'
+                  ? 'Lorem Ipsum ist einfach ein Blindtext der Druck- und Satzindustrie. Willkommen in unserem Büro — wir freuen uns, Sie persönlich kennenzulernen.'
+                  : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Welcome to our office — we look forward to meeting you in person.')}
+              </p>
+              <p>
+                {t.officeP2 || (lang === 'de'
+                  ? 'Unser Team steht Ihnen bei all Ihren Immobilienanliegen jederzeit gerne zur Seite.'
+                  : 'Our team is always happy to help with all your property needs.')}
+              </p>
+              <ul className="mt-3">
+                <li>{t.officeLi1 || (lang === 'de' ? 'Persönliche Beratung vor Ort' : 'Personal on-site consultation')}</li>
+                <li>{t.officeLi2 || (lang === 'de' ? 'Erfahrenes Maklerteam' : 'Experienced broker team')}</li>
+                <li>{t.officeLi3 || (lang === 'de' ? 'Individuelle Betreuung' : 'Individual support')}</li>
+              </ul>
+            </div>
+          </div>
+
           <div className="row g-5">
 
             {/* Form Column */}
             <div className="col-lg-7">
-              <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
+              <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
                 {t.formTitle}
               </h3>
               <form className="home-1-form" onSubmit={handleSubmit}>
@@ -137,7 +168,7 @@ export default function Kontakt() {
                     </div>
                   )}
 
-                  <div className="col-12">
+                  <div className="col-12 mb-5">
                     <button type="submit" className="btn btn1" disabled={loading}
                       style={{ padding: '14px 40px', fontSize: '14px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                       {loading ? t.sendingBtn : t.sendBtn}
@@ -149,7 +180,7 @@ export default function Kontakt() {
 
             {/* Contact Info Column */}
             <div className="col-lg-5">
-              <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
+              <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
                 {t.contactTitle}
               </h3>
 
@@ -199,20 +230,6 @@ export default function Kontakt() {
                 )}
               </div>
 
-              {/* Office Photo + Paragraph */}
-              <div style={{ marginTop: '32px' }}>
-                <img
-                  src="/assets/img/p5-right-img.png"
-                  alt="Office"
-                  className="img-fluid w-100"
-                  style={{ borderRadius: '10px', height: '220px', objectFit: 'cover', border: '1px solid #ece6db' }}
-                />
-                <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.7', marginTop: '16px' }}>
-                  {t.officeText || (lang === 'de'
-                    ? 'Lorem Ipsum ist einfach ein Blindtext der Druck- und Satzindustrie. Willkommen in unserem Büro — wir freuen uns, Sie persönlich kennenzulernen und Ihnen bei all Ihren Immobilienanliegen zur Seite zu stehen.'
-                    : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Welcome to our office — we look forward to meeting you in person and helping with all your property needs.')}
-                </p>
-              </div>
             </div>
 
           </div>

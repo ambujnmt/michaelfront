@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useSiteInfo } from '@/lib/SiteInfoContext'
 
@@ -30,13 +31,20 @@ export default function HomeHeader() {
   const { lang, setLang } = useLanguage()
   const { phone } = useSiteInfo()
   const tr = t[lang]
+  const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Route change hote hi menu hamesha band ho jaye (refresh ho ya na ho, dono me consistent)
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
 
   return (
     <div className="video-container">
@@ -73,6 +81,11 @@ export default function HomeHeader() {
           transition: color 0.2s;
         }
         .hh-sub li a:hover { color: #fff !important; }
+
+        @media (max-width: 991px) {
+          .header-nav.navbar-collapse { display: none; }
+          .header-nav.navbar-collapse.show { display: block; }
+        }
       `}</style>
 
       <header className="site-header header-style-1 vdo-header mobile-sider-drawer-menu"
@@ -119,27 +132,30 @@ export default function HomeHeader() {
         <div className="sticky-header main-bar-wraper">
           <div className="main-bar">
             <div className="container">
-              <div className="header-nav navbar-collapse collapse">
+              <div
+                className="header-nav navbar-collapse"
+                style={{ display: menuOpen ? 'block' : undefined }}
+              >
                 <ul className="nav navbar-nav">
                   {/* IMMOBILIEN → link to /immobilien */}
-                  <li>
+                  <li onClick={() => setMenuOpen(false)}>
                     <Link href="/immobilien">{tr.immobilien}</Link>
                   </li>
 
                   {/* VERKAUF */}
-                  <li>
+                  <li onClick={() => setMenuOpen(false)}>
                     <Link href="/verkauf">{tr.verkauf}</Link>
                   </li>
 
                   {/* UNTERNEHMEN → dropdown */}
-                  <li className="hh-dropdown">
+                  <li className="hh-dropdown" onClick={() => setMenuOpen(false)}>
                     <Link href="/unternehmen">
                       {tr.unternehmen}
                     </Link>
                   </li>
 
                   {/* KONTAKT */}
-                  <li>
+                  <li onClick={() => setMenuOpen(false)}>
                     <Link href="/kontakt">{tr.kontakt}</Link>
                   </li>
                 </ul>
@@ -147,11 +163,13 @@ export default function HomeHeader() {
 
               {/* MOBILE TOGGLE */}
               <button
-                id="mobile-side-drawer"
-                data-target=".header-nav"
-                data-toggle="collapse"
                 type="button"
-                className="navbar-toggler collapsed"
+                className={`navbar-toggler ${menuOpen ? '' : 'collapsed'}`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setMenuOpen((prev) => !prev)
+                }}
               >
                 <span className="sr-only">Toggle navigation</span>
                 <span className="icon-bar icon-bar-first"></span>
