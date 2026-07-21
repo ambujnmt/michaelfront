@@ -196,7 +196,7 @@ export default function Home() {
         </video>
         <div className="overlay"></div>
         <div className="content head-sec">
-          <h3>{tr.sec3Text}</h3>
+          <h1>{tr.sec3Text}</h1>
         </div>
       </section>
 

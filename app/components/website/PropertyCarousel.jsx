@@ -62,12 +62,11 @@ export default function PropertyCarousel() {
     <section className="p4-sec1 p5-sec1">
 
       <div className="container">
-        <div className="row">
-          <div className="col-lg-12 col-md-12 head-sec text-center">
-            {/* <h6>{tr.sec2Title}</h6> */}
-            <h3>{tr.sec2Sub}</h3>
-          </div>
+        <section className="inner-page-banner head-sec" style={{ paddingTop: '0px' }}>
+        <div className="container text-center">
+         <h1 style={{ margin: 0 }}>{tr.sec2Sub}</h1>
         </div>
+      </section>
         <div className="filter-wrap p-a15 our-gallery">
           <ul className="masonry-filter link-style text-uppercase center-block m-t0">
             {tabs.map(tab => (

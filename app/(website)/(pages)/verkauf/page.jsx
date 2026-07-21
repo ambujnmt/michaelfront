@@ -167,7 +167,7 @@ export default function Verkauf() {
               {lang === 'de' ? 'Zurück' : 'Back'}
             </button>
           </div>
-          <p>{tr.bannerSub}</p>
+          <h4>{tr.bannerSub}</h4>
         </div>
       </section>
 

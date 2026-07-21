@@ -1,8 +1,15 @@
 /* ========================== Michaelleber css start here ========================= */
+@font-face {
+    font-family: "Centra No2";
+    src: url("/assets/fonts/fonnts.com-Centra_No2.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
 :root{
-	--head-font: "Playfair Display", serif;
-	--pera-font: "Playfair Display", serif;
+	--head-font: "Centra No2", sans-serif;
+	--pera-font: "Centra No2", sans-serif;
 }
 
 .top-col1 img{
@@ -88,25 +95,26 @@
 	margin: 70px 0px;
 }
 
-.head-sec h1{
+.head-sec-page h1{
 	font-family: var(--head-font);
     font-weight: normal;
 	line-height: 60px;
-    font-size: 50px;
+    font-size: 40px;
     letter-spacing: 5%;
     margin-bottom: 20px;
 	color: #000;
     text-transform: uppercase;
 }
 
-.head-sec h3{
+
+.head-sec h1{
 	font-family: var(--head-font);
     font-weight: normal;
 	line-height: 60px;
-    font-size: 50px;
+    font-size: 40px;
     letter-spacing: 5%;
     margin-bottom: 20px;
-	color: #000;
+	color: #fff;
     text-transform: uppercase;
 }
 
@@ -393,9 +401,10 @@ section.page-2-sec4 {
 
 /* page 3 css start here */
 .head-2{
-	background-color: transparent;
+	/* background-color: transparent; */
     position: absolute;
     width: 100%;
+    background-color: #0000002c;
 }
 
 .slotholder_fadeoutwrap {
@@ -483,7 +492,7 @@ section.page-2-sec4 {
 
 .objekt-section {
     padding: 50px 30px 50px;
-    background-color: #000;
+    background-color: #0000009e;
     margin-top: 40px;
 }
  
@@ -508,7 +517,7 @@ section.page-2-sec4 {
     font-size: 15px;
     font-weight: normal;
     letter-spacing: 0%;
-    color: #828282;
+    color: #e8e8e8;
     }
  
     .detail-value {
@@ -517,7 +526,7 @@ section.page-2-sec4 {
     font-size: 15px;
     font-weight: normal;
     letter-spacing: 0%;
-    color: #828282;
+    color: #e8e8e8;
     }
  
     /* Vertical divider between two columns on md+ */
@@ -570,7 +579,7 @@ section.page-2-sec4 {
 
 .pera2 p{
 	font-family: var(--head-font);
-	font-size: 15px;
+	font-size: 18px;
 	font-weight: normal;
 	letter-spacing: 0%;
 	color: #828282;
@@ -846,7 +855,7 @@ a.flip-col-btn:hover{
     height: 100vh;
     overflow: hidden;
     margin-top: 70px;
-    margin-bottom: 10px; /* ya 30px */
+    margin-bottom: 2px; /* ya 30px */
 }
 
 .p5-sec3 .background-video{
@@ -1799,7 +1808,9 @@ a.flip-col-btn:hover{
 }
 /* // page 8 css start here */
 
-
+.pro-dtl-sec2{
+    margin-top: 50px;
+}
 
 
 
@@ -1834,13 +1845,19 @@ a.flip-col-btn:hover{
 	.vision-sec-col6-1 h3{margin-bottom: 20px;}
 	.page-2-middle-txt h4{line-height: 35px; font-size: 20px;}
 	.page-2-sec4-col6-1{height: unset; margin-bottom: 20px;}
-	.p3-col-sec{display: none;}
+	/* .p3-col-sec{display: none;} */
 	.fullscreen-container {height: 100% !important;}
 	.p3-margin-top {margin-top: 50px;}
 	.p3-sec3 .col-lg-12{padding: 70px 15px;}
 	.detail-label{min-width: 145px; font-size: 14px;}
 	.detail-value{text-align: left; font-size: 14px;}
 	.copyrights-text2{float: unset;}
+    .masonry-filter > li{margin-right: 18px;}
+    .pro-dtl-sec2{margin-top: 150px !important;}
+    .sub-btn1{margin: 30px 0px;}
+    .p3-col-sec { background-color: #000000b5; height: unset; position: relative; top: 100px; }
+    .p3-col-sec-box1::before{height: 90px; top: 0px;}
+    .p3-col-sec-box1::before{display: none;}
 }
 /* // Mobile tab */
 
@@ -1854,9 +1871,14 @@ a.flip-col-btn:hover{
 	.header-nav .nav > li{margin: 0px 0px;}
 	.top-lang-col{margin-top: -20px;}	
 	.site-header{padding-bottom: 20px;}
-	.p3-col-sec{display: none;}
+	/* .p3-col-sec{display: none;} */
 	.detail-value{text-align: left;}
 	.detail-label{min-width: 170px;}
+    .pro-dtl-sec2{margin-top: 215px !important;}
+    .sub-btn1{margin: 30px 0px;}
+    .p3-col-sec { background-color: #000000b5; height: unset; position: relative; top: 160px; padding: 20px 0px;}
+    .p3-col-sec-box1::before{display: none;} 
+    .foot-social-icons{display: flex; justify-content: center;}
 }
 /* // Tablet tab */
 /* ==== // Responsive css here ==== */
@@ -1880,11 +1902,11 @@ a.flip-col-btn:hover{
 /* ── Inner Page Banner ──────────────────────────────────── */
 .inner-page-banner {
     background-color: #fff;
-    padding: 15px 0 30px;
+    padding: 15px 0 20px;
 }
 .inner-page-banner h1 {
     color: #000;
-    font-size: 42px;
+    font-size: 40px;
     font-weight: 700;
     margin-bottom: 12px;
     text-transform: uppercase;
@@ -1977,6 +1999,7 @@ a.flip-col-btn:hover{
     justify-content: center;
     font-size: 16px;
     flex-shrink: 0;
+    border-radius: 5px;
 }
 .kontakt-info-item p {
     font-size: 15px;
@@ -1985,3 +2008,23 @@ a.flip-col-btn:hover{
     margin-bottom: 0;
     font-family: var(--head-font);
 }
+
+.floor-plan-slider .owl-stage-outer {
+    display: grid;
+    justify-content: center;
+}
+
+.floor-plan-slider img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.floor-plan-slider .wt-thum-bx{
+    border-radius: 6px;
+}
+
+.p3-col-sec .row {
+    display: flex;
+    justify-content: center;
+}
+ 
