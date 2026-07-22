@@ -43,7 +43,7 @@ export default function Footer() {
               <div className="widget widget_about">
                 <Link href="/">
                   <img
-                    src="/assets/img/logo.png"
+                    src="/assets/img/new-logo.svg"
                     alt="MICHAELLEBER"
                     className="img-fluid"
                   />
