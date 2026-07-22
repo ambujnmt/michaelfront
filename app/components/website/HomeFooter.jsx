@@ -47,7 +47,7 @@ export default function HomeFooter() {
                   <Link href="/">
                     {/* Use a higher-resolution logo or SVG if available */}
                     <img
-                      src="/assets/img/logo.png"
+                      src="/assets/img/new-logo.svg"
                       alt="MICHAELLEBER"
                       className="img-fluid"
                     />
