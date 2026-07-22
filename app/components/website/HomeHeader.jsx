@@ -109,7 +109,7 @@ export default function HomeHeader() {
             <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center">
               <div className="logo-header text-center">
                 <Link href="/">
-                  <img src="/assets/img/logo.png" alt="image" />
+                  <img src="/assets/img/new-logo.svg" alt="image" />
                 </Link>
               </div>
             </div>
