@@ -91,13 +91,18 @@ export default function Newsletter() {
 
             {status && status !== 'loading' && (() => {
               const cfg = {
-                success:   { icon: 'fa-check-circle',       color: '#16a34a', bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.4)',  msg: t.success },
-                duplicate: { icon: 'fa-exclamation-circle', color: '#b45309', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.4)', msg: t.duplicate },
-                error:     { icon: 'fa-times-circle',        color: '#dc2626', bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.4)',  msg: t.error },
+                success:   { icon: 'fa-check-circle',       bg: '#16a34a', border: '#22c55e', msg: t.success },
+                duplicate: { icon: 'fa-exclamation-circle', bg: '#d97706', border: '#f59e0b', msg: t.duplicate },
+                error:     { icon: 'fa-times-circle',        bg: '#dc2626', border: '#ef4444', msg: t.error },
               }[status]
               return cfg ? (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '14px', padding: '10px 18px', borderRadius: '8px', background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.color, fontSize: '13px', fontWeight: '600' }}>
-                  <i className={`fa ${cfg.icon}`} />{cfg.msg}
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                  margin: '18px auto 0', maxWidth: '440px', padding: '13px 20px', borderRadius: '10px',
+                  background: cfg.bg, border: `1px solid ${cfg.border}`, color: '#ffffff',
+                  fontSize: '14px', fontWeight: '700', boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
+                }}>
+                  <i className={`fa ${cfg.icon}`} style={{ fontSize: '16px', color: '#ffffff' }} />{cfg.msg}
                 </div>
               ) : null
             })()}

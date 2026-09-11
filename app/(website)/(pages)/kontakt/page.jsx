@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useSiteInfo } from '@/lib/SiteInfoContext'
 import websiteApi from '@/lib/websiteApi'
 import allTranslations from '@/lib/translations'
+import { API_URL as API } from '@/service/config'
 
 export default function Kontakt() {
 
@@ -18,6 +19,38 @@ export default function Kontakt() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
+
+  const [kontaktPage, setKontaktPage] = useState(null)
+
+  useEffect(() => {
+    websiteApi.getKontaktPage()
+      .then(res => { if (res.success) setKontaktPage(res.data) })
+      .catch(() => {})
+  }, [])
+
+  // Falls back to the static translation/defaults until an admin saves content for this field
+  const pick = (dbVal, fallback) => (dbVal && dbVal.trim()) ? dbVal : fallback
+  const stripEmptyBlocks = (html) => html.replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
+
+  const defaultOfficeHeading = t.officeHeading || (lang === 'de' ? 'Unser Büro' : 'Our Office')
+  const defaultOfficeP1 = t.officeP1 || (lang === 'de'
+    ? 'Lorem Ipsum ist einfach ein Blindtext der Druck- und Satzindustrie. Willkommen in unserem Büro — wir freuen uns, Sie persönlich kennenzulernen.'
+    : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Welcome to our office — we look forward to meeting you in person.')
+  const defaultOfficeP2 = t.officeP2 || (lang === 'de'
+    ? 'Unser Team steht Ihnen bei all Ihren Immobilienanliegen jederzeit gerne zur Seite.'
+    : 'Our team is always happy to help with all your property needs.')
+  const defaultOfficeLi = [
+    t.officeLi1 || (lang === 'de' ? 'Persönliche Beratung vor Ort' : 'Personal on-site consultation'),
+    t.officeLi2 || (lang === 'de' ? 'Erfahrenes Maklerteam' : 'Experienced broker team'),
+    t.officeLi3 || (lang === 'de' ? 'Individuelle Betreuung' : 'Individual support'),
+  ]
+  const fallbackContent = `<p>${defaultOfficeP1}</p><p>${defaultOfficeP2}</p><ul>${defaultOfficeLi.map(l => `<li>${l}</li>`).join('')}</ul>`
+
+  const titleText    = pick(kontaktPage?.[`title_${lang}`], t.bannerTitle)
+  const subtitleText = pick(kontaktPage?.[`subtitle_${lang}`], t.bannerSubtitle)
+  const headingText  = pick(kontaktPage?.[`heading_${lang}`], defaultOfficeHeading)
+  const contentHtml  = stripEmptyBlocks(pick(kontaktPage?.[`content_${lang}`], fallbackContent))
+  const officeImage  = kontaktPage?.image ? `${API}${kontaktPage.image}` : '/assets/img/p5-right-img.png'
 
   const showFlash = (type, msg) => {
     if (type === 'success') setSuccess(msg)
@@ -49,16 +82,14 @@ export default function Kontakt() {
   return (
     <>
       {/* Page Heading — single banner, no nested duplicate */}
-      <section className="inner-page-banner head-sec">
-        <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <h1 style={{ margin: 0 }}>{t.bannerTitle}</h1>
-            <button onClick={() => router.back()} className="btn btn1" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
-              <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
-              {lang === 'de' ? 'Zurück' : 'Back'}
-            </button>
-          </div>
-          <h4>{t.bannerSubtitle}</h4>
+      <section className="inner-page-banner head-sec" style={{ padding: '50px 0px 50px 0px' }}>
+        <div className="container text-center page-banner-inner">
+          <button onClick={() => router.back()} className="btn btn1 page-banner-back" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
+            <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
+            {lang === 'de' ? 'Zurück' : 'Back'}
+          </button>
+          <h1 style={{ margin: '0 0 8px' }}>{titleText}</h1>
+          <h4 style={{ margin: 0 }}>{subtitleText}</h4>
         </div>
       </section>
 
@@ -66,33 +97,53 @@ export default function Kontakt() {
       <section className="section-padding">
         <div className="container">
 
-          {/* Office Photo + Paragraph — full width, above the form */}
-          <div className="row g-5 align-items-center mb-5">
-            <div className="col-lg-7">
-              <img
-                src="/assets/img/p5-right-img.png"
-                alt="Office"
-                className="img-fluid w-100"
-                style={{ borderRadius: '10px', height: '320px', objectFit: 'cover', border: '1px solid #ece6db' }}
-              />
+          {/* Office Photo full-width, content below (matches /unternehmen) */}
+          <style>{`
+            .kontakt-img-full {
+              width: 100%;
+              height: 420px;
+              object-fit: cover;
+              border-radius: 10px;
+              border: 1px solid #ece6db;
+              margin-bottom: 40px;
+            }
+            @media (max-width: 767px) {
+              .kontakt-img-full { height: 240px; margin-bottom: 28px; }
+            }
+            .kontakt-content { max-width: 100%; }
+            .kontakt-content * {
+              max-width: 100%;
+              white-space: normal;
+              overflow-wrap: normal;
+              word-wrap: normal;
+              word-break: normal;
+              hyphens: none;
+            }
+            .kontakt-content p { margin-bottom: 16px; }
+            .kontakt-content ul { list-style: none; margin: 16px 0 0; padding: 0; }
+            .kontakt-content ul li {
+              position: relative;
+              padding-left: 28px;
+              margin-bottom: 10px;
+              color: rgb(68, 68, 68);
+            }
+            .kontakt-content ul li::before {
+              content: "\\f058";
+              font-family: "FontAwesome";
+              position: absolute;
+              left: 0;
+              top: 0;
+              font-size: 16px;
+              color: rgb(68, 68, 68);
+            }
+          `}</style>
+          <div className="row mb-5">
+            <div className="col-12">
+              <img src={officeImage} alt="Office" className="kontakt-img-full" />
             </div>
-            <div className="col-lg-5 head-sec">
-              <h2>{t.officeHeading || (lang === 'de' ? 'Unser Büro' : 'Our Office')}</h2>
-              <p>
-                {t.officeP1 || (lang === 'de'
-                  ? 'Lorem Ipsum ist einfach ein Blindtext der Druck- und Satzindustrie. Willkommen in unserem Büro — wir freuen uns, Sie persönlich kennenzulernen.'
-                  : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Welcome to our office — we look forward to meeting you in person.')}
-              </p>
-              <p>
-                {t.officeP2 || (lang === 'de'
-                  ? 'Unser Team steht Ihnen bei all Ihren Immobilienanliegen jederzeit gerne zur Seite.'
-                  : 'Our team is always happy to help with all your property needs.')}
-              </p>
-              <ul className="mt-3">
-                <li>{t.officeLi1 || (lang === 'de' ? 'Persönliche Beratung vor Ort' : 'Personal on-site consultation')}</li>
-                <li>{t.officeLi2 || (lang === 'de' ? 'Erfahrenes Maklerteam' : 'Experienced broker team')}</li>
-                <li>{t.officeLi3 || (lang === 'de' ? 'Individuelle Betreuung' : 'Individual support')}</li>
-              </ul>
+            <div className="col-12 head-sec">
+              <h2>{headingText}</h2>
+              <div className="kontakt-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
             </div>
           </div>
 
@@ -120,11 +171,23 @@ export default function Kontakt() {
                   <div className="col-md-6">
                     <div className="form-group mb-4">
                       <input
-                        type="text"
+                        type="tel"
                         className="form-control"
                         placeholder={t.phonePlaceholder}
                         value={form.phone}
-                        onChange={e => setForm({ ...form, phone: e.target.value })}
+                        onChange={e => {
+                          const cleaned = e.target.value.replace(/[^\d+\s()-]/g, '')
+                          let digits = 0
+                          let limited = ''
+                          for (const ch of cleaned) {
+                            if (/\d/.test(ch)) {
+                              if (digits >= 15) continue
+                              digits++
+                            }
+                            limited += ch
+                          }
+                          setForm({ ...form, phone: limited })
+                        }}
                       />
                     </div>
                   </div>
@@ -213,18 +276,6 @@ export default function Kontakt() {
                     </div>
                     <div>
                       <p style={{ margin: 0 }}>{siteInfo.email}</p>
-                    </div>
-                  </div>
-                )}
-
-                {siteInfo.opening_hours && (
-                  <div className="kontakt-info-item">
-                    <div className="kontakt-icon">
-                      <i className="fa fa-clock-o"></i>
-                    </div>
-                    <div>
-                      <p style={{ fontWeight: '600', marginBottom: '2px' }}>{lang === 'de' ? 'Öffnungszeiten' : 'Opening Hours'}</p>
-                      <p style={{ color: '#666', margin: 0 }}>{siteInfo.opening_hours}</p>
                     </div>
                   </div>
                 )}

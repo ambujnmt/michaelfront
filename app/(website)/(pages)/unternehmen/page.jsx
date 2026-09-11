@@ -15,48 +15,98 @@ export default function UberUns() {
 
   const [members, setMembers] = useState([])
   const [teamLoading, setTeamLoading] = useState(true)
+  const [about, setAbout] = useState(null)
 
   useEffect(() => {
     websiteApi.getTeam()
       .then(res => { if (res.success) setMembers(res.data) })
       .catch(() => {})
       .finally(() => setTeamLoading(false))
+
+    websiteApi.getAbout()
+      .then(res => { if (res.success) setAbout(res.data) })
+      .catch(() => {})
   }, [])
+
+  // Falls back to the static translation until an admin saves content for this field
+  const pick = (dbVal, fallback) => (dbVal && dbVal.trim()) ? dbVal : fallback
+
+  // Quill leaves a trailing empty <p><br></p> / <li><br></li> behind — strip those
+  // so an empty bullet/paragraph doesn't render with nothing next to it.
+  const stripEmptyBlocks = (html) => html.replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
+
+  const fallbackContent = `<p>${tr.p1}</p><p>${tr.p2}</p><ul>${[tr.li1, tr.li2, tr.li3].map(l => `<li>${l.replace(/^✔\s*/, '')}</li>`).join('')}</ul>`
+
+  const titleText    = pick(about?.[`title_${lang}`], tr.bannerTitle)
+  const subtitleText = pick(about?.[`subtitle_${lang}`], tr.bannerSub)
+  const headingText  = pick(about?.[`heading_${lang}`], tr.heading)
+  const contentHtml  = stripEmptyBlocks(pick(about?.[`content_${lang}`], fallbackContent))
+  const aboutImage   = about?.image ? `${API}${about.image}` : '/assets/img/img4.png'
 
   return (
     <>
-      <section className="inner-page-banner head-sec">
-        <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <h1 style={{ margin: 0 }}>{tr.bannerTitle}</h1>
-            <button onClick={() => router.back()} className="btn btn1" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
-              <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
-              {lang === 'de' ? 'Zurück' : 'Back'}
-            </button>
-          </div>
-          <h4>{tr.bannerSub}</h4>
+      <section className="inner-page-banner head-sec" style={{ padding: '50px 0px 50px 0px' }}>
+        <div className="container text-center page-banner-inner">
+          <button onClick={() => router.back()} className="btn btn1 page-banner-back" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
+            <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
+            {lang === 'de' ? 'Zurück' : 'Back'}
+          </button>
+          <h1 style={{ margin: '0 0 8px' }}>{titleText}</h1>
+          <h4 style={{ margin: 0 }}>{subtitleText}</h4>
         </div>
       </section>
 
       <section className="section-padding">
         <div className="container">
-          <div className="row align-items-center">
+          <style>{`
+            .about-img-full {
+              width: 100%;
+              height: 420px;
+              object-fit: cover;
+              border-radius: 10px;
+              border: 1px solid #ece6db;
+              margin-bottom: 40px;
+            }
+            @media (max-width: 767px) {
+              .about-img-full { height: 240px; margin-bottom: 28px; }
+            }
+            .about-content { max-width: 100%; }
+            .about-content * {
+              max-width: 100%;
+              white-space: normal;
+              overflow-wrap: normal;
+              word-wrap: normal;
+              word-break: normal;
+              hyphens: none;
+            }
+            .about-content p { margin-bottom: 16px; }
+            .about-content ul { list-style: none; margin: 16px 0 0; padding: 0; }
+            .about-content ul li {
+              position: relative;
+              padding-left: 28px;
+              margin-bottom: 10px;
+              color: rgb(68, 68, 68);
+            }
+            .about-content ul li::before {
+              content: "\\f058";
+              font-family: "FontAwesome";
+              position: absolute;
+              left: 0;
+              top: 0;
+              font-size: 16px;
+              color: rgb(68, 68, 68);
+            }
+          `}</style>
 
-            <div className="col-lg-6 mb-4">
-              <img src="/assets/img/img4.png" alt="About" className="img-fluid" />
+          <div className="row">
+            <div className="col-12">
+              <img src={aboutImage} alt="About" className="about-img-full" />
             </div>
 
-            <div className="col-lg-6 mb-4 head-sec">
-              <h2>{tr.heading}</h2>
-              <p>{tr.p1}</p>
-              <p>{tr.p2}</p>
-              <ul className="mt-3">
-                <li>{tr.li1}</li>
-                <li>{tr.li2}</li>
-                <li>{tr.li3}</li>
-              </ul>
+            <div className="col-12 head-sec">
+              <h2>{headingText}</h2>
+              <div className="about-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
             </div>
-
           </div>
         </div>
       </section>
@@ -97,7 +147,7 @@ export default function UberUns() {
                     {m.image
                       ? <img
                           src={`${API}${m.image}`}
-                          alt={m.name}
+                          alt={m[`name_${lang}`] || m.name}
                           style={{ width: '100%', height: '320px', borderRadius: '5px', objectFit: 'cover', display: 'block' }}
                         />
                       : <div style={{ width: '100%', height: '320px', borderRadius: '5px', background: '#f2efe9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>
@@ -106,9 +156,18 @@ export default function UberUns() {
                     }
 
                     <div style={{ padding: '20px' }}>
-                      {m.name && <h5 style={{ marginBottom: '4px', color: '#1a1a1a', fontWeight: 600 }}>{m.name}</h5>}
-                      {m.position && <p style={{ fontSize: '13px', color: '#8a8a8a', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.position}</p>}
-                      {m.bio && <p style={{ fontSize: '13px', color: '#666', lineHeight: '1.6', marginBottom: '14px' }}>{m.bio}</p>}
+                      {(() => {
+                        const nm = m[`name_${lang}`] || m.name
+                        return nm ? <h5 style={{ marginBottom: '4px', color: '#1a1a1a', fontWeight: 600 }}>{nm}</h5> : null
+                      })()}
+                      {(() => {
+                        const pos = m[`position_${lang}`] || m.position
+                        return pos ? <p style={{ fontSize: '13px', color: '#8a8a8a', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{pos}</p> : null
+                      })()}
+                      {(() => {
+                        const bio = m[`bio_${lang}`] || m.bio
+                        return bio ? <p style={{ fontSize: '13px', color: '#666', lineHeight: '1.6', marginBottom: '14px' }}>{bio}</p> : null
+                      })()}
 
                       <div style={{ borderTop: '1px solid #ece6db', paddingTop: '14px', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {m.phone && (

@@ -210,7 +210,7 @@ img { max-width: 100%; height: auto; }
 
 /* ── ABOUT / UBER-UNS PAGE ──────────────────────────────── */
 @media (max-width: 767px) {
-  .section-padding { padding: 40px 0; }
+  .section-padding { padding: 0px 0; }
 }
 
 /* ── CONTACT / KONTAKT PAGE ─────────────────────────────── */
@@ -281,7 +281,7 @@ img { max-width: 100%; height: auto; }
 
 /* ── SECTION PADDING ────────────────────────────────────── */
 @media (max-width: 767px) {
-  .section-padding { padding: 40px 0 !important; }
+  .section-padding { padding: 0px 0 !important; }
   .p7-sec3 { margin: 40px 0 10px; }
   .p7-sec5 { margin-top: 40px; }
   .p7-sec6 { padding: 50px 0 40px; }

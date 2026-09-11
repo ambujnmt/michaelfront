@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
+import { localizeProperties } from '@/lib/propertyI18n'
 import Newsletter from '@/app/components/website/Newsletter'
 
 import { API_URL as API } from '@/service/config'
@@ -44,7 +45,7 @@ export default function Immobilien() {
     : properties.filter(p => (p.property_type || 'villa') === activeFilter)
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
-  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+  const paginated  = localizeProperties(filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE), lang)
 
   const goToPage = (n) => {
     setPage(n)
@@ -55,7 +56,7 @@ export default function Immobilien() {
     <>
 
       {/* Banner */}
-      <section className="inner-page-banner head-sec" style={{ paddingTop: '50px' }}>
+      <section className="inner-page-banner head-sec imm-banner" style={{ padding: '50px 0 0px' }}>
         <div className="container text-center">
           {/* <h6 style={{ margin: '0 0 8px' }}>{trHome.sec2Sub}</h6> */}
           <h1 style={{ margin: 0 }}>{trHome.sec2Sub}</h1>
@@ -183,6 +184,7 @@ export default function Immobilien() {
 /* the homepage card so both areas look consistent.                      */
 /* ---------------------------------------------------------------------- */
 function PropertyCard({ p, tr }) {
+  const router = useRouter()
   const [hovered, setHovered] = useState(false)
   const type = p.property_type || 'villa'
   const isLand = type === 'various'
@@ -192,7 +194,7 @@ function PropertyCard({ p, tr }) {
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => setHovered(v => !v)} // lets touch devices tap to reveal details
+      onClick={() => router.push(`/immobilien/${p.slug}`)} // whole card opens the detail page
       style={{
         position: 'relative',
         borderRadius: '5px',
@@ -276,9 +278,10 @@ function PropertyCard({ p, tr }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString()}</h5>
+          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString('de-DE')}</h5>
           <Link
             href={`/immobilien/${p.slug}`}
+            onClick={(e) => e.stopPropagation()}
             style={{
               padding: '8px 16px',
               background: '#8a6b3f',

@@ -67,12 +67,16 @@ export default function Header({ className = '' }) {
   const pageName = getPageName(pathname, lang)
   const pageIcon = getPageIcon(pathname)
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Close the mobile menu on route change
+  useEffect(() => { setMenuOpen(false) }, [pathname])
 
   return (
     <header className={`site-header header-style-1 mobile-sider-drawer-menu ${className}`}
@@ -106,6 +110,11 @@ export default function Header({ className = '' }) {
           transition: color 0.2s;
         }
         .hh-sub li a:hover { color: #fff !important; }
+
+        @media (max-width: 991px) {
+          .header-nav.navbar-collapse { display: none; }
+          .header-nav.navbar-collapse.show { display: block; }
+        }
       `}</style>
 
       <div className="container">
@@ -153,27 +162,28 @@ export default function Header({ className = '' }) {
       <div className="sticky-header main-bar-wraper">
         <div className="main-bar">
           <div className="container">
-            <div className="header-nav navbar-collapse collapse">
+            <div className={`header-nav navbar-collapse ${menuOpen ? 'show' : ''}`}
+              style={{ display: menuOpen ? 'block' : undefined }}>
               <ul className="nav navbar-nav">
-                <li>
+                <li onClick={() => setMenuOpen(false)}>
                   <Link href="/immobilien">
                     {lang === 'de' ? 'immobilien' : 'properties'}
                   </Link>
                 </li>
 
-                <li>
+                <li onClick={() => setMenuOpen(false)}>
                   <Link href="/verkauf">
                     {lang === 'de' ? 'verkauf' : 'sales'}
                   </Link>
                 </li>
 
-                <li className="hh-dropdown">
+                <li className="hh-dropdown" onClick={() => setMenuOpen(false)}>
                     <Link href="/unternehmen">
                       {lang === 'de' ? 'unternehmen' : 'company'}
                     </Link>
                 </li>
 
-                <li>
+                <li onClick={() => setMenuOpen(false)}>
                   <Link href="/kontakt">
                     {lang === 'de' ? 'kontakt' : 'contact'}
                   </Link>
@@ -183,11 +193,10 @@ export default function Header({ className = '' }) {
 
             {/* MOBILE TOGGLE */}
             <button
-              id="mobile-side-drawer"
-              data-target=".header-nav"
-              data-toggle="collapse"
               type="button"
-              className="navbar-toggler collapsed"
+              className={`navbar-toggler ${menuOpen ? '' : 'collapsed'}`}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuOpen(prev => !prev) }}
+              aria-expanded={menuOpen}
             >
               <span className="sr-only">Toggle navigation</span>
               <span className="icon-bar icon-bar-first"></span>

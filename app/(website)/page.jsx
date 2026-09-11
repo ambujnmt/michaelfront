@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
+import { API_URL as API } from '@/service/config'
 import HomeHeader from '../components/website/HomeHeader'
 import HomeFooter from '../components/website/HomeFooter'
 import PropertyCarousel from '../components/website/PropertyCarousel'
@@ -160,6 +161,19 @@ export default function Home() {
   const { lang } = useLanguage()
   const tr = translations.home[lang] || translations.home['de']
   const [showModal, setShowModal] = useState(false)
+  const [videoBanner, setVideoBanner] = useState(null)
+
+  useEffect(() => {
+    websiteApi.getVideoBanner().then(res => {
+      if (res.success) setVideoBanner(res.data)
+    })
+  }, [])
+
+  // Video banner section — editable in the admin panel (Video Banner);
+  // falls back to the static asset/translation until admin data has loaded
+  // or if a field is left empty.
+  const videoBannerText = videoBanner?.[`text_${lang}`] || tr.sec3Text
+  const videoBannerSrc = videoBanner?.video ? `${API}${videoBanner.video}` : '/assets/img/p5-vdo2.mp4'
 
   useEffect(() => {
     // Only show once every 24 hours, regardless of login/logout or new sessions.
@@ -186,17 +200,17 @@ export default function Home() {
       {/* Shows at most once every 24 hours, tracked via localStorage */}
       {showModal && <NewsletterModal onClose={() => setShowModal(false)} />}
 
-      {/* ── SEC 1 — PROPERTIES ── */}
+      {/* ── SEC 1 — PROPERTIES (3 highlighted) ── */}
       <PropertyCarousel />
 
       {/* ── SEC 2 — VIDEO BANNER ── */}
       <section className="p5-sec3">
-        <video autoPlay muted loop playsInline className="background-video">
-          <source src="/assets/img/p5-vdo2.mp4" type="video/mp4" />
+        <video key={videoBannerSrc} autoPlay muted loop playsInline className="background-video">
+          <source src={videoBannerSrc} type="video/mp4" />
         </video>
         <div className="overlay"></div>
         <div className="content head-sec">
-          <h1>{tr.sec3Text}</h1>
+          <h1>{videoBannerText}</h1>
         </div>
       </section>
 
@@ -223,7 +237,7 @@ export default function Home() {
         </div>
       </section> */}
 
-      {/* ── SEC 4 — NEWSLETTER ── */}
+      {/* ── SEC 3 — NEWSLETTER (unchanged) ── */}
       <Newsletter />
 
       <HomeFooter />

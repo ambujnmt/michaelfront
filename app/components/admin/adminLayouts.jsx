@@ -12,8 +12,19 @@ export default function AdminLayout({ children }) {
   const [admin,       setAdmin]       = useState(null)
   const [loading,     setLoading]     = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isMobile,    setIsMobile]    = useState(false)
   const [navProgress, setNavProgress] = useState(false)
   const [prevPath,    setPrevPath]    = useState(null)
+
+  // Responsive sidebar: overlay + closed by default on small screens.
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 991px)')
+    const apply = (matches) => { setIsMobile(matches); setSidebarOpen(!matches) }
+    apply(mq.matches)
+    const onChange = (e) => setIsMobile(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
 
   // Show progress bar when pathname changes (navigation in progress → done)
   useEffect(() => {
@@ -146,14 +157,29 @@ export default function AdminLayout({ children }) {
         }
       `}</style>
 
-      {/* Sidebar — slides in/out */}
+      {/* Mobile backdrop */}
+      {isMobile && sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 998 }}
+        />
+      )}
+
+      {/* Sidebar — slides in/out (overlay on mobile, push on desktop) */}
       <div style={{
         flexShrink: 0, height: '100vh',
-        width: sidebarOpen ? '260px' : '0px',
-        overflow: 'hidden',
-        transition: 'width 0.28s cubic-bezier(0.4,0,0.2,1)',
+        ...(isMobile ? {
+          position: 'fixed', top: 0, left: 0, zIndex: 999, width: '260px',
+          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1)',
+          boxShadow: sidebarOpen ? '0 0 40px rgba(0,0,0,0.5)' : 'none',
+        } : {
+          width: sidebarOpen ? '260px' : '0px',
+          overflow: 'hidden',
+          transition: 'width 0.28s cubic-bezier(0.4,0,0.2,1)',
+        }),
       }}>
-        <Sidebar onNavigate={() => setNavProgress(true)} />
+        <Sidebar onNavigate={() => { setNavProgress(true); if (isMobile) setSidebarOpen(false) }} />
       </div>
 
       {/* Right side */}
