@@ -18,11 +18,29 @@ const inputStyle = {
   color: '#f1f5f9', fontSize: '14px', outline: 'none', boxSizing: 'border-box',
 }
 
-const emptyForm = { name: '', position: '', bio: '', email: '', phone: '', status: 'Active', sort_order: 0 }
+const emptyForm = {
+  name_de: '', name_en: '',
+  position_de: '', position_en: '',
+  bio_de: '', bio_en: '',
+  email: '', phone: '', status: 'Active', sort_order: 0,
+}
+
+const langTag = (l) => ({
+  display: 'inline-block', marginLeft: '8px', fontSize: '10px', fontWeight: '700',
+  color: l === 'de' ? '#60a5fa' : '#34d399',
+  background: l === 'de' ? 'rgba(96,165,250,0.15)' : 'rgba(52,211,153,0.15)',
+  border: `1px solid ${l === 'de' ? 'rgba(96,165,250,0.35)' : 'rgba(52,211,153,0.35)'}`,
+  padding: '1px 7px', borderRadius: '20px', verticalAlign: 'middle',
+})
 
 function TeamModal({ item, mode, onClose, onSaved }) {
   const [form, setForm] = useState(item ? {
-    name: item.name || '', position: item.position || '', bio: item.bio || '',
+    name_de: item.name_de ?? item.name ?? '',
+    name_en: item.name_en ?? '',
+    position_de: item.position_de ?? item.position ?? '',
+    position_en: item.position_en ?? '',
+    bio_de: item.bio_de ?? item.bio ?? '',
+    bio_en: item.bio_en ?? '',
     email: item.email || '', phone: item.phone || '',
     status: item.status || 'Active', sort_order: item.sort_order || 0,
   } : emptyForm)
@@ -39,7 +57,7 @@ function TeamModal({ item, mode, onClose, onSaved }) {
   }
 
   const handleSave = async () => {
-    if (!form.name.trim()) { Swal.fire('Validation', 'Name is required.', 'warning'); return }
+    if (!form.name_de.trim() && !form.name_en.trim()) { Swal.fire('Validation', 'Name is required.', 'warning'); return }
     setSaving(true)
     const fd = new FormData()
     Object.entries(form).forEach(([k, v]) => fd.append(k, v))
@@ -94,26 +112,51 @@ function TeamModal({ item, mode, onClose, onSaved }) {
             <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFile} />
           </div>
 
-          <div>
-            <Label>Name *</Label>
-            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Full name" style={inputStyle}
-              onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div>
+              <Label>Name * <span style={langTag('de')}>DE</span></Label>
+              <input value={form.name_de} onChange={e => setForm({ ...form, name_de: e.target.value })} placeholder="Voller Name" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+            </div>
+            <div>
+              <Label>Name <span style={langTag('en')}>EN</span></Label>
+              <input value={form.name_en} onChange={e => setForm({ ...form, name_en: e.target.value })} placeholder="Full name" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+            </div>
           </div>
 
-          <div>
-            <Label>Position / Role</Label>
-            <input value={form.position} onChange={e => setForm({ ...form, position: e.target.value })} placeholder="e.g. Senior Agent" style={inputStyle}
-              onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div>
+              <Label>Position / Role <span style={langTag('de')}>DE</span></Label>
+              <input value={form.position_de} onChange={e => setForm({ ...form, position_de: e.target.value })} placeholder="z.B. Senior Maklerin" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+            </div>
+            <div>
+              <Label>Position / Role <span style={langTag('en')}>EN</span></Label>
+              <input value={form.position_en} onChange={e => setForm({ ...form, position_en: e.target.value })} placeholder="e.g. Senior Agent" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+            </div>
           </div>
 
-          <div>
-            <Label>Bio</Label>
-            <textarea rows={3} value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} placeholder="Short description..."
-              style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }}
-              onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div>
+              <Label>Bio <span style={langTag('de')}>DE</span></Label>
+              <textarea rows={3} value={form.bio_de} onChange={e => setForm({ ...form, bio_de: e.target.value })} placeholder="Kurzbeschreibung..."
+                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }}
+                onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+            </div>
+            <div>
+              <Label>Bio <span style={langTag('en')}>EN</span></Label>
+              <textarea rows={3} value={form.bio_en} onChange={e => setForm({ ...form, bio_en: e.target.value })} placeholder="Short description..."
+                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }}
+                onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.5)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'} />
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>

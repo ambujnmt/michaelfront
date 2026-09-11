@@ -1,15 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Footer from '@/app/components/website/Footer'
 import Newsletter from '@/app/components/website/Newsletter'
 import websiteApi from '@/lib/websiteApi'
+import { localizeProperty, localizeProperties } from '@/lib/propertyI18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 
 import { API_URL as API } from '@/service/config'
+
+// Quill saves "empty" content as non-empty-looking HTML (e.g. "<p></p>" or
+// "<p><br></p>"), so a plain truthiness check lets an empty editor through
+// and hides the default fallback text. Strip tags and check for real text.
+function hasRichContent(html) {
+  return !!html && html.replace(/<[^>]*>/g, '').trim().length > 0
+}
 
 function OtherPropertiesSlider({ properties }) {
   useEffect(() => {
@@ -55,9 +63,16 @@ export default function PropertyDetail() {
   const { lang, setLang } = useLanguage()
   const tr = translations.propertyDetail[lang]
   const pageName = lang === 'de' ? 'Immobilien' : 'Properties'
-  const [property, setProperty] = useState(null)
+  const [rawProperty, setRawProperty] = useState(null)
   const [gallery,  setGallery]  = useState([])
   const [others,   setOthers]   = useState([])
+  const [apartmentImages, setApartmentImages] = useState([])
+
+  // The DE/EN toggle in the header switches `lang` live, so derive the
+  // displayed copy from the raw row rather than re-fetching. EN falls back
+  // to DE per-field when the English value is blank.
+  const property = useMemo(() => localizeProperty(rawProperty, lang), [rawProperty, lang])
+  const localizedOthers = useMemo(() => localizeProperties(others, lang), [others, lang])
   const [loading,  setLoading]  = useState(true)
   const [form,     setForm]     = useState({ name: '', phone: '', email: '', message: '' })
   const [sent,     setSent]     = useState(false)
@@ -79,11 +94,19 @@ export default function PropertyDetail() {
           websiteApi.getProperties(),
         ])
         if (propRes.success) {
-          setProperty(propRes.data)
+          setRawProperty(propRes.data)
           try {
             const imgRes = await websiteApi.getPropertyImages(propRes.data.id)
             if (imgRes.success) setGallery(imgRes.data)
           } catch (_) {}
+          if ((propRes.data.property_type || 'villa') === 'apartment') {
+            try {
+              const aptRes = await websiteApi.getApartmentImages(propRes.data.id)
+              if (aptRes.success) setApartmentImages(aptRes.data)
+            } catch (_) {}
+          } else {
+            setApartmentImages([])
+          }
           if (allRes.success) {
             const currentType = propRes.data.property_type || 'villa'
             setOthers(allRes.data.filter(p => p.slug !== slug && (p.property_type || 'villa') === currentType))
@@ -141,23 +164,25 @@ export default function PropertyDetail() {
       const $el = jq('.floor-plan-slider')
       if (!$el.length) return
       if ($el.hasClass('owl-loaded')) $el.trigger('destroy.owl.carousel').removeClass('owl-loaded owl-drag')
+      // apartmentImages is only populated for apartment listings
+      const slideCount = apartmentImages.length > 0 ? apartmentImages.length : gallery.length
       $el.owlCarousel({
-        loop: gallery.length > 3,
+        loop: slideCount > 1,
         margin: 16,
         nav: true,
-        dots: true,
+        dots: false,
         autoplay: false,
         mouseDrag: true,
         touchDrag: true,
         responsive: {
           0:   { items: 1 },
-          768: { items: 2 },
-          1200:{ items: 3 },
+          768: { items: slideCount >= 2 ? 2 : 1 },
+          1200:{ items: slideCount >= 3 ? 3 : slideCount },
         },
       })
     }, 500)
     return () => clearTimeout(floorTimer)
-  }, [loading, property, gallery])
+  }, [loading, property, gallery, apartmentImages])
 
   useEffect(() => {
     if (loading || !property) return
@@ -231,9 +256,14 @@ export default function PropertyDetail() {
   const heroImg = property?.image ? `${API}${property.image}` : '/assets/img/p3-hero-img.png'
 
   // ── Property type helpers (mirrors PropertyCard logic on the listing pages) ──
-  const propType = property?.property_type || 'villa'
-  const isLand   = propType === 'various'
-  const isHouse  = propType === 'villa'
+  const propType    = property?.property_type || 'villa'
+  const isLand      = propType === 'various'
+  const isHouse     = propType === 'villa'
+  const isApartment = propType === 'apartment'
+
+  // For apartments, the FLOOR PLAN slider shows the apartment images;
+  // everything else keeps using the regular gallery.
+  const floorPlanImages = isApartment && apartmentImages.length > 0 ? apartmentImages : gallery
 
   return (
     <div className="page-wraper">
@@ -523,7 +553,7 @@ export default function PropertyDetail() {
               {(isLand || isHouse) && (
                 <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
-                    <h5>{tr.plotArea || (lang === 'de' ? 'Grundstück' : 'Plot')}</h5>
+                    <h5>{tr.plotArea || (lang === 'de' ? 'GRUNDSTÜCK' : 'PLOT')}</h5>
                     <p>{property.plot_size ?? property.size} M²</p>
                   </div>
                 </div>
@@ -533,7 +563,7 @@ export default function PropertyDetail() {
               {!isLand && (
                 <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
-                    <h5>{tr.livingArea || (lang === 'de' ? 'Wohnfläche' : 'Living area')}</h5>
+                    <h5>{tr.livingArea || (lang === 'de' ? 'WOHNFLÄCHE' : 'LIVING AREA')}</h5>
                     <p>{property.size} M²</p>
                   </div>
                 </div>
@@ -549,11 +579,21 @@ export default function PropertyDetail() {
                 </div>
               )}
 
+              {/* Floor / Etage — apartments only */}
+              {isApartment && property.floor && (
+                <div className="col-lg-2 col-md-3 col-6">
+                  <div className="p3-col-sec-box1 text-center">
+                    <h5>{tr.floor}</h5>
+                    <p>{property.floor}</p>
+                  </div>
+                </div>
+              )}
+
               {/* Open/Outdoor Area — everyone except Land/Plot */}
               {!isLand && (
                 <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
-                    <h5>{tr.openAreas || (lang === 'de' ? 'Freiflächen' : 'Open areas')}</h5>
+                    <h5>{tr.openAreas || (lang === 'de' ? 'FREIFLÄCHEN' : 'OPEN AREAS')}</h5>
                     <p>{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'}</p>
                   </div>
                 </div>
@@ -562,7 +602,7 @@ export default function PropertyDetail() {
               <div className="col-lg-2 col-md-3 col-6">
                 <div className="p3-col-sec-box1 text-center">
                   <h5>{tr.purchasePrice}</h5>
-                  <p>€ {Number(property.price).toLocaleString()}</p>
+                  <p>€ {Number(property.price).toLocaleString('de-DE')} –</p>
                 </div>
               </div>
 
@@ -595,17 +635,80 @@ export default function PropertyDetail() {
           </div>
         </section>
 
+        {/* Rich text pasted from the admin editor can contain lists, headings,
+            tables, images and very long unbroken strings. Keep every one of
+            them inside the column so nothing is clipped or pushed off-screen
+            on mobile, and left-align the body copy so lists stay readable. */}
+        <style>{`
+          .rich-content {
+            text-align: left;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            font-family: var(--head-font);
+            font-size: 18px;
+            line-height: 1.75;
+            color: #828282;
+          }
+          .rich-content > *:first-child { margin-top: 0; }
+          .rich-content * { max-width: 100%; }
+          .rich-content p { margin: 0 0 15px; color: #828282; }
+          .rich-content h1, .rich-content h2, .rich-content h3,
+          .rich-content h4, .rich-content h5, .rich-content h6 {
+            color: #3d474a; line-height: 1.3; margin: 26px 0 12px;
+          }
+          .rich-content ul, .rich-content ol {
+            text-align: left; padding-left: 1.4em; margin: 0 0 15px;
+          }
+          .rich-content li { margin-bottom: 8px; color: #828282; }
+          .rich-content a { color: #8a6b3f; word-break: break-all; }
+          .rich-content img { height: auto; border-radius: 6px; }
+          .rich-content blockquote {
+            border-left: 3px solid #8a6b3f; margin: 0 0 15px;
+            padding-left: 14px; color: #666;
+          }
+          .rich-content pre {
+            white-space: pre-wrap; word-break: break-word;
+            background: #e7e6e6; padding: 12px; border-radius: 6px; overflow-x: auto;
+          }
+          .rich-content table {
+            display: block; width: 100%; overflow-x: auto;
+            border-collapse: collapse;
+          }
+          .rich-content td, .rich-content th {
+            border: 1px solid #d9d8d8; padding: 8px 10px;
+          }
+          /* honour alignment picked in the admin editor */
+          .rich-content .ql-align-center { text-align: center; }
+          .rich-content .ql-align-right { text-align: right; }
+          .rich-content .ql-align-justify { text-align: justify; }
+          .rich-content .ql-indent-1 { padding-left: 3em; }
+          .rich-content .ql-indent-2 { padding-left: 6em; }
+          .rich-content .ql-indent-3 { padding-left: 9em; }
+          @media (max-width: 767px) {
+            .rich-content { font-size: 15px; line-height: 1.7; }
+          }
+        `}</style>
+
         <section className="p3-sec3">
           <div className="container">
             <div className="row">
               <div className="col-lg-12 col-md-12">
                 <div className="head-sec text-center pera2">
                   <h3>{tr.lageTitle}</h3>
-                  <p>{tr.lage1}</p><p>{tr.lage2}</p><p>{tr.lage3}</p><p>{tr.lage4}</p>
+                  {hasRichContent(property.location_details) ? (
+                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.location_details }} />
+                  ) : (
+                    <><p>{tr.lage1}</p><p>{tr.lage2}</p><p>{tr.lage3}</p><p>{tr.lage4}</p></>
+                  )}
                 </div>
                 <div className="head-sec text-center pera2 mt-5">
                   <h3>{tr.ausstattungTitle}</h3>
-                  <p>{tr.aus1}</p><p>{tr.aus2}</p><p>{tr.aus3}</p><p>{tr.aus4}</p><p>{tr.aus5}</p>
+                  {hasRichContent(property.features) ? (
+                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.features }} />
+                  ) : (
+                    <><p>{tr.aus1}</p><p>{tr.aus2}</p><p>{tr.aus3}</p><p>{tr.aus4}</p><p>{tr.aus5}</p></>
+                  )}
                 </div>
               </div>
             </div>
@@ -618,13 +721,19 @@ export default function PropertyDetail() {
               <div className="col-lg-12 col-md-12">
                 <div className="head-sec text-center pera2">
                   <h3>{tr.infoTitle}</h3>
-                  <p>{tr.info1}</p><p>{tr.info2}</p>
+                  {hasRichContent(property.information) ? (
+                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.information }} />
+                  ) : (
+                    <><p>{tr.info1}</p><p>{tr.info2}</p></>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </section>
 
+        {/* FLOOR PLAN — apartments only */}
+        {isApartment && (
         <section className="p3-sec5">
           <div className="section-full">
             <div className="container">
@@ -632,7 +741,7 @@ export default function PropertyDetail() {
                 <div className="col-lg-12 col-md-12 head-sec-page text-center"><h3>{tr.floorPlanTitle}</h3></div>
               </div>
               <div className="owl-carousel owl-theme floor-plan-slider mt-4">
-                {gallery.length > 0 ? gallery.map((img) => (
+                {floorPlanImages.length > 0 ? floorPlanImages.map((img) => (
                   <div className="item" key={img.id}>
                     <div className="wt-box">
                       <div
@@ -646,7 +755,7 @@ export default function PropertyDetail() {
                       >
                         <img
                           src={`${API}${img.image}`}
-                          alt="gallery"
+                          alt={property.title}
                           style={{ borderRadius: '6px', margin: '0 auto', maxWidth: '100%' }}
                         />
                       </div>
@@ -677,6 +786,7 @@ export default function PropertyDetail() {
             </div>
           </div>
         </section>
+        )}
 
         {/* ── Objektdetails — field set depends on property type ── */}
         <section className="p3-sec6" style={{ backgroundColor: '#f7f7f7' }}>
@@ -715,39 +825,48 @@ export default function PropertyDetail() {
                     </>
                   )}
 
+                  {/* Floor / Etage — apartments only */}
+                  {isApartment && property.floor && (
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.floorLabel}</span>
+                      <span className="detail-value">{property.floor}</span>
+                    </div>
+                  )}
+
                   <div className="detail-row">
                     <span className="detail-label">{tr.priceLabel}</span>
-                    <span className="detail-value">€ {Number(property.price).toLocaleString()}</span>
+                    <span className="detail-value">€ {Number(property.price).toLocaleString('de-DE')} –</span>
                   </div>
                 </div>
 
-                {/* Bedrooms / Bathrooms / Status — everyone except Land/Plot */}
-                {!isLand && (
-                  <div className="col-12 col-md-6">
-                    <div className="detail-row">
-                      <span className="detail-label">{tr.bedroomsLabel}</span>
-                      <span className="detail-value">{property.bedrooms}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">{tr.bathroomsLabel}</span>
-                      <span className="detail-value">{property.bathrooms}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">{tr.statusLabel}</span>
-                      <span className="detail-value">{property.status}</span>
-                    </div>
-                  </div>
-                )}
+                <div className="col-12 col-md-6">
+                  {!isLand && (
+                    <>
+                      <div className="detail-row">
+                        <span className="detail-label">{tr.bedroomsLabel}</span>
+                        <span className="detail-value">{property.bedrooms}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">{tr.bathroomsLabel}</span>
+                        <span className="detail-value">{property.bathrooms}</span>
+                      </div>
+                    </>
+                  )}
 
-                {/* Status still shown for Land/Plot, just placed in the left column's flow */}
-                {isLand && (
-                  <div className="col-12 col-md-6 ps-md-5">
+                  {property.commission && (
                     <div className="detail-row">
-                      <span className="detail-label">{tr.statusLabel}</span>
-                      <span className="detail-value">{property.status}</span>
+                      <span className="detail-label">{tr.commissionLabel}</span>
+                      <span className="detail-value">{property.commission}</span>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {property.extras && (
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.extrasLabel}</span>
+                      <span className="detail-value">{property.extras}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -770,7 +889,19 @@ export default function PropertyDetail() {
                     <form className="home-1-form" onSubmit={handleSubmit}>
                       <div className="row">
                         <div className="col-lg-6 col-md-6"><div className="form-group"><input type="text" className="form-control" placeholder={tr.namePh} required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div></div>
-                        <div className="col-lg-6 col-md-6"><div className="form-group"><input type="tel" className="form-control" placeholder={tr.phonePh} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} /></div></div>
+                        <div className="col-lg-6 col-md-6"><div className="form-group"><input type="tel" className="form-control" placeholder={tr.phonePh} value={form.phone} onChange={e => {
+                          const cleaned = e.target.value.replace(/[^\d+\s()-]/g, '')
+                          let digits = 0
+                          let limited = ''
+                          for (const ch of cleaned) {
+                            if (/\d/.test(ch)) {
+                              if (digits >= 15) continue
+                              digits++
+                            }
+                            limited += ch
+                          }
+                          setForm({ ...form, phone: limited })
+                        }} /></div></div>
                         <div className="col-lg-12 col-md-12"><div className="form-group"><input type="email" className="form-control" placeholder={tr.emailPh} required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div></div>
                         <div className="col-lg-12 col-md-12"><div className="form-group"><textarea rows="4" className="form-control" placeholder={tr.messagePh} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} /></div></div>
                         <div className="col-lg-12 col-md-12"><div className="form-txt pera2"><p>{tr.privacyText}</p></div></div>
@@ -791,7 +922,7 @@ export default function PropertyDetail() {
             <div className="container">
               <div className="row">
                 <div className="col-lg-12 col-md-12"><div className="head-sec text-center"><h3>{tr.otherProps}</h3></div></div>
-                <OtherPropertiesSlider properties={others} />
+                <OtherPropertiesSlider properties={localizedOthers} />
               </div>
             </div>
           </section>

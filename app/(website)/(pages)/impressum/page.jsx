@@ -1,9 +1,13 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useSiteInfo } from '@/lib/SiteInfoContext'
 import translations from '@/lib/translations'
+import websiteApi from '@/lib/websiteApi'
+
+const sectionIcons = ['fa-briefcase', 'fa-gavel', 'fa-info-circle', 'fa-file-text']
 
 export default function Impressum() {
   const router = useRouter()
@@ -11,30 +15,67 @@ export default function Impressum() {
   const { site_name, address, email, phone } = useSiteInfo()
   const tr = translations.impressum[lang]
 
-  return (
-    <section style={{ padding: '40px 0 100px' }}>
-      <div className="container">
+  const [impressumPage, setImpressumPage] = useState(null)
 
-        {/* Page Heading */}
-        <div className="row mb-5">
-          <div className="col-12">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <h1 style={{ fontSize: '38px', fontWeight: '700', textTransform: 'uppercase', margin: 0, fontFamily: 'var(--head-font)' }}>
-                {tr.bannerTitle}
-              </h1>
-              <button onClick={() => router.back()} className="btn btn1" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
-                <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
-                {lang === 'de' ? 'Zurück' : 'Back'}
-              </button>
-            </div>
-            <p style={{ color: '#666', fontSize: '16px', margin: 0, fontFamily: 'var(--pera-font)' }}>{tr.bannerSub}</p>
-          </div>
+  useEffect(() => {
+    websiteApi.getImpressumPage()
+      .then(res => { if (res.success) setImpressumPage(res.data) })
+      .catch(() => {})
+  }, [])
+
+  const pick = (dbVal, fallback) => (dbVal && dbVal.trim()) ? dbVal : fallback
+  const stripEmptyBlocks = (html) => (html || '').replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
+
+  const titleText    = pick(impressumPage?.[`title_${lang}`], tr.bannerTitle)
+  const subtitleText = pick(impressumPage?.[`subtitle_${lang}`], tr.bannerSub)
+
+  const dbSections = (impressumPage?.sections || []).filter(s => s[`heading_${lang}`]?.trim() || s[`content_${lang}`]?.trim())
+
+  const extraSections = dbSections.map(s => ({ title: s[`heading_${lang}`], html: stripEmptyBlocks(s[`content_${lang}`]) }))
+
+  return (
+    <>
+      {/* Page Heading — centered banner (matches /kontakt) */}
+      <section className="inner-page-banner head-sec" style={{ padding: '50px 0px 50px 0px' }}>
+        <div className="container text-center page-banner-inner">
+          <button onClick={() => router.back()} className="btn btn1 page-banner-back" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
+            <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
+            {lang === 'de' ? 'Zurück' : 'Back'}
+          </button>
+          <h1 style={{ margin: '0 0 8px' }}>{titleText}</h1>
+          <h4 style={{ margin: 0 }}>{subtitleText}</h4>
         </div>
+      </section>
+
+      {/* Content */}
+      <section className="section-padding" style={{paddingBottom: '90px' }}>
+        <div className="container">
 
         {/* Cards Row */}
+        <style>{`
+          .impressum-card-text * { max-width: 100%; overflow-wrap: break-word; white-space: normal; }
+          .impressum-card-text p { margin: 0; }
+          .impressum-card-text p + p { margin-top: 10px; }
+          .impressum-card-text ul { list-style: none; margin: 10px 0 0; padding: 0; }
+          .impressum-card-text ul li {
+            position: relative;
+            padding-left: 26px;
+            margin-bottom: 8px;
+            color: rgb(68, 68, 68);
+          }
+          .impressum-card-text ul li::before {
+            content: "\\f00c";
+            font-family: "FontAwesome";
+            position: absolute;
+            left: 0;
+            top: 1px;
+            font-size: 13px;
+            color: #888;
+          }
+        `}</style>
         <div className="row g-4">
 
-          {/* Card 1 — Company Info */}
+          {/* Card 1 — Company Info (from Settings → Website Info) */}
           <div className="col-lg-6">
             <div className="imp-card">
               <div className="imp-card-icon">
@@ -46,7 +87,7 @@ export default function Impressum() {
             </div>
           </div>
 
-          {/* Card 2 — Contact */}
+          {/* Card 2 — Contact (from Settings → Website Info) */}
           <div className="col-lg-6">
             <div className="imp-card">
               <div className="imp-card-icon">
@@ -58,31 +99,23 @@ export default function Impressum() {
             </div>
           </div>
 
-          {/* Card 3 — Trade */}
-          <div className="col-lg-6">
-            <div className="imp-card">
-              <div className="imp-card-icon">
-                <i className="fa fa-briefcase"></i>
+          {/* Cards 3+ — dynamic sections from admin */}
+          {extraSections.map((sec, i) => (
+            <div key={i} className="col-lg-6">
+              <div className="imp-card">
+                <div className="imp-card-icon">
+                  <i className={`fa ${sectionIcons[i % sectionIcons.length]}`}></i>
+                </div>
+                <h4>{sec.title}</h4>
+                <div className="impressum-card-text" dangerouslySetInnerHTML={{ __html: sec.html }} />
               </div>
-              <h4>{tr.sec3Title}</h4>
-              <p><i className="fa fa-check me-2" style={{ color: '#888', fontSize: '13px' }}></i>{tr.sec3Line1}</p>
-              <p><i className="fa fa-check me-2" style={{ color: '#888', fontSize: '13px' }}></i>{tr.sec3Line2}</p>
             </div>
-          </div>
-
-          {/* Card 4 — EU Dispute */}
-          <div className="col-lg-6">
-            <div className="imp-card">
-              <div className="imp-card-icon">
-                <i className="fa fa-gavel"></i>
-              </div>
-              <h4>{tr.sec4Title}</h4>
-              <p>{tr.sec4Text}</p>
-            </div>
-          </div>
+          ))}
 
         </div>
-      </div>
-    </section>
+
+        </div>
+      </section>
+    </>
   )
 }

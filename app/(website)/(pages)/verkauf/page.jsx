@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
+import { localizeProperties } from '@/lib/propertyI18n'
 
 import { API_URL as API } from '@/service/config'
 
@@ -19,16 +20,45 @@ export default function Verkauf() {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [content, setContent] = useState(null)
 
   useEffect(() => {
     websiteApi.getSalesProperties()
       .then(res => { if (res.success) setProperties(res.data) })
       .catch(() => {})
       .finally(() => setLoading(false))
+
+    websiteApi.getVerkaufPage()
+      .then(res => { if (res.success) setContent(res.data) })
+      .catch(() => {})
   }, [])
 
+  // Falls back to the static translation until an admin saves content.
+  const pick = (dbVal, fallback) => (dbVal && String(dbVal).trim()) ? dbVal : fallback
+
+  // Quill leaves a trailing empty <p><br></p> behind — strip those so an
+  // empty block doesn't render as a gap.
+  const stripEmptyBlocks = (html) => html.replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
+
+  // True only when the HTML carries real text (not just <p></p>, <br>, &nbsp;).
+  const hasText = (html) =>
+    !!html && String(html).replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim().length > 0
+  const pickHtml = (dbVal, fallback) => (hasText(dbVal) ? dbVal : fallback)
+
+  const splitAt = tr.photoAfter + 1
+  const fallbackTop    = tr.paragraphs.slice(0, splitAt).map(p => `<p>${p}</p>`).join('')
+  const fallbackBottom = tr.paragraphs.slice(splitAt).map(p => `<p>${p}</p>`).join('')
+
+  const heading    = pick(content?.[`heading_${lang}`], tr.heading)
+  const title      = pick(content?.[`title_${lang}`], heading)
+  const subtitle   = pick(content?.[`subtitle_${lang}`], tr.bannerSub)
+  const textTop    = stripEmptyBlocks(pickHtml(content?.[`text_top_${lang}`], fallbackTop))
+  const textBottom = stripEmptyBlocks(pickHtml(content?.[`text_bottom_${lang}`], fallbackBottom))
+  const photoNote  = pick(content?.[`photo_note_${lang}`], tr.photoNote)
+  const photoImage = content?.image ? `${API}${content.image}` : ''
+
   const totalPages = Math.ceil(properties.length / PER_PAGE)
-  const paginated  = properties.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+  const paginated  = localizeProperties(properties.slice((page - 1) * PER_PAGE, page * PER_PAGE), lang)
 
   const goToPage = (n) => {
     setPage(n)
@@ -52,6 +82,135 @@ export default function Verkauf() {
   return (
     <>
       <style>{`
+        /* ── Verkauf intro (client text + photo placeholder) ──────────────
+           Centered, readable single column that matches the premium
+           editorial feel used across the site. */
+        .verkauf-sec .verkauf-body {
+          max-width: 100%;
+          width: 100%;
+          margin: 0 auto;
+          /* Long German compounds must be able to wrap in the narrower
+             column beside the photo — hyphenate at proper syllable
+             points (needs lang="de"/"en" on the element), and hard-break
+             as a last resort so nothing ever overflows / clips. */
+          -webkit-hyphens: auto;
+          hyphens: auto;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+        }
+        .verkauf-sec .verkauf-body::after {
+          content: "";
+          display: block;
+          clear: both;
+        }
+        .verkauf-sec .verkauf-body p {
+          margin-bottom: 18px;
+        }
+        .verkauf-sec .verkauf-body p:last-child {
+          margin-bottom: 0;
+        }
+        /* Rich-text (admin Quill) blocks */
+        .verkauf-rte ul,
+        .verkauf-rte ol {
+          margin: 0 0 18px;
+          padding-left: 22px;
+        }
+        .verkauf-rte li {
+          margin-bottom: 8px;
+        }
+        .verkauf-rte h1,
+        .verkauf-rte h2,
+        .verkauf-rte h3 {
+          font-family: var(--head-font);
+          color: #000;
+          margin: 6px 0 14px;
+          line-height: 1.3;
+        }
+        .verkauf-rte a {
+          color: #8a6b3f;
+          text-decoration: underline;
+        }
+        .verkauf-rte img {
+          max-width: 100%;
+          height: auto;
+        }
+        .verkauf-rte-below {
+          margin-top: 18px;
+        }
+
+        /* Photo — right of the text on desktop, between the two text blocks;
+           stacks full-width on mobile. */
+        .verkauf-photo {
+          float: right;
+          width: 44%;
+          margin: 6px 0 24px 44px;
+        }
+        .verkauf-photo img {
+          display: block;
+          width: 100%;
+          height: 300px;
+          object-fit: cover;
+          border-radius: 4px;
+        }
+        .verkauf-photo-box {
+          position: relative;
+          width: 100%;
+          height: 300px;
+          background: #f7f4ee;
+          border: 1px solid #e8e0d5;
+          border-radius: 4px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          color: #c3b393;
+        }
+        .verkauf-photo-box i {
+          font-size: 40px;
+        }
+        .verkauf-photo-box span {
+          font-family: var(--head-font);
+          font-size: 13px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+        .verkauf-photo figcaption {
+          margin-top: 10px;
+          font-family: var(--head-font);
+          font-size: 13px;
+          line-height: 20px;
+          color: #a9a093;
+          text-align: center;
+        }
+        @media (max-width: 991px) {
+          .verkauf-photo {
+            width: 50%;
+            margin-left: 32px;
+          }
+        }
+        @media (max-width: 767px) {
+          .verkauf-photo {
+            float: none;
+            width: 100%;
+            margin: 24px 0;
+          }
+        }
+
+        /* ── Sales listing ───────────────────────────────────────────────
+           Vertical rhythm matched to the home page "PROPERTIES" section
+           (.p5-sec1 margin-top:70px + .p4-sec1 margin-bottom:50px). The
+           .container already gives the same side gutters as the home grid. */
+        .verkauf-listing {
+          padding-top: 70px;
+          padding-bottom: 50px;
+        }
+        @media (max-width: 767px) {
+          .verkauf-listing {
+            padding-top: 40px;
+            padding-bottom: 40px;
+          }
+        }
         .sale-card {
           position: relative;
           background: #fff;
@@ -158,20 +317,53 @@ export default function Verkauf() {
         }
       `}</style>
 
-      <section className="inner-page-banner head-sec">
-        <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <h1 style={{ margin: 0 }}>{tr.bannerTitle}</h1>
-            <button onClick={() => router.back()} className="btn btn1" style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}>
-              <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
-              {lang === 'de' ? 'Zurück' : 'Back'}
-            </button>
-          </div>
-          <h4>{tr.bannerSub}</h4>
+      <section className="inner-page-banner head-sec" style={{ padding: '50px 0px 50px 0px' }}>
+        <div className="container text-center page-banner-inner">
+          <button
+            onClick={() => router.back()}
+            className="btn btn1 page-banner-back"
+            style={{ fontSize: '13px', padding: '8px 20px', flexShrink: 0 }}
+          >
+            <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
+            {lang === 'de' ? 'Zurück' : 'Back'}
+          </button>
+          <h1 style={{ margin: 0 }}>{title}</h1>
+          {subtitle ? <h4 style={{ margin: '8px 0 0' }}>{subtitle}</h4> : null}
         </div>
       </section>
 
-      <section className="section-padding">
+      {/* ── Client text + photo ── */}
+      <section className="section-padding verkauf-sec">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 verkauf-body" lang={lang}>
+              <div
+                className="verkauf-rte"
+                dangerouslySetInnerHTML={{ __html: textTop }}
+              />
+
+              <figure className="verkauf-photo">
+                {photoImage ? (
+                  <img src={photoImage} alt={heading} />
+                ) : (
+                  <div className="verkauf-photo-box">
+                    <i className="fa fa-camera" aria-hidden="true" />
+                    <span>{lang === 'de' ? 'Foto' : 'Photo'}</span>
+                  </div>
+                )}
+                {!photoImage && photoNote ? <figcaption>{photoNote}</figcaption> : null}
+              </figure>
+
+              <div
+                className="verkauf-rte verkauf-rte-below"
+                dangerouslySetInnerHTML={{ __html: textBottom }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-padding verkauf-listing">
         <div className="container">
           {loading ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: '#888' }}>
@@ -212,7 +404,7 @@ export default function Verkauf() {
                           <div className="sale-card-type-badge">{typeLabel(p.property_type)}</div>
                           {p.price && (
                             <div className="sale-card-price-badge">
-                              € {Number(p.price).toLocaleString()}
+                              € {Number(p.price).toLocaleString('de-DE')}
                             </div>
                           )}
                           <div className="sale-card-arrow">

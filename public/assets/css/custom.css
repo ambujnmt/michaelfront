@@ -883,10 +883,12 @@ a.flip-col-btn:hover{
     align-items: center;
 }
 
+.p5-sec3 .content h1,
 .p5-sec3 .content h3{
     color: #fff;
     text-align: center;
     margin: 0;
+    max-width: 70%;
 }
 
 .p5-sec3 .row{
@@ -1915,6 +1917,30 @@ a.flip-col-btn:hover{
     color: #555;
     font-size: 16px;
     margin-bottom: 0;
+}
+/* Centered banner heading (like /immobilien) with the "Back" button kept
+   pinned to the top-right so it doesn't shift the centered title. */
+.inner-page-banner .page-banner-inner {
+    position: relative;
+}
+.inner-page-banner .page-banner-back {
+    position: absolute;
+    right: 15px;
+    top: 0;
+}
+/* Mobile: hide the Back button (it would overlap the centered title). */
+@media (max-width: 767px) {
+    .inner-page-banner .page-banner-back {
+        display: none;
+    }
+    /* Trim the inline 50px banner padding down to 40px on mobile */
+    .inner-page-banner {
+        padding: 40px 0 !important;
+    }
+    /* /immobilien: 40px top only, no bottom padding */
+    .inner-page-banner.imm-banner {
+        padding: 40px 0 0 !important;
+    }
 }
 
 /* ── Suchagent Page ──────────────────────────────────────── */

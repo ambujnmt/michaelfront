@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useSiteInfo } from '@/lib/SiteInfoContext'
+import websiteApi from '@/lib/websiteApi'
+import { API_URL as API } from '@/service/config'
 
 const t = {
   de: {
@@ -34,12 +36,23 @@ export default function HomeHeader() {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [heroVideo, setHeroVideo] = useState('')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    websiteApi.getVideoBanner().then(res => {
+      if (res.success && res.data?.hero_video) setHeroVideo(res.data.hero_video)
+    })
+  }, [])
+
+  // Editable in the admin panel (Video Banner → Top Hero Banner Video);
+  // falls back to the static asset until admin data has loaded or none is saved.
+  const heroVideoSrc = heroVideo ? `${API}${heroVideo}` : '/assets/img/hero-vdo.mp4'
 
   // Route change hote hi menu hamesha band ho jaye (refresh ho ya na ho, dono me consistent)
   useEffect(() => {
@@ -48,8 +61,8 @@ export default function HomeHeader() {
 
   return (
     <div className="video-container">
-      <video autoPlay muted loop playsInline className="background-video">
-        <source src="/assets/img/hero-vdo.mp4" type="video/mp4" />
+      <video key={heroVideoSrc} autoPlay muted loop playsInline className="background-video">
+        <source src={heroVideoSrc} type="video/mp4" />
       </video>
 
       <style>{`

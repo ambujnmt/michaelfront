@@ -7,7 +7,7 @@ import PropertyForm from './PropertyForm'
 import Swal from 'sweetalert2'
 
 import { API_URL as API } from '@/service/config'
-const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false }
+const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false, location_details: '', features: '', information: '', title_en: '', location_en: '', description_en: '', location_details_en: '', features_en: '', information_en: '', floor: '', commission: '', extras: '' }
 const statusColor = { Active: '#34d399', Sold: '#94a3b8', Pending: '#fbbf24' }
 const thStyle = { padding: '14px 18px', color: '#94a3b8', fontWeight: '700', textAlign: 'left', fontSize: '12px', letterSpacing: '0.8px', textTransform: 'uppercase' }
 const tdStyle = (extra = {}) => ({ padding: '15px 18px', fontSize: '14px', color: '#cbd5e1', ...extra })
@@ -25,14 +25,14 @@ function Modal({ title, onClose, children, wide }) {
       backdropFilter: 'blur(4px)',
       WebkitBackdropFilter: 'blur(4px)',
       zIndex: 9999, display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-      padding: '40px 16px', overflowY: 'auto',
+      padding: wide ? '24px 20px' : '40px 16px', overflowY: 'auto',
       msOverflowStyle: 'none', scrollbarWidth: 'none',
     }} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={{
         background: '#1e2a3a',
         borderRadius: '20px',
         width: '100%',
-        maxWidth: wide ? '920px' : '680px',
+        maxWidth: wide ? 'none' : '680px',
         border: '1px solid rgba(99,179,237,0.25)',
         boxShadow: '0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.08)',
       }}>
@@ -93,7 +93,20 @@ function ViewContent({ property, gallery }) {
                 <div><p style={labelStyle}>Rooms</p><p style={valueStyle}>{property.rooms || '—'}</p></div>
                 <div><p style={labelStyle}>Bedrooms</p><p style={valueStyle}>{property.bedrooms || '—'}</p></div>
                 <div><p style={labelStyle}>Bathrooms</p><p style={valueStyle}>{property.bathrooms || '—'}</p></div>
+                {property.property_type === 'apartment' && (
+                  <div><p style={labelStyle}>Floor</p><p style={valueStyle}>{property.floor || '—'}</p></div>
+                )}
               </div>
+              {(property.commission || property.extras) && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
+                  {property.commission && (
+                    <div><p style={labelStyle}>Commission</p><p style={valueStyle}>{property.commission}</p></div>
+                  )}
+                  {property.extras && (
+                    <div><p style={labelStyle}>Extras</p><p style={valueStyle}>{property.extras}</p></div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -107,6 +120,32 @@ function ViewContent({ property, gallery }) {
                 className="desc-view"
                 dangerouslySetInnerHTML={{ __html: property.description }}
               />
+            </div>
+          </div>
+        )}
+
+        {(property.title_en || property.location_en || property.description_en) && (
+          <div className="col-12">
+            <div style={cardStyle}>
+              <p style={{ ...labelStyle, marginBottom: '10px', color: '#60a5fa' }}>English</p>
+              {property.title_en && (
+                <div style={{ marginBottom: '10px' }}>
+                  <p style={labelStyle}>Title</p>
+                  <p style={valueStyle}>{property.title_en}</p>
+                </div>
+              )}
+              {property.location_en && (
+                <div style={{ marginBottom: '10px' }}>
+                  <p style={labelStyle}>Location</p>
+                  <p style={valueStyle}>{property.location_en}</p>
+                </div>
+              )}
+              {property.description_en && (
+                <div>
+                  <p style={{ ...labelStyle, marginBottom: '8px' }}>Description</p>
+                  <div className="desc-view" dangerouslySetInnerHTML={{ __html: property.description_en }} />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -185,6 +224,8 @@ export default function Properties() {
   const [bannerFile, setBannerFile] = useState(null)
   const [galleryFiles, setGalleryFiles] = useState([])
   const [existingGallery, setExistingGallery] = useState([])
+  const [apartmentFiles, setApartmentFiles] = useState([])
+  const [existingApartmentImages, setExistingApartmentImages] = useState([])
   const [viewProperty, setViewProperty] = useState(null)
   const [viewGallery, setViewGallery] = useState([])
 
@@ -207,6 +248,8 @@ export default function Properties() {
     setBannerFile(null)
     setGalleryFiles([])
     setExistingGallery([])
+    setApartmentFiles([])
+    setExistingApartmentImages([])
     setViewProperty(null)
     setViewGallery([])
   }
@@ -216,6 +259,8 @@ export default function Properties() {
     setForm(emptyForm)
     setBannerFile(null)
     setGalleryFiles([])
+    setApartmentFiles([])
+    setExistingApartmentImages([])
     setModal('add')
   }
 
@@ -224,12 +269,17 @@ export default function Properties() {
     setEditId(id)
     setModal('edit')
     setModalLoading(true)
-    const [propRes, imgRes] = await Promise.all([adminApi.getProperty(id), adminApi.getPropertyImages(id)])
+    const [propRes, imgRes, aptRes] = await Promise.all([
+      adminApi.getProperty(id),
+      adminApi.getPropertyImages(id),
+      adminApi.getApartmentImages(id),
+    ])
     if (propRes.success) {
       const p = propRes.data
-      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, plot_size: p.plot_size ?? '', outdoor_area: p.outdoor_area ?? '', rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1 })
+      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, plot_size: p.plot_size ?? '', outdoor_area: p.outdoor_area ?? '', rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1, location_details: p.location_details || '', features: p.features || '', information: p.information || '', title_en: p.title_en || '', location_en: p.location_en || '', description_en: p.description_en || '', location_details_en: p.location_details_en || '', features_en: p.features_en || '', information_en: p.information_en || '', floor: p.floor || '', commission: p.commission || '', extras: p.extras || '' })
     }
     if (imgRes.success) setExistingGallery(imgRes.data)
+    if (aptRes.success) setExistingApartmentImages(aptRes.data)
     setModalLoading(false)
   }
 
@@ -252,6 +302,7 @@ export default function Properties() {
       if (!res.success) { Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'Failed', background: '#1a1f2e', color: '#f1f5f9' }); setModalLoading(false); return }
       if (bannerFile) { const fd = new FormData(); fd.append('banner', bannerFile); await adminApi.uploadBanner(res.id, fd) }
       if (galleryFiles.length > 0) { const fd = new FormData(); galleryFiles.forEach(f => fd.append('images', f)); await adminApi.uploadGalleryImages(res.id, fd) }
+      if (apartmentFiles.length > 0 && form.property_type === 'apartment') { const fd = new FormData(); apartmentFiles.forEach(f => fd.append('apartment_images', f)); await adminApi.uploadApartmentImages(res.id, fd) }
       closeModal()
       fetchProperties()
       showFlash('success', 'Property added successfully!')
@@ -268,6 +319,7 @@ export default function Properties() {
       if (!res.success) { Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'Failed', background: '#1a1f2e', color: '#f1f5f9' }); setModalLoading(false); return }
       if (bannerFile) { const fd = new FormData(); fd.append('banner', bannerFile); await adminApi.uploadBanner(editId, fd) }
       if (galleryFiles.length > 0) { const fd = new FormData(); galleryFiles.forEach(f => fd.append('images', f)); await adminApi.uploadGalleryImages(editId, fd) }
+      if (apartmentFiles.length > 0 && form.property_type === 'apartment') { const fd = new FormData(); apartmentFiles.forEach(f => fd.append('apartment_images', f)); await adminApi.uploadApartmentImages(editId, fd) }
       closeModal()
       fetchProperties()
       showFlash('success', 'Property updated successfully!')
@@ -287,6 +339,11 @@ export default function Properties() {
   const handleDeleteGallery = async (imageId) => {
     const res = await adminApi.deleteGalleryImage(imageId)
     if (res.success) setExistingGallery(prev => prev.filter(img => img.id !== imageId))
+  }
+
+  const handleDeleteApartmentImage = async (imageId) => {
+    const res = await adminApi.deleteApartmentImage(imageId)
+    if (res.success) setExistingApartmentImages(prev => prev.filter(img => img.id !== imageId))
   }
 
   const filtered = properties.filter(p => {
@@ -420,7 +477,11 @@ export default function Properties() {
             galleryFiles={galleryFiles}
             onGalleryAdd={(file) => setGalleryFiles(prev => [...prev, file])}
             onGalleryRemove={(i) => setGalleryFiles(prev => prev.filter((_, idx) => idx !== i))}
-            existingGallery={[]} onDeleteGallery={() => {}} />
+            existingGallery={[]} onDeleteGallery={() => {}}
+            apartmentFiles={apartmentFiles}
+            onApartmentAdd={(file) => setApartmentFiles(prev => [...prev, file])}
+            onApartmentRemove={(i) => setApartmentFiles(prev => prev.filter((_, idx) => idx !== i))}
+            existingApartmentImages={[]} onDeleteApartmentImage={() => {}} />
         </Modal>
       )}
 
@@ -434,7 +495,11 @@ export default function Properties() {
                 galleryFiles={galleryFiles}
                 onGalleryAdd={(file) => setGalleryFiles(prev => [...prev, file])}
                 onGalleryRemove={(i) => setGalleryFiles(prev => prev.filter((_, idx) => idx !== i))}
-                existingGallery={existingGallery} onDeleteGallery={handleDeleteGallery} />
+                existingGallery={existingGallery} onDeleteGallery={handleDeleteGallery}
+                apartmentFiles={apartmentFiles}
+                onApartmentAdd={(file) => setApartmentFiles(prev => [...prev, file])}
+                onApartmentRemove={(i) => setApartmentFiles(prev => prev.filter((_, idx) => idx !== i))}
+                existingApartmentImages={existingApartmentImages} onDeleteApartmentImage={handleDeleteApartmentImage} />
           }
         </Modal>
       )}

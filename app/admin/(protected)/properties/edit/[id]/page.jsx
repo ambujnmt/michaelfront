@@ -30,6 +30,7 @@ export default function EditProperty() {
           bathrooms: p.bathrooms || 0, status: p.status,
           property_type: p.property_type || 'villa',
           description: p.description || '', image: p.image || '',
+          location_details: p.location_details || '', features: p.features || '', information: p.information || '',
           show_in_sales: p.show_in_sales == 1,
         })
       }

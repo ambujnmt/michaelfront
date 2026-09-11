@@ -1,102 +1,83 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
+import { localizeProperties } from '@/lib/propertyI18n'
 import { API_URL as API } from '@/service/config'
-
-function Loader() {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '60px 0' }}>
-      <div style={{
-        width: '48px', height: '48px',
-        border: '4px solid #e0e0e0',
-        borderTop: '4px solid #8a6b3f',
-        borderRadius: '50%',
-        animation: 'spin 0.8s linear infinite',
-      }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  )
-}
 
 export default function PropertyCarousel() {
   const { lang } = useLanguage()
   const tr = translations.home[lang] || translations.home['de']
   const [properties, setProperties] = useState([])
-  const [activeFilter, setActiveFilter] = useState('villa')
-  const [loading, setLoading] = useState(false)
-  const timerRef = useRef(null)
+  const [homeIntro, setHomeIntro] = useState(null)
 
   useEffect(() => {
     websiteApi.getProperties().then(res => {
       if (res.success) setProperties(res.data)
     })
+    websiteApi.getHomeIntro().then(res => {
+      if (res.success) setHomeIntro(res.data)
+    })
   }, [])
-
-  const handleFilterChange = (key) => {
-    if (key === activeFilter) return
-    setLoading(true)
-    clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => {
-      setActiveFilter(key)
-      setLoading(false)
-    }, 600)
-  }
 
   if (properties.length === 0) return null
 
-  const filtered = properties
-    .filter(p => (p.property_type || 'villa') === activeFilter)
-    .slice(0, 4)
+  // Homepage teaser: the 3 highlighted (most recent) properties.
+  // The API returns them ordered newest-first.
+  const featured = localizeProperties(properties.slice(0, 3), lang)
 
-  const tabs = [
-    { key: 'villa',     label: tr.filter1 },
-    { key: 'apartment', label: tr.filter2 },
-    { key: 'various',   label: tr.filter3 },
-  ]
+  // "MICHAEL LEBER IMMOBILIEN" heading + intro text — editable in the
+  // admin panel (Home Intro); falls back to the static translation
+  // until the admin data has loaded or if a field is left empty.
+  const mlHeading = homeIntro?.[`heading_${lang}`] || tr.mlHeading
+  const mlIntro1 = homeIntro?.[`intro1_${lang}`] || tr.mlIntro1
+  const mlIntro2 = homeIntro?.[`intro2_${lang}`] || tr.mlIntro2
 
   return (
     <section className="p4-sec1 p5-sec1">
+      <style>{`
+        /* "MICHAEL LEBER IMMOBILIEN" styled like the "IMMOBILIEN" banner heading */
+        .ml-heading {
+          font-family: var(--head-font);
+          font-weight: 700;
+          font-size: 40px;
+          line-height: 60px;
+          letter-spacing: 5%;
+          color: #000;
+          text-transform: uppercase;
+          margin-bottom: 18px;
+        }
+      `}</style>
 
       <div className="container">
-        <section className="inner-page-banner head-sec" style={{ paddingTop: '0px' }}>
-        <div className="container text-center">
-         <h1 style={{ margin: 0 }}>{tr.sec2Sub}</h1>
-        </div>
-      </section>
-        <div className="filter-wrap p-a15 our-gallery">
-          <ul className="masonry-filter link-style text-uppercase center-block m-t0">
-            {tabs.map(tab => (
-              <li key={tab.key} className={activeFilter === tab.key ? 'active' : ''}>
-                <a href="#" onClick={e => { e.preventDefault(); handleFilterChange(tab.key) }}>
-                  {tab.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <div className="head-sec text-center" style={{ width: '100%', margin: '0 auto 44px', padding: '0 15px' }}>
+          <h2 className="ml-heading">{mlHeading}</h2>
+          <p style={{ marginBottom: '12px', color: '#666', lineHeight: 1.75 }}>{mlIntro1}</p>
+          <p style={{ margin: 0, color: '#666', lineHeight: 1.75 }}>{mlIntro2}</p>
         </div>
       </div>
 
-      {loading ? <Loader /> : (
-        <div className="container">
-          {filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
-              <p>{lang === 'de' ? 'Keine Immobilien gefunden.' : 'No properties found.'}</p>
+      <div className="container">
+        <section className="inner-page-banner head-sec" style={{ padding: '22px 0 30px' }}>
+          <div className="container text-center">
+            <h1 style={{ margin: 0 }}>{tr.sec2Sub}</h1>
+          </div>
+        </section>
+      </div>
+
+      <div className="container">
+        <div className="row">
+          {featured.map(p => (
+            <div className="col-lg-4 col-md-6 col-12" style={{ marginBottom: '30px' }} key={p.id}>
+              <PropertyCard p={p} tr={tr} />
             </div>
-          ) : (
-            <div className="row">
-              {filtered.map(p => (
-                <div className="col-lg-6 col-md-6 col-12" style={{ marginBottom: '30px' }} key={p.id}>
-                  <PropertyCard p={p} tr={tr} />
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
-      )}
+      </div>
 
       <div className="col-lg-12 col-md-12 text-center p-5-btn">
         <a href="/immobilien">
@@ -117,6 +98,7 @@ export default function PropertyCarousel() {
 /* House also shows Land Area, everyone else skips it.                    */
 /* ---------------------------------------------------------------------- */
 function PropertyCard({ p, tr }) {
+  const router = useRouter()
   const [hovered, setHovered] = useState(false)
   const type = p.property_type || 'villa'
   const isLand = type === 'various'
@@ -126,7 +108,7 @@ function PropertyCard({ p, tr }) {
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => setHovered(v => !v)} // lets touch devices tap to reveal details
+      onClick={() => router.push(`/immobilien/${p.slug}`)} // whole card opens the detail page
       style={{
         position: 'relative',
         borderRadius: '5px',
@@ -210,9 +192,10 @@ function PropertyCard({ p, tr }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString()}</h5>
+          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString('de-DE')}</h5>
           <Link
             href={`/immobilien/${p.slug}`}
+            onClick={(e) => e.stopPropagation()}
             style={{
               padding: '8px 16px',
               background: '#8a6b3f',
