@@ -27,7 +27,8 @@ export default function Impressum() {
   const stripEmptyBlocks = (html) => (html || '').replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
 
   const titleText    = pick(impressumPage?.[`title_${lang}`], tr.bannerTitle)
-  const subtitleText = pick(impressumPage?.[`subtitle_${lang}`], tr.bannerSub)
+  // Only shown when the admin has actually set a subtitle — no static fallback.
+  const subtitleText = impressumPage?.[`subtitle_${lang}`]?.trim() || ''
 
   const dbSections = (impressumPage?.sections || []).filter(s => s[`heading_${lang}`]?.trim() || s[`content_${lang}`]?.trim())
 
@@ -42,8 +43,8 @@ export default function Impressum() {
             <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
             {lang === 'de' ? 'Zurück' : 'Back'}
           </button>
-          <h1 style={{ margin: '0 0 8px' }}>{titleText}</h1>
-          <h4 style={{ margin: 0 }}>{subtitleText}</h4>
+          <h1 style={{ margin: subtitleText ? '0 0 8px' : 0 }}>{titleText}</h1>
+          {subtitleText ? <h4 style={{ margin: 0 }}>{subtitleText}</h4> : null}
         </div>
       </section>
 

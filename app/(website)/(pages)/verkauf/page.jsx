@@ -2,36 +2,58 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
 import websiteApi from '@/lib/websiteApi'
-import { localizeProperties } from '@/lib/propertyI18n'
 
 import { API_URL as API } from '@/service/config'
-
-const PER_PAGE = 20
 
 export default function Verkauf() {
   const router = useRouter()
   const { lang } = useLanguage()
   const tr = translations.verkauf[lang]
+  const t = translations.kontakt[lang]
 
-  const [properties, setProperties] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
   const [content, setContent] = useState(null)
 
-  useEffect(() => {
-    websiteApi.getSalesProperties()
-      .then(res => { if (res.success) setProperties(res.data) })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+  // Same contact form as the Kontakt page
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
+  const [sending, setSending] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [error, setError] = useState('')
 
+  useEffect(() => {
     websiteApi.getVerkaufPage()
       .then(res => { if (res.success) setContent(res.data) })
       .catch(() => {})
   }, [])
+
+  const showFlash = (type, msg) => {
+    if (type === 'success') setSuccess(msg)
+    else setError(msg)
+    setTimeout(() => { setSuccess(''); setError('') }, 4000)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSending(true)
+    setSuccess('')
+    setError('')
+
+    try {
+      const data = await websiteApi.submitContact(form)
+      if (data.success) {
+        showFlash('success', t.successMsg)
+        setForm({ name: '', email: '', phone: '', message: '' })
+      } else {
+        showFlash('error', data.message || t.errorMsg)
+      }
+    } catch {
+      showFlash('error', t.errorMsg)
+    }
+
+    setSending(false)
+  }
 
   // Falls back to the static translation until an admin saves content.
   const pick = (dbVal, fallback) => (dbVal && String(dbVal).trim()) ? dbVal : fallback
@@ -51,33 +73,12 @@ export default function Verkauf() {
 
   const heading    = pick(content?.[`heading_${lang}`], tr.heading)
   const title      = pick(content?.[`title_${lang}`], heading)
-  const subtitle   = pick(content?.[`subtitle_${lang}`], tr.bannerSub)
+  // Only shown when the admin has actually set a subtitle — no static fallback.
+  const subtitle   = content?.[`subtitle_${lang}`]?.trim() || ''
   const textTop    = stripEmptyBlocks(pickHtml(content?.[`text_top_${lang}`], fallbackTop))
   const textBottom = stripEmptyBlocks(pickHtml(content?.[`text_bottom_${lang}`], fallbackBottom))
   const photoNote  = pick(content?.[`photo_note_${lang}`], tr.photoNote)
   const photoImage = content?.image ? `${API}${content.image}` : ''
-
-  const totalPages = Math.ceil(properties.length / PER_PAGE)
-  const paginated  = localizeProperties(properties.slice((page - 1) * PER_PAGE, page * PER_PAGE), lang)
-
-  const goToPage = (n) => {
-    setPage(n)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const typeLabel = (type) => {
-    const t = type || 'villa'
-    if (lang === 'de') {
-      if (t === 'villa') return 'Haus'
-      if (t === 'apartment') return 'Wohnung'
-      if (t === 'various') return 'Grundstück'
-      return t
-    }
-    if (t === 'villa') return 'House'
-    if (t === 'apartment') return 'Apartment'
-    if (t === 'various') return 'Land'
-    return t
-  }
 
   return (
     <>
@@ -138,24 +139,22 @@ export default function Verkauf() {
           margin-top: 18px;
         }
 
-        /* Photo — right of the text on desktop, between the two text blocks;
-           stacks full-width on mobile. */
+        /* Photo — full width, its own block between the two text blocks. */
         .verkauf-photo {
-          float: right;
-          width: 44%;
-          margin: 6px 0 24px 44px;
+          width: 100%;
+          margin: 24px 0;
         }
         .verkauf-photo img {
           display: block;
           width: 100%;
-          height: 300px;
+          height: 480px;
           object-fit: cover;
           border-radius: 4px;
         }
         .verkauf-photo-box {
           position: relative;
           width: 100%;
-          height: 300px;
+          height: 480px;
           background: #f7f4ee;
           border: 1px solid #e8e0d5;
           border-radius: 4px;
@@ -183,137 +182,11 @@ export default function Verkauf() {
           color: #a9a093;
           text-align: center;
         }
-        @media (max-width: 991px) {
-          .verkauf-photo {
-            width: 50%;
-            margin-left: 32px;
-          }
-        }
         @media (max-width: 767px) {
-          .verkauf-photo {
-            float: none;
-            width: 100%;
-            margin: 24px 0;
+          .verkauf-photo img,
+          .verkauf-photo-box {
+            height: 260px;
           }
-        }
-
-        /* ── Sales listing ───────────────────────────────────────────────
-           Vertical rhythm matched to the home page "PROPERTIES" section
-           (.p5-sec1 margin-top:70px + .p4-sec1 margin-bottom:50px). The
-           .container already gives the same side gutters as the home grid. */
-        .verkauf-listing {
-          padding-top: 70px;
-          padding-bottom: 50px;
-        }
-        @media (max-width: 767px) {
-          .verkauf-listing {
-            padding-top: 40px;
-            padding-bottom: 40px;
-          }
-        }
-        .sale-card {
-          position: relative;
-          background: #fff;
-          border-radius: 14px;
-          overflow: hidden;
-          height: 100%;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-        }
-        .sale-card-img-wrap {
-          position: relative;
-          overflow: hidden;
-          height: 230px;
-        }
-        .sale-card-img-wrap img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-        .sale-card-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%);
-        }
-        .sale-card-price-badge {
-          position: absolute;
-          bottom: 14px;
-          left: 16px;
-          color: #fff;
-          font-size: 19px;
-          font-weight: 800;
-          letter-spacing: 0.3px;
-          text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        }
-        .sale-card-arrow {
-          position: absolute;
-          top: 14px;
-          right: 14px;
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.9);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 0;
-          transform: translateX(6px);
-          transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .sale-card:hover .sale-card-arrow {
-          opacity: 1;
-          transform: translateX(0);
-        }
-        .sale-card-body {
-          padding: 18px 20px 20px;
-        }
-        .sale-card-title {
-          font-size: 16px;
-          font-weight: 700;
-          color: #1a1a1a;
-          margin-bottom: 8px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .sale-card-meta {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 12px;
-          padding-top: 12px;
-          margin-top: 4px;
-          border-top: 1px solid #f0ece3;
-        }
-        .sale-card-meta span {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 12.5px;
-          color: #7a7264;
-        }
-        .sale-card-meta i {
-          color: #8a6b3f;
-          font-size: 13px;
-        }
-        .sale-card-location {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          color: #999;
-          margin-bottom: 2px;
-        }
-        .sale-card-type-badge {
-          position: absolute;
-          top: 14px;
-          left: 14px;
-          background: rgba(138, 107, 63, 0.92);
-          color: #fff;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.4px;
-          text-transform: uppercase;
-          padding: 5px 12px;
-          border-radius: 20px;
         }
       `}</style>
 
@@ -363,160 +236,106 @@ export default function Verkauf() {
         </div>
       </section>
 
-      <section className="section-padding verkauf-listing">
+      {/* ── Contact form (same as the Kontakt page) ── */}
+      <section className="section-padding" style={{ paddingTop: '100px' }}>
         <div className="container">
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: '#888' }}>
-              <i className="fa fa-spinner fa-spin" style={{ fontSize: '28px', display: 'block', marginBottom: '12px' }} />
-              {lang === 'de' ? 'Laden...' : 'Loading...'}
-            </div>
-          ) : properties.length === 0 ? (
-            <div className="text-center" style={{ padding: '0px 20px', marginBottom: '40px' }}>
-              <div style={{
-                display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
-                background: '#f9f7f4', borderRadius: '16px', padding: '60px 80px',
-                border: '1px solid #e8e0d5',
-              }}>
-                <i className="fa fa-building-o" style={{ fontSize: '64px', color: '#c8b89a', marginBottom: '20px' }} />
-                <h4 style={{ color: '#5a4a3a', marginBottom: '10px', fontWeight: '600' }}>
-                  {lang === 'de' ? 'Keine Objekte verfügbar' : 'No Properties Available'}
-                </h4>
-                <p style={{ color: '#999', fontSize: '14px', marginBottom: '0', maxWidth: '300px' }}>
-                  {lang === 'de'
-                    ? 'Derzeit sind keine Verkaufsobjekte verfügbar.'
-                    : 'There are currently no properties available for sale.'}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="row">
-                {paginated.map((p) => (
-                  <div key={p.id} className="col-lg-4 col-md-6 mb-4">
-                    <Link href={`/immobilien/${p.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <div className="sale-card">
-                        <div className="sale-card-img-wrap">
-                          <img
-                            src={p.image ? `${API}${p.image}` : '/assets/img/img1.png'}
-                            alt={p.title || 'Property'}
-                          />
-                          <div className="sale-card-overlay" />
-                          <div className="sale-card-type-badge">{typeLabel(p.property_type)}</div>
-                          {p.price && (
-                            <div className="sale-card-price-badge">
-                              € {Number(p.price).toLocaleString('de-DE')}
-                            </div>
-                          )}
-                          <div className="sale-card-arrow">
-                            <i className="fa fa-arrow-right" style={{ fontSize: '13px', color: '#8a6b3f' }} />
-                          </div>
-                        </div>
+          <div className="row">
 
-                        <div className="sale-card-body">
-                          {p.title && <div className="sale-card-title">{p.title}</div>}
-
-                          {p.location && (
-                            <div className="sale-card-location">
-                              <i className="fa fa-map-marker" style={{ color: '#c8b89a' }} />
-                              {p.location}
-                            </div>
-                          )}
-
-                          {(() => {
-                            const type = p.property_type || 'villa'
-                            const isLand = type === 'various'
-                            const isHouse = type === 'villa'
-
-                            if (isLand) {
-                              return p.plot_size ? (
-                                <div className="sale-card-meta">
-                                  <span><i className="fa fa-map-o" />{p.plot_size} m² {lang === 'de' ? 'Grundstück' : 'Plot'}</span>
-                                </div>
-                              ) : null
-                            }
-
-                            const hasAny = p.size || (isHouse && p.plot_size) || p.outdoor_area || p.rooms || p.bedrooms || p.bathrooms
-                            if (!hasAny) return null
-
-                            return (
-                              <div className="sale-card-meta">
-                                {p.size && (
-                                  <span><i className="fa fa-arrows-alt" />{p.size} m² {lang === 'de' ? 'Wohnfläche' : 'Living'}</span>
-                                )}
-                                {isHouse && p.plot_size && (
-                                  <span><i className="fa fa-map-o" />{p.plot_size} m² {lang === 'de' ? 'Grundstück' : 'Plot'}</span>
-                                )}
-                                {p.outdoor_area && (
-                                  <span><i className="fa fa-tree" />{p.outdoor_area} m² {lang === 'de' ? 'Freifläche' : 'Outdoor'}</span>
-                                )}
-                                {p.rooms && (
-                                  <span><i className="fa fa-th-large" />{p.rooms} {lang === 'de' ? 'Zimmer' : 'Rooms'}</span>
-                                )}
-                                {p.bedrooms && (
-                                  <span><i className="fa fa-bed" />{p.bedrooms} {lang === 'de' ? 'Schlafzimmer' : 'Bedrooms'}</span>
-                                )}
-                                {p.bathrooms && (
-                                  <span><i className="fa fa-bath" />{p.bathrooms} {lang === 'de' ? 'Bäder' : 'Bathrooms'}</span>
-                                )}
-                              </div>
-                            )
-                          })()}
-                        </div>
-                      </div>
-                    </Link>
+            <div className="col-12">
+              <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
+                {t.formTitle}
+              </h3>
+              <form className="home-1-form" onSubmit={handleSubmit}>
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="form-group mb-4">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={t.namePlaceholder}
+                        value={form.name}
+                        onChange={e => setForm({ ...form, name: e.target.value })}
+                        required
+                      />
+                    </div>
                   </div>
-                ))}
-              </div>
+                  <div className="col-md-6">
+                    <div className="form-group mb-4">
+                      <input
+                        type="tel"
+                        className="form-control"
+                        placeholder={t.phonePlaceholder}
+                        value={form.phone}
+                        onChange={e => {
+                          const cleaned = e.target.value.replace(/[^\d+\s()-]/g, '')
+                          let digits = 0
+                          let limited = ''
+                          for (const ch of cleaned) {
+                            if (/\d/.test(ch)) {
+                              if (digits >= 15) continue
+                              digits++
+                            }
+                            limited += ch
+                          }
+                          setForm({ ...form, phone: limited })
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="form-group mb-4">
+                      <input
+                        type="email"
+                        className="form-control"
+                        placeholder={t.emailPlaceholder}
+                        value={form.email}
+                        onChange={e => setForm({ ...form, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="form-group mb-4">
+                      <textarea
+                        rows="6"
+                        className="form-control"
+                        placeholder={t.messagePlaceholder}
+                        value={form.message}
+                        onChange={e => setForm({ ...form, message: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '40px 0 20px' }}>
-                  <button
-                    onClick={() => goToPage(page - 1)}
-                    disabled={page === 1}
-                    style={{
-                      padding: '8px 14px', border: '1px solid #ccc', background: 'transparent',
-                      cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.4 : 1,
-                      borderRadius: '4px', fontSize: '14px',
-                    }}
-                  >
-                    <i className="fa fa-chevron-left" />
-                  </button>
+                  {(success || error) && (
+                    <div className="col-12 mb-3">
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        padding: '13px 18px', borderRadius: '10px', fontSize: '14px', fontWeight: '600',
+                        background: success ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                        border: `1px solid ${success ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)'}`,
+                        color: success ? '#16a34a' : '#dc2626',
+                      }}>
+                        <i className={`fa ${success ? 'fa-check-circle' : 'fa-exclamation-circle'}`} />
+                        {success || error}
+                      </div>
+                    </div>
+                  )}
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                    <button
-                      key={n}
-                      onClick={() => goToPage(n)}
-                      style={{
-                        padding: '8px 14px', border: '1px solid',
-                        borderColor: page === n ? '#8a6b3f' : '#ccc',
-                        background: page === n ? '#8a6b3f' : 'transparent',
-                        color: page === n ? '#fff' : 'inherit',
-                        cursor: 'pointer', borderRadius: '4px', fontSize: '14px',
-                        fontWeight: page === n ? '700' : '400',
-                      }}
-                    >
-                      {n}
+                  <div className="col-12 mb-5">
+                    <button type="submit" className="btn btn1" disabled={sending}
+                      style={{ padding: '14px 40px', fontSize: '14px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                      {sending ? t.sendingBtn : t.sendBtn}
                     </button>
-                  ))}
-
-                  <button
-                    onClick={() => goToPage(page + 1)}
-                    disabled={page === totalPages}
-                    style={{
-                      padding: '8px 14px', border: '1px solid #ccc', background: 'transparent',
-                      cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.4 : 1,
-                      borderRadius: '4px', fontSize: '14px',
-                    }}
-                  >
-                    <i className="fa fa-chevron-right" />
-                  </button>
+                  </div>
                 </div>
-              )}
-            </>
-          )}
+              </form>
+            </div>
+
+          </div>
         </div>
       </section>
+
     </>
   )
 }

@@ -594,7 +594,7 @@ export default function PropertyDetail() {
                 <div className="col-lg-2 col-md-3 col-6">
                   <div className="p3-col-sec-box1 text-center">
                     <h5>{tr.openAreas || (lang === 'de' ? 'FREIFLÄCHEN' : 'OPEN AREAS')}</h5>
-                    <p>{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'}</p>
+                    <p>{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'} M²</p>
                   </div>
                 </div>
               )}
@@ -602,7 +602,7 @@ export default function PropertyDetail() {
               <div className="col-lg-2 col-md-3 col-6">
                 <div className="p3-col-sec-box1 text-center">
                   <h5>{tr.purchasePrice}</h5>
-                  <p>€ {Number(property.price).toLocaleString('de-DE')} –</p>
+                  <p>€ {Number(property.price).toLocaleString('de-DE')},-</p>
                 </div>
               </div>
 
@@ -617,17 +617,20 @@ export default function PropertyDetail() {
                 <div className="head-sec-page text-center"><h1>{property.title}</h1></div>
               </div>
               {property.description && (
-                <div className="col-lg-10 col-md-12 mx-auto">
-                  <div className="text-center pera2">
+                <div className="col-lg-12 col-md-12">
+                  <div className="pera2" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
                     <div
+                      style={{ textAlign: 'justify' }}
                       dangerouslySetInnerHTML={{ __html: property.description }}
                     />
                     <div className="mt-5"></div>
-                    <a href="#anfragen">
-                      <button type="button" className="btn btn1">
-                        {tr.exposeBtn}
-                      </button>
-                    </a>
+                    <div className="text-center">
+                      <a href="#anfragen">
+                        <button type="button" className="btn btn1">
+                          {tr.exposeBtn}
+                        </button>
+                      </a>
+                    </div>
                   </div>
                 </div>
               )}
@@ -638,10 +641,10 @@ export default function PropertyDetail() {
         {/* Rich text pasted from the admin editor can contain lists, headings,
             tables, images and very long unbroken strings. Keep every one of
             them inside the column so nothing is clipped or pushed off-screen
-            on mobile, and left-align the body copy so lists stay readable. */}
+            on mobile. Body copy is justified in a narrow column (LAGE / AUSSTATTUNG / INFORMATIONEN). */}
         <style>{`
           .rich-content {
-            text-align: left;
+            text-align: justify;
             max-width: 100%;
             overflow-wrap: break-word;
             word-break: break-word;
@@ -659,6 +662,10 @@ export default function PropertyDetail() {
           }
           .rich-content ul, .rich-content ol {
             text-align: left; padding-left: 1.4em; margin: 0 0 15px;
+          }
+          /* Static fallback copy (no rich content saved yet) — justified to match */
+          .p3-sec3 .pera2 p, .p3-sec4 .pera2 p {
+            // text-align: justify;
           }
           .rich-content li { margin-bottom: 8px; color: #828282; }
           .rich-content a { color: #8a6b3f; word-break: break-all; }
@@ -679,7 +686,7 @@ export default function PropertyDetail() {
             border: 1px solid #d9d8d8; padding: 8px 10px;
           }
           /* honour alignment picked in the admin editor */
-          .rich-content .ql-align-center { text-align: center; }
+          // .rich-content .ql-align-center { text-align: center; }
           .rich-content .ql-align-right { text-align: right; }
           .rich-content .ql-align-justify { text-align: justify; }
           .rich-content .ql-indent-1 { padding-left: 3em; }
@@ -693,17 +700,17 @@ export default function PropertyDetail() {
         <section className="p3-sec3">
           <div className="container">
             <div className="row">
-              <div className="col-lg-12 col-md-12">
-                <div className="head-sec text-center pera2">
-                  <h3>{tr.lageTitle}</h3>
+              <div className="col-lg-10 col-md-10 mx-auto">
+                <div className="head-sec pera2" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+                  <h3 className='text-center'>{tr.lageTitle}</h3>
                   {hasRichContent(property.location_details) ? (
                     <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.location_details }} />
                   ) : (
                     <><p>{tr.lage1}</p><p>{tr.lage2}</p><p>{tr.lage3}</p><p>{tr.lage4}</p></>
                   )}
                 </div>
-                <div className="head-sec text-center pera2 mt-5">
-                  <h3>{tr.ausstattungTitle}</h3>
+                <div className="head-sec pera2 mt-5" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+                  <h3 className="text-center">{tr.ausstattungTitle}</h3>
                   {hasRichContent(property.features) ? (
                     <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.features }} />
                   ) : (
@@ -719,8 +726,8 @@ export default function PropertyDetail() {
           <div className="container">
             <div className="row">
               <div className="col-lg-12 col-md-12">
-                <div className="head-sec text-center pera2">
-                  <h3>{tr.infoTitle}</h3>
+                <div className="head-sec pera2" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+                  <h3 className='text-center'>{tr.infoTitle}</h3>
                   {hasRichContent(property.information) ? (
                     <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.information }} />
                   ) : (
@@ -820,7 +827,7 @@ export default function PropertyDetail() {
                       </div>
                       <div className="detail-row">
                         <span className="detail-label">{tr.openAreasLabel || (lang === 'de' ? 'Freiflächen' : 'Open areas')}</span>
-                        <span className="detail-value">{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'}</span>
+                        <span className="detail-value">{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'} m²</span>
                       </div>
                     </>
                   )}
@@ -835,7 +842,7 @@ export default function PropertyDetail() {
 
                   <div className="detail-row">
                     <span className="detail-label">{tr.priceLabel}</span>
-                    <span className="detail-value">€ {Number(property.price).toLocaleString('de-DE')} –</span>
+                    <span className="detail-value">€ {Number(property.price).toLocaleString('de-DE')},-</span>
                   </div>
                 </div>
 

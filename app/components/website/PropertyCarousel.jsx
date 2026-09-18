@@ -13,54 +13,21 @@ export default function PropertyCarousel() {
   const { lang } = useLanguage()
   const tr = translations.home[lang] || translations.home['de']
   const [properties, setProperties] = useState([])
-  const [homeIntro, setHomeIntro] = useState(null)
 
   useEffect(() => {
-    websiteApi.getProperties().then(res => {
+    websiteApi.getHomepageProperties().then(res => {
       if (res.success) setProperties(res.data)
-    })
-    websiteApi.getHomeIntro().then(res => {
-      if (res.success) setHomeIntro(res.data)
     })
   }, [])
 
   if (properties.length === 0) return null
 
-  // Homepage teaser: the 3 highlighted (most recent) properties.
-  // The API returns them ordered newest-first.
+  // Homepage teaser: properties the admin flagged with the "Show on
+  // Homepage" toggle (Admin → Properties → edit), newest-first, capped at 3.
   const featured = localizeProperties(properties.slice(0, 3), lang)
-
-  // "MICHAEL LEBER IMMOBILIEN" heading + intro text — editable in the
-  // admin panel (Home Intro); falls back to the static translation
-  // until the admin data has loaded or if a field is left empty.
-  const mlHeading = homeIntro?.[`heading_${lang}`] || tr.mlHeading
-  const mlIntro1 = homeIntro?.[`intro1_${lang}`] || tr.mlIntro1
-  const mlIntro2 = homeIntro?.[`intro2_${lang}`] || tr.mlIntro2
 
   return (
     <section className="p4-sec1 p5-sec1">
-      <style>{`
-        /* "MICHAEL LEBER IMMOBILIEN" styled like the "IMMOBILIEN" banner heading */
-        .ml-heading {
-          font-family: var(--head-font);
-          font-weight: 700;
-          font-size: 40px;
-          line-height: 60px;
-          letter-spacing: 5%;
-          color: #000;
-          text-transform: uppercase;
-          margin-bottom: 18px;
-        }
-      `}</style>
-
-      <div className="container">
-        <div className="head-sec text-center" style={{ width: '100%', margin: '0 auto 44px', padding: '0 15px' }}>
-          <h2 className="ml-heading">{mlHeading}</h2>
-          <p style={{ marginBottom: '12px', color: '#666', lineHeight: 1.75 }}>{mlIntro1}</p>
-          <p style={{ margin: 0, color: '#666', lineHeight: 1.75 }}>{mlIntro2}</p>
-        </div>
-      </div>
-
       <div className="container">
         <section className="inner-page-banner head-sec" style={{ padding: '22px 0 30px' }}>
           <div className="container text-center">
@@ -164,7 +131,7 @@ function PropertyCard({ p, tr }) {
         <h4 style={{ margin: '0 0 2px', color: '#1a1a1a', fontWeight: 600 }}>{p.title}</h4>
         <p style={{ margin: '0 0 10px', color: '#555', fontSize: '14px' }}>{p.location}</p>
 
-        {/* text labels instead of blurry icons — field set depends on property type */}
+        {/* Icon + label pairs — field set depends on property type */}
         <div
           style={{
             display: 'flex',
@@ -176,29 +143,29 @@ function PropertyCard({ p, tr }) {
           }}
         >
           {isLand ? (
-            <span><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
+            <span><i className="fa fa-map-o" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
           ) : (
             <>
-              <span><strong>{p.size}</strong> m² {tr.livingAreaLabel || 'Wohnfläche'}</span>
+              <span><i className="fa fa-arrows-alt" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.size}</strong> m² {tr.livingAreaLabel || 'Wohnfläche'}</span>
               {isHouse && (
-                <span><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
+                <span><i className="fa fa-map-o" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
               )}
-              <span><strong>{p.outdoor_area ?? '-'}</strong> m² {tr.outdoorAreaLabel || 'Freifläche'}</span>
-              <span><strong>{p.rooms}</strong> {tr.roomsLabel || 'Zimmer'}</span>
-              <span><strong>{p.bedrooms}</strong> {tr.bedroomsLabel || 'Schlafzimmer'}</span>
-              <span><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Bäder'}</span>
+              <span><i className="fa fa-tree" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.outdoor_area ?? '-'}</strong> m² {tr.outdoorAreaLabel || 'Freifläche'}</span>
+              <span><i className="fa fa-th-large" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.rooms}</strong> {tr.roomsLabel || 'Zimmer'}</span>
+              <span><i className="fa fa-bed" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bedrooms}</strong> {tr.bedroomsLabel || 'Schlafzimmer'}</span>
+              <span><i className="fa fa-bath" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Bäder'}</span>
             </>
           )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString('de-DE')}</h5>
+          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString('de-DE')},-</h5>
           <Link
             href={`/immobilien/${p.slug}`}
             onClick={(e) => e.stopPropagation()}
             style={{
               padding: '8px 16px',
-              background: '#8a6b3f',
+              background: '#000',
               color: '#fff',
               borderRadius: '3px',
               fontSize: '13px',

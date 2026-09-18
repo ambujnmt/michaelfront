@@ -31,7 +31,6 @@ const cardStyle = {
 
 const emptyForm = {
   title_de: '', title_en: '',
-  subtitle_de: '', subtitle_en: '',
   heading_de: '', heading_en: '',
   text_top_de: '', text_top_en: '',
   text_bottom_de: '', text_bottom_en: '',
@@ -208,12 +207,6 @@ export default function VerkaufPageSettings() {
           icon="fa-header" label="Title" name="title" form={form} setForm={setForm}
           placeholder="VERKAUF"
           hint="Main heading shown centered at the top of the page."
-        />
-
-        <TextFieldPair
-          icon="fa-align-left" label="Subtitle" name="subtitle" form={form} setForm={setForm}
-          placeholder="Optional line under the title"
-          hint="Shown under the title. Leave empty to hide it."
         />
 
         <EditorPair

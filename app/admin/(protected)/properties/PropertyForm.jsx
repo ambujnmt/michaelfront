@@ -474,6 +474,39 @@ export default function PropertyForm({
             })()}
           </div>
 
+          {/* Homepage toggle — controls the 3-property showcase on the homepage */}
+          <div className="col-lg-12" style={{ marginBottom: '20px' }}>
+            {(() => {
+              const on = form.show_on_homepage == 1 || form.show_on_homepage === true
+              return (
+                <div
+                  onClick={() => setForm({ ...form, show_on_homepage: !on })}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  <div style={{
+                    width: '44px', height: '24px', borderRadius: '12px', flexShrink: 0,
+                    background: on ? '#2563eb' : 'rgba(255,255,255,0.12)',
+                    border: `1px solid ${on ? '#2563eb' : 'rgba(255,255,255,0.25)'}`,
+                    position: 'relative', transition: 'background 0.2s, border-color 0.2s',
+                  }}>
+                    <div style={{
+                      position: 'absolute', top: '3px',
+                      left: on ? '22px' : '3px',
+                      width: '16px', height: '16px', borderRadius: '50%',
+                      background: '#fff',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
+                      transition: 'left 0.2s',
+                    }} />
+                  </div>
+                  <span style={{ color: '#cbd5e1', fontSize: '14px', fontWeight: '600' }}>
+                    Show on Homepage
+                    <span style={{ color: '#64748b', fontWeight: '400', fontSize: '12px', marginLeft: '6px' }}>(3-property showcase)</span>
+                  </span>
+                </div>
+              )
+            })()}
+          </div>
+
           {/* Submit */}
           <div className="col-lg-12">
             <button type="submit" disabled={loading} style={{

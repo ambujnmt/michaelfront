@@ -31,8 +31,6 @@ const cardStyle = {
 
 const emptyForm = {
   title_de: '', title_en: '',
-  subtitle_de: '', subtitle_en: '',
-  heading_de: '', heading_en: '',
   content_de: '', content_en: '',
 }
 
@@ -156,7 +154,7 @@ export default function AboutSettings() {
   return (
     <form onSubmit={handleSubmit}>
       <style>{`
-        /* Rich-text editors: tall, readable on the dark admin theme,
+        /* Rich-text editor: tall, readable on the dark admin theme,
            spaces & line breaks kept visible. */
         .ab-editor .ql-toolbar {
           background: #131b2b;
@@ -188,8 +186,6 @@ export default function AboutSettings() {
       <div className="row">
 
         <TextFieldPair icon="fa-align-left" label="Title" name="title" form={form} setForm={setForm} placeholder="Page title..." />
-        <TextFieldPair icon="fa-align-left" label="Subtitle" name="subtitle" form={form} setForm={setForm} placeholder="Page subtitle..." />
-        <TextFieldPair icon="fa-header" label="Heading" name="heading" form={form} setForm={setForm} placeholder="Section heading..." />
         <EditorPair icon="fa-paragraph" label="Paragraph" name="content" form={form} setForm={setForm} placeholder="Main content — add your highlight points here as a bullet list..." />
 
         {/* Section Image */}

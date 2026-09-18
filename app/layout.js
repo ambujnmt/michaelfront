@@ -19,7 +19,6 @@ export default function RootLayout({ children }) {
         {/* CSS FILES */}
         <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/assets/css/fontawesome/css/font-awesome.min.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="/assets/css/flaticon.min.css" />
         <link rel="stylesheet" href="/assets/css/animate.min.css" />
         <link rel="stylesheet" href="/assets/css/owl.carousel.min.css" />

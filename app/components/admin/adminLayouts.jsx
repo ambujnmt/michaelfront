@@ -86,6 +86,10 @@ export default function AdminLayout({ children }) {
           color: #e2e8f0 !important;
           line-height: 1.8;
           padding: 16px 18px;
+          /* Pasted content sometimes replaces every space with &nbsp;
+             (non-breaking), which otherwise turns a whole paragraph into
+             one unbreakable line that silently overflows off-screen. */
+          overflow-wrap: anywhere;
         }
         .ql-editor * {
           color: inherit !important;
@@ -146,12 +150,13 @@ export default function AdminLayout({ children }) {
           transition: border-color 0.15s, box-shadow 0.15s;
         }
 
-        /* Text selection highlight */
-        input::selection, textarea::selection {
+        /* Text selection highlight — inputs/textareas + the Quill editor
+           (contenteditable, so it needs its own ::selection rule). */
+        input::selection, textarea::selection, .ql-editor ::selection {
           background: rgba(59,130,246,0.45);
           color: #ffffff;
         }
-        input::-moz-selection, textarea::-moz-selection {
+        input::-moz-selection, textarea::-moz-selection, .ql-editor ::-moz-selection {
           background: rgba(59,130,246,0.45);
           color: #ffffff;
         }

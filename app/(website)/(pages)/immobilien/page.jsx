@@ -141,8 +141,8 @@ export default function Immobilien() {
                     onClick={() => goToPage(n)}
                     style={{
                       padding: '8px 14px', border: '1px solid',
-                      borderColor: page === n ? '#8a6b3f' : '#ccc',
-                      background: page === n ? '#8a6b3f' : 'transparent',
+                      borderColor: page === n ? '#000' : '#ccc',
+                      background: page === n ? '#000' : 'transparent',
                       color: page === n ? '#fff' : 'inherit',
                       cursor: 'pointer', borderRadius: '4px', fontSize: '14px',
                       fontWeight: page === n ? '700' : '400',
@@ -250,7 +250,7 @@ function PropertyCard({ p, tr }) {
         <h4 style={{ margin: '0 0 2px', color: '#1a1a1a', fontWeight: 600 }}>{p.title}</h4>
         <p style={{ margin: '0 0 10px', color: '#555', fontSize: '14px' }}>{p.location}</p>
 
-        {/* text labels instead of blurry icons — field set depends on property type */}
+        {/* Icon + label pairs — field set depends on property type */}
         <div
           style={{
             display: 'flex',
@@ -262,29 +262,29 @@ function PropertyCard({ p, tr }) {
           }}
         >
           {isLand ? (
-            <span><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
+            <span><i className="fa fa-map-o" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
           ) : (
             <>
-              <span><strong>{p.size}</strong> m² {tr.livingAreaLabel || 'Wohnfläche'}</span>
+              <span><i className="fa fa-arrows-alt" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.size}</strong> m² {tr.livingAreaLabel || 'Wohnfläche'}</span>
               {isHouse && (
-                <span><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
+                <span><i className="fa fa-map-o" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
               )}
-              <span><strong>{p.outdoor_area ?? '-'}</strong> m² {tr.outdoorAreaLabel || 'Freifläche'}</span>
-              <span><strong>{p.rooms}</strong> {tr.roomsLabel || 'Zimmer'}</span>
-              <span><strong>{p.bedrooms}</strong> {tr.bedroomsLabel || 'Schlafzimmer'}</span>
-              <span><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Bäder'}</span>
+              <span><i className="fa fa-tree" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.outdoor_area ?? '-'}</strong> m² {tr.outdoorAreaLabel || 'Freifläche'}</span>
+              <span><i className="fa fa-th-large" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.rooms}</strong> {tr.roomsLabel || 'Zimmer'}</span>
+              <span><i className="fa fa-bed" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bedrooms}</strong> {tr.bedroomsLabel || 'Schlafzimmer'}</span>
+              <span><i className="fa fa-bath" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Bäder'}</span>
             </>
           )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString('de-DE')}</h5>
+          <h5 style={{ margin: 0, color: '#1a1a1a' }}>€ {Number(p.price).toLocaleString('de-DE')},-</h5>
           <Link
             href={`/immobilien/${p.slug}`}
             onClick={(e) => e.stopPropagation()}
             style={{
               padding: '8px 16px',
-              background: '#8a6b3f',
+              background: '#000',
               color: '#fff',
               borderRadius: '3px',
               fontSize: '13px',

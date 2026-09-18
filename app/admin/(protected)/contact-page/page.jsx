@@ -31,8 +31,6 @@ const cardStyle = {
 
 const emptyForm = {
   title_de: '', title_en: '',
-  subtitle_de: '', subtitle_en: '',
-  heading_de: '', heading_en: '',
   content_de: '', content_en: '',
 }
 
@@ -188,8 +186,6 @@ export default function ContactPageSettings() {
       <div className="row">
 
         <TextFieldPair icon="fa-align-left" label="Title" name="title" form={form} setForm={setForm} placeholder="Page title..." />
-        <TextFieldPair icon="fa-align-left" label="Subtitle" name="subtitle" form={form} setForm={setForm} placeholder="Page subtitle..." />
-        <TextFieldPair icon="fa-header" label="Office Heading" name="heading" form={form} setForm={setForm} placeholder="e.g. Our Office..." />
         <EditorPair icon="fa-paragraph" label="Office Paragraph" name="content" form={form} setForm={setForm} placeholder="Office description — add your highlight points here as a bullet list..." />
 
         {/* Office Image */}

@@ -7,7 +7,7 @@ import PropertyForm from './PropertyForm'
 import Swal from 'sweetalert2'
 
 import { API_URL as API } from '@/service/config'
-const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false, location_details: '', features: '', information: '', title_en: '', location_en: '', description_en: '', location_details_en: '', features_en: '', information_en: '', floor: '', commission: '', extras: '' }
+const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false, show_on_homepage: false, location_details: '', features: '', information: '', title_en: '', location_en: '', description_en: '', location_details_en: '', features_en: '', information_en: '', floor: '', commission: '', extras: '' }
 const statusColor = { Active: '#34d399', Sold: '#94a3b8', Pending: '#fbbf24' }
 const thStyle = { padding: '14px 18px', color: '#94a3b8', fontWeight: '700', textAlign: 'left', fontSize: '12px', letterSpacing: '0.8px', textTransform: 'uppercase' }
 const tdStyle = (extra = {}) => ({ padding: '15px 18px', fontSize: '14px', color: '#cbd5e1', ...extra })
@@ -167,9 +167,9 @@ function ViewContent({ property, gallery }) {
   )
 }
 
-// ── Sales Toggle ────────────────────────────────────────────
-function SalesToggle({ property, onChange }) {
-  const [on, setOn] = useState(property.show_in_sales == 1)
+// ── Sales / Homepage Toggle ───────────────────────────────────
+function SalesToggle({ property, field, onChange }) {
+  const [on, setOn] = useState(property[field] == 1)
   const [busy, setBusy] = useState(false)
 
   const toggle = async () => {
@@ -177,7 +177,7 @@ function SalesToggle({ property, onChange }) {
     setBusy(true)
     const next = !on
     setOn(next)
-    await adminApi.updateProperty(property.id, { ...property, show_in_sales: next })
+    await adminApi.updateProperty(property.id, { ...property, [field]: next })
     onChange()
     setBusy(false)
   }
@@ -276,7 +276,7 @@ export default function Properties() {
     ])
     if (propRes.success) {
       const p = propRes.data
-      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, plot_size: p.plot_size ?? '', outdoor_area: p.outdoor_area ?? '', rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1, location_details: p.location_details || '', features: p.features || '', information: p.information || '', title_en: p.title_en || '', location_en: p.location_en || '', description_en: p.description_en || '', location_details_en: p.location_details_en || '', features_en: p.features_en || '', information_en: p.information_en || '', floor: p.floor || '', commission: p.commission || '', extras: p.extras || '' })
+      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, plot_size: p.plot_size ?? '', outdoor_area: p.outdoor_area ?? '', rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1, show_on_homepage: p.show_on_homepage == 1, location_details: p.location_details || '', features: p.features || '', information: p.information || '', title_en: p.title_en || '', location_en: p.location_en || '', description_en: p.description_en || '', location_details_en: p.location_details_en || '', features_en: p.features_en || '', information_en: p.information_en || '', floor: p.floor || '', commission: p.commission || '', extras: p.extras || '' })
     }
     if (imgRes.success) setExistingGallery(imgRes.data)
     if (aptRes.success) setExistingApartmentImages(aptRes.data)
@@ -391,14 +391,14 @@ export default function Properties() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: '#141824' }}>
-              {['#', 'Banner', 'Title', 'Location', 'Sales', 'Status', 'Actions'].map(h => (
+              {['#', 'Banner', 'Title', 'Location', 'Sales', 'Homepage', 'Status', 'Actions'].map(h => (
                 <th key={h} style={thStyle}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan="7" style={{ padding: '60px', textAlign: 'center', color: '#64748b', fontSize: '15px' }}>
+              <tr><td colSpan="8" style={{ padding: '60px', textAlign: 'center', color: '#64748b', fontSize: '15px' }}>
                 <i className="fa fa-search" style={{ fontSize: '32px', display: 'block', marginBottom: '12px', color: '#334155' }} />
                 {search || statusFilter !== 'All' ? 'No matching properties found' : 'No properties found'}
               </td></tr>
@@ -424,7 +424,10 @@ export default function Properties() {
                 </td>
                 <td style={tdStyle()}><i className="fa fa-map-marker" style={{ marginRight: '7px', color: '#60a5fa' }} />{p.location}</td>
                 <td style={tdStyle()}>
-                  <SalesToggle property={p} onChange={fetchProperties} />
+                  <SalesToggle property={p} field="show_in_sales" onChange={fetchProperties} />
+                </td>
+                <td style={tdStyle()}>
+                  <SalesToggle property={p} field="show_on_homepage" onChange={fetchProperties} />
                 </td>
                 <td style={tdStyle()}>
                   <span style={{ background: statusColor[p.status] + '20', color: statusColor[p.status], border: `1px solid ${statusColor[p.status]}50`, padding: '5px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: '700' }}>{p.status}</span>

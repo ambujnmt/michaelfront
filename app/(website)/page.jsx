@@ -9,6 +9,7 @@ import { API_URL as API } from '@/service/config'
 import HomeHeader from '../components/website/HomeHeader'
 import HomeFooter from '../components/website/HomeFooter'
 import PropertyCarousel from '../components/website/PropertyCarousel'
+import MichaelLeberImmobilien from '../components/website/MichaelLeberImmobilien'
 import Newsletter from '../components/website/Newsletter'
 
 const MODAL_STORAGE_KEY = 'newsletterModalLastShown'
@@ -200,8 +201,8 @@ export default function Home() {
       {/* Shows at most once every 24 hours, tracked via localStorage */}
       {showModal && <NewsletterModal onClose={() => setShowModal(false)} />}
 
-      {/* ── SEC 1 — PROPERTIES (3 highlighted) ── */}
-      <PropertyCarousel />
+      {/* ── SEC 1 — MICHAEL LEBER IMMOBILIEN ── */}
+      <MichaelLeberImmobilien />
 
       {/* ── SEC 2 — VIDEO BANNER ── */}
       <section className="p5-sec3">
@@ -214,7 +215,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── SEC 3 — SELL PROPERTY ── */}
+      {/* ── SEC 3 — PROPERTIES (3 highlighted) ── */}
+      <PropertyCarousel />
+
+      {/* ── SEC 4 — SELL PROPERTY ── */}
       {/* <section className="p5-sec4">
         <div className="container">
           <div className="row">
@@ -237,7 +241,7 @@ export default function Home() {
         </div>
       </section> */}
 
-      {/* ── SEC 3 — NEWSLETTER (unchanged) ── */}
+      {/* ── SEC 5 — NEWSLETTER (unchanged) ── */}
       <Newsletter />
 
       <HomeFooter />

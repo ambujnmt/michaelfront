@@ -38,8 +38,6 @@ export default function UberUns() {
   const fallbackContent = `<p>${tr.p1}</p><p>${tr.p2}</p><ul>${[tr.li1, tr.li2, tr.li3].map(l => `<li>${l.replace(/^✔\s*/, '')}</li>`).join('')}</ul>`
 
   const titleText    = pick(about?.[`title_${lang}`], tr.bannerTitle)
-  const subtitleText = pick(about?.[`subtitle_${lang}`], tr.bannerSub)
-  const headingText  = pick(about?.[`heading_${lang}`], tr.heading)
   const contentHtml  = stripEmptyBlocks(pick(about?.[`content_${lang}`], fallbackContent))
   const aboutImage   = about?.image ? `${API}${about.image}` : '/assets/img/img4.png'
 
@@ -51,8 +49,7 @@ export default function UberUns() {
             <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
             {lang === 'de' ? 'Zurück' : 'Back'}
           </button>
-          <h1 style={{ margin: '0 0 8px' }}>{titleText}</h1>
-          <h4 style={{ margin: 0 }}>{subtitleText}</h4>
+          <h1 style={{ margin: 0 }}>{titleText}</h1>
         </div>
       </section>
 
@@ -70,17 +67,17 @@ export default function UberUns() {
             @media (max-width: 767px) {
               .about-img-full { height: 240px; margin-bottom: 28px; }
             }
-            .about-content { max-width: 100%; }
+            .about-content { max-width: 100%; text-align: justify; }
             .about-content * {
               max-width: 100%;
               white-space: normal;
+              /* Never break in the middle of a word — only wrap at spaces. */
               overflow-wrap: normal;
-              word-wrap: normal;
               word-break: normal;
               hyphens: none;
             }
             .about-content p { margin-bottom: 16px; }
-            .about-content ul { list-style: none; margin: 16px 0 0; padding: 0; }
+            .about-content ul { list-style: none; margin: 16px 0 0; padding: 0; text-align: left; }
             .about-content ul li {
               position: relative;
               padding-left: 28px;
@@ -104,7 +101,6 @@ export default function UberUns() {
             </div>
 
             <div className="col-12 head-sec">
-              <h2>{headingText}</h2>
               <div className="about-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
             </div>
           </div>
@@ -130,7 +126,7 @@ export default function UberUns() {
               <p>{lang === 'de' ? 'Keine Teammitglieder gefunden.' : 'No team members found.'}</p>
             </div>
           ) : (
-            <div className="row">
+            <div className="row justify-content-center">
               {members.map((m) => (
                 <div key={m.id} className="col-lg-3 col-md-6 mb-4 text-center">
                   <div

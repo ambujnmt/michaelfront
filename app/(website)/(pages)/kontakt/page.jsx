@@ -32,7 +32,6 @@ export default function Kontakt() {
   const pick = (dbVal, fallback) => (dbVal && dbVal.trim()) ? dbVal : fallback
   const stripEmptyBlocks = (html) => html.replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
 
-  const defaultOfficeHeading = t.officeHeading || (lang === 'de' ? 'Unser Büro' : 'Our Office')
   const defaultOfficeP1 = t.officeP1 || (lang === 'de'
     ? 'Lorem Ipsum ist einfach ein Blindtext der Druck- und Satzindustrie. Willkommen in unserem Büro — wir freuen uns, Sie persönlich kennenzulernen.'
     : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Welcome to our office — we look forward to meeting you in person.')
@@ -47,8 +46,6 @@ export default function Kontakt() {
   const fallbackContent = `<p>${defaultOfficeP1}</p><p>${defaultOfficeP2}</p><ul>${defaultOfficeLi.map(l => `<li>${l}</li>`).join('')}</ul>`
 
   const titleText    = pick(kontaktPage?.[`title_${lang}`], t.bannerTitle)
-  const subtitleText = pick(kontaktPage?.[`subtitle_${lang}`], t.bannerSubtitle)
-  const headingText  = pick(kontaktPage?.[`heading_${lang}`], defaultOfficeHeading)
   const contentHtml  = stripEmptyBlocks(pick(kontaktPage?.[`content_${lang}`], fallbackContent))
   const officeImage  = kontaktPage?.image ? `${API}${kontaktPage.image}` : '/assets/img/p5-right-img.png'
 
@@ -88,8 +85,7 @@ export default function Kontakt() {
             <i className="fa fa-arrow-left" style={{ marginRight: '6px' }}></i>
             {lang === 'de' ? 'Zurück' : 'Back'}
           </button>
-          <h1 style={{ margin: '0 0 8px' }}>{titleText}</h1>
-          <h4 style={{ margin: 0 }}>{subtitleText}</h4>
+          <h1 style={{ margin: 0 }}>{titleText}</h1>
         </div>
       </section>
 
@@ -110,7 +106,11 @@ export default function Kontakt() {
             @media (max-width: 767px) {
               .kontakt-img-full { height: 240px; margin-bottom: 28px; }
             }
-            .kontakt-content { max-width: 100%; }
+            .kontakt-content {
+              // max-width: 1000px;
+              margin: 0 auto;
+              // text-align: center;
+            }
             .kontakt-content * {
               max-width: 100%;
               white-space: normal;
@@ -120,7 +120,7 @@ export default function Kontakt() {
               hyphens: none;
             }
             .kontakt-content p { margin-bottom: 16px; }
-            .kontakt-content ul { list-style: none; margin: 16px 0 0; padding: 0; }
+            .kontakt-content ul { list-style: none; margin: 16px auto 0; padding: 0; display: inline-block; text-align: left; }
             .kontakt-content ul li {
               position: relative;
               padding-left: 28px;
@@ -141,8 +141,7 @@ export default function Kontakt() {
             <div className="col-12">
               <img src={officeImage} alt="Office" className="kontakt-img-full" />
             </div>
-            <div className="col-12 head-sec">
-              <h2>{headingText}</h2>
+            <div className="col-lg-12 col-md-12 head-sec mx-auto">
               <div className="kontakt-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
             </div>
           </div>

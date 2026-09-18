@@ -32,6 +32,8 @@ export default function EditProperty() {
           description: p.description || '', image: p.image || '',
           location_details: p.location_details || '', features: p.features || '', information: p.information || '',
           show_in_sales: p.show_in_sales == 1,
+          show_on_homepage: p.show_on_homepage == 1,
+          commission: p.commission || '', extras: p.extras || '',
         })
       }
       if (imgRes.success) setExistingGallery(imgRes.data)
