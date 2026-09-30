@@ -28,6 +28,39 @@ export default function UberUns() {
       .catch(() => {})
   }, [])
 
+  useEffect(() => {
+    if (teamLoading || members.length === 0) return
+    let retryTimer = null
+    const tryInit = () => {
+      const jq = window.jQuery
+      if (!jq || !jq.fn || !jq.fn.owlCarousel) { retryTimer = setTimeout(tryInit, 300); return }
+      const $el = jq('.team-slider')
+      if (!$el.length) { retryTimer = setTimeout(tryInit, 300); return }
+      if ($el.hasClass('owl-loaded')) $el.trigger('destroy.owl.carousel').removeClass('owl-loaded owl-drag')
+      $el.owlCarousel({
+        loop: true,
+        margin: 24,
+        nav: false,
+        dots: true,
+        dotsClass: 'owl-dashed-dot',
+        autoplay: true,
+        autoplayTimeout: 4000,
+        autoplaySpeed: 800,
+        autoplayHoverPause: true,
+        mouseDrag: true,
+        touchDrag: true,
+        responsive: {
+          0:    { items: 1 },
+          576:  { items: 2 },
+          992:  { items: 3 },
+          1200: { items: 4 },
+        },
+      })
+    }
+    const t = setTimeout(tryInit, 400)
+    return () => { clearTimeout(t); clearTimeout(retryTimer) }
+  }, [teamLoading, members])
+
   // Falls back to the static translation until an admin saves content for this field
   const pick = (dbVal, fallback) => (dbVal && dbVal.trim()) ? dbVal : fallback
 
@@ -35,11 +68,9 @@ export default function UberUns() {
   // so an empty bullet/paragraph doesn't render with nothing next to it.
   const stripEmptyBlocks = (html) => html.replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
 
-  const fallbackContent = `<p>${tr.p1}</p><p>${tr.p2}</p><ul>${[tr.li1, tr.li2, tr.li3].map(l => `<li>${l.replace(/^✔\s*/, '')}</li>`).join('')}</ul>`
-
   const titleText    = pick(about?.[`title_${lang}`], tr.bannerTitle)
-  const contentHtml  = stripEmptyBlocks(pick(about?.[`content_${lang}`], fallbackContent))
-  const aboutImage   = about?.image ? `${API}${about.image}` : '/assets/img/img4.png'
+  const contentHtml  = stripEmptyBlocks(about?.[`content_${lang}`] || '')
+  const aboutImage   = about?.image ? `${API}${about.image}` : ''
 
   return (
     <>
@@ -58,22 +89,32 @@ export default function UberUns() {
           <style>{`
             .about-img-full {
               width: 100%;
-              height: 420px;
-              object-fit: cover;
+              height: auto;
+              object-fit: contain;
               border-radius: 10px;
               border: 1px solid #ece6db;
               margin-bottom: 40px;
             }
             @media (max-width: 767px) {
-              .about-img-full { height: 240px; margin-bottom: 28px; }
+              .about-img-full { height: auto; object-fit: contain; margin-bottom: 28px; }
             }
-            .about-content { max-width: 100%; text-align: justify; }
+            .team-card-img { height: 270px; }
+            @media (max-width: 767px) {
+              .team-card-img { height: 330px; }
+              .team-heading { font-size: 24px !important; line-height: 34px; }
+            }
+            .about-content { max-width: 100% !important; text-align: justify; overflow-wrap: break-word; }
             .about-content * {
-              max-width: 100%;
-              white-space: normal;
-              /* Never break in the middle of a word — only wrap at spaces. */
-              overflow-wrap: normal;
-              word-break: normal;
+              max-width: 100% !important;
+              white-space: normal !important;
+              /* Never break in the middle of a word — only wrap at spaces,
+                 unless a single unbroken string is too long to fit at all
+                 (overflow-wrap acts as a safety net there). Pasted admin
+                 content can carry inline styles (e.g. white-space: pre from
+                 Word/Quill) that would otherwise defeat this and push the
+                 text off the right edge of the page — !important beats them. */
+              overflow-wrap: break-word !important;
+              word-break: normal !important;
               hyphens: none;
             }
             .about-content p { margin-bottom: 16px; }
@@ -96,13 +137,17 @@ export default function UberUns() {
           `}</style>
 
           <div className="row">
-            <div className="col-12">
-              <img src={aboutImage} alt="About" className="about-img-full" />
-            </div>
+            {aboutImage && (
+              <div className="col-12">
+                <img src={aboutImage} alt="About" className="about-img-full" />
+              </div>
+            )}
 
+            {contentHtml && (
             <div className="col-12 head-sec">
               <div className="about-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
             </div>
+            )}
           </div>
         </div>
       </section>
@@ -111,7 +156,7 @@ export default function UberUns() {
       <section className="section-padding pt-0">
         <div className="container">
           <div className="head-sec-page text-center m-5">
-            <h1 style={{ margin: 0 }}>{trTeam.bannerTitle}</h1>
+            <h1 className="team-heading" style={{ margin: 0, fontWeight: 700 }}>{trTeam.bannerTitle}</h1>
             <p>{trTeam.bannerSub}</p>
           </div>
 
@@ -126,9 +171,9 @@ export default function UberUns() {
               <p>{lang === 'de' ? 'Keine Teammitglieder gefunden.' : 'No team members found.'}</p>
             </div>
           ) : (
-            <div className="row justify-content-center">
+            <div className="owl-carousel owl-theme team-slider">
               {members.map((m) => (
-                <div key={m.id} className="col-lg-3 col-md-6 mb-4 text-center">
+                <div key={m.id} className="item text-center">
                   <div
                     className="team-card"
                     style={{
@@ -144,9 +189,10 @@ export default function UberUns() {
                       ? <img
                           src={`${API}${m.image}`}
                           alt={m[`name_${lang}`] || m.name}
-                          style={{ width: '100%', height: '320px', borderRadius: '5px', objectFit: 'cover', display: 'block' }}
+                          className="team-card-img"
+                          style={{ width: '100%', borderRadius: '5px', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
                         />
-                      : <div style={{ width: '100%', height: '320px', borderRadius: '5px', background: '#f2efe9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>
+                      : <div className="team-card-img" style={{ width: '100%', borderRadius: '5px', background: '#f2efe9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>
                           👤
                         </div>
                     }

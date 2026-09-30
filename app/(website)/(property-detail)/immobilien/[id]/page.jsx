@@ -79,6 +79,9 @@ export default function PropertyDetail() {
   const [sending,  setSending]  = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
+  // Close the mobile menu on route change
+  useEffect(() => { setMenuOpen(false) }, [pathname])
+
   const navLabels = {
     de: { immobilien: 'immobilien', verkauf: 'verkauf', unternehmen: 'unternehmen', kontakt: 'kontakt' },
     en: { immobilien: 'properties', verkauf: 'sales', unternehmen: 'company', kontakt: 'contact' },
@@ -171,11 +174,14 @@ export default function PropertyDetail() {
         margin: 16,
         nav: true,
         dots: false,
-        autoplay: false,
+        autoplay: slideCount > 1,
+        autoplayTimeout: 4000,
+        autoplaySpeed: 800,
+        autoplayHoverPause: true,
         mouseDrag: true,
         touchDrag: true,
         responsive: {
-          0:   { items: 1 },
+          0:   { items: slideCount >= 2 ? 2 : 1 },
           768: { items: slideCount >= 2 ? 2 : 1 },
           1200:{ items: slideCount >= 3 ? 3 : slideCount },
         },
@@ -271,7 +277,7 @@ export default function PropertyDetail() {
       <div id="rev_slider_149_1_wrapper" className="rev_slider_wrapper fullscreen-container"
         style={{ backgroundColor: '#2d3032', padding: 0, position: 'relative' }}>
 
-        <header className="site-header header-style-1 mobile-sider-drawer-menu head-2">
+        <header className={`site-header header-style-1 mobile-sider-drawer-menu head-2 ${menuOpen ? 'active' : ''}`}>
           <div className="container">
             <div className="row align-items-center">
               <div className="col-lg-4 col-md-4 top-col4-1">
@@ -282,12 +288,12 @@ export default function PropertyDetail() {
                 </div>
                 </Link>
               </div>
-              <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center">
+              <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center logo-col">
                 <div className="logo-header text-center">
                   <Link href="/"><img src="/assets/img/new-logo.svg" alt="image" /></Link>
                 </div>
               </div>
-              <div className="col-lg-4 col-md-6 col-6">
+              <div className="col-lg-4 col-md-6 col-6 lang-col">
                 <div className="top-lang-col">
                   <h5>
                     <span onClick={() => setLang('de')} style={{ cursor: 'pointer', fontWeight: lang === 'de' ? '900' : '400', textDecoration: lang === 'de' ? 'underline' : 'none' }}>DE</span>
@@ -304,7 +310,7 @@ export default function PropertyDetail() {
             <div className="main-bar">
               <div className="container">
                 <div
-                  className="header-nav navbar-collapse"
+                  className={`header-nav navbar-collapse ${menuOpen ? 'show' : ''}`}
                   style={{ display: menuOpen ? 'block' : undefined }}
                 >
                   <ul className="nav navbar-nav">
@@ -374,7 +380,26 @@ export default function PropertyDetail() {
 
           @media (max-width: 991px) {
             .header-nav.navbar-collapse { display: none; }
-            .header-nav.navbar-collapse.show { display: block; }
+            .header-nav.navbar-collapse.show { display: block; padding-top: 60px; }
+
+            .row.align-items-center { position: relative; }
+            .logo-col {
+              flex: 0 0 100%;
+              max-width: 100%;
+            }
+            .lang-col {
+              position: absolute;
+              top: 50%;
+              right: 15px;
+              transform: translateY(-50%);
+              width: auto;
+              flex: none;
+              max-width: none;
+            }
+            .lang-col .top-lang-col {
+              margin-top: 0;
+              float: none;
+            }
           }
 
           .hero-slider-wrap { width: 100%; height: 100vh; position: relative; overflow: hidden; background: #2d3032; }
@@ -618,8 +643,9 @@ export default function PropertyDetail() {
               </div>
               {property.description && (
                 <div className="col-lg-12 col-md-12">
-                  <div className="pera2" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+                  <div className="pera2" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                     <div
+                      className="rich-content"
                       style={{ textAlign: 'justify' }}
                       dangerouslySetInnerHTML={{ __html: property.description }}
                     />
@@ -647,7 +673,7 @@ export default function PropertyDetail() {
             text-align: justify;
             max-width: 100%;
             overflow-wrap: break-word;
-            word-break: break-word;
+            word-break: normal;
             font-family: var(--head-font);
             font-size: 18px;
             line-height: 1.75;
@@ -698,10 +724,10 @@ export default function PropertyDetail() {
         `}</style>
 
         <section className="p3-sec3">
-          <div className="container">
+          <div className="container-fluid">
             <div className="row">
-              <div className="col-lg-10 col-md-10 mx-auto">
-                <div className="head-sec pera2" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+              <div className="col-lg-12 col-md-12 mx-auto">
+                <div className="head-sec pera2" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 className='text-center'>{tr.lageTitle}</h3>
                   {hasRichContent(property.location_details) ? (
                     <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.location_details }} />
@@ -709,7 +735,7 @@ export default function PropertyDetail() {
                     <><p>{tr.lage1}</p><p>{tr.lage2}</p><p>{tr.lage3}</p><p>{tr.lage4}</p></>
                   )}
                 </div>
-                <div className="head-sec pera2 mt-5" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <div className="head-sec pera2 mt-5" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 className="text-center">{tr.ausstattungTitle}</h3>
                   {hasRichContent(property.features) ? (
                     <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.features }} />
@@ -726,7 +752,7 @@ export default function PropertyDetail() {
           <div className="container">
             <div className="row">
               <div className="col-lg-12 col-md-12">
-                <div className="head-sec pera2" style={{ maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <div className="head-sec pera2" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 className='text-center'>{tr.infoTitle}</h3>
                   {hasRichContent(property.information) ? (
                     <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.information }} />
@@ -797,7 +823,7 @@ export default function PropertyDetail() {
 
         {/* ── Objektdetails — field set depends on property type ── */}
         <section className="p3-sec6" style={{ backgroundColor: '#f7f7f7' }}>
-          <div className="container">
+          <div className="container py-3">
             <div className="objekt-section">
               <div className="head-sec"><h3 className='text-center'>{tr.detailsTitle}</h3></div>
               <div className="row">
@@ -817,17 +843,33 @@ export default function PropertyDetail() {
 
                   {!isLand && (
                     <>
-                      <div className="detail-row">
-                        <span className="detail-label">{tr.areaLabel}</span>
-                        <span className="detail-value">{property.size} m²</span>
+                      <div className="row g-0">
+                        <div className="col-6 col-md-12">
+                          <div className="detail-row">
+                            <span className="detail-label">{tr.areaLabel}</span>
+                            <span className="detail-value">{property.size} m²</span>
+                          </div>
+                        </div>
+                        <div className="col-6 col-md-12">
+                          <div className="detail-row">
+                            <span className="detail-label">{tr.roomsLabel}</span>
+                            <span className="detail-value">{property.rooms}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="detail-row">
-                        <span className="detail-label">{tr.roomsLabel}</span>
-                        <span className="detail-value">{property.rooms}</span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">{tr.openAreasLabel || (lang === 'de' ? 'Freiflächen' : 'Open areas')}</span>
-                        <span className="detail-value">{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'} m²</span>
+                      <div className="row g-0">
+                        <div className="col-6 col-md-12">
+                          <div className="detail-row">
+                            <span className="detail-label">{tr.openAreasLabel || (lang === 'de' ? 'Freiflächen' : 'Open areas')}</span>
+                            <span className="detail-value">{property.outdoor_area ?? property.open_area ?? property.terrace_area ?? '-'} m²</span>
+                          </div>
+                        </div>
+                        <div className="col-6 col-md-12">
+                          <div className="detail-row">
+                            <span className="detail-label">{tr.priceLabel}</span>
+                            <span className="detail-value">€ {Number(property.price).toLocaleString('de-DE')},-</span>
+                          </div>
+                        </div>
                       </div>
                     </>
                   )}
@@ -840,24 +882,30 @@ export default function PropertyDetail() {
                     </div>
                   )}
 
-                  <div className="detail-row">
-                    <span className="detail-label">{tr.priceLabel}</span>
-                    <span className="detail-value">€ {Number(property.price).toLocaleString('de-DE')},-</span>
-                  </div>
+                  {isLand && (
+                    <div className="detail-row">
+                      <span className="detail-label">{tr.priceLabel}</span>
+                      <span className="detail-value">€ {Number(property.price).toLocaleString('de-DE')},-</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="col-12 col-md-6">
                   {!isLand && (
-                    <>
-                      <div className="detail-row">
-                        <span className="detail-label">{tr.bedroomsLabel}</span>
-                        <span className="detail-value">{property.bedrooms}</span>
+                    <div className="row g-0">
+                      <div className="col-6 col-md-12">
+                        <div className="detail-row">
+                          <span className="detail-label">{tr.bedroomsLabel}</span>
+                          <span className="detail-value">{property.bedrooms}</span>
+                        </div>
                       </div>
-                      <div className="detail-row">
-                        <span className="detail-label">{tr.bathroomsLabel}</span>
-                        <span className="detail-value">{property.bathrooms}</span>
+                      <div className="col-6 col-md-12">
+                        <div className="detail-row">
+                          <span className="detail-label">{tr.bathroomsLabel}</span>
+                          <span className="detail-value">{property.bathrooms}</span>
+                        </div>
                       </div>
-                    </>
+                    </div>
                   )}
 
                   {property.commission && (
@@ -882,7 +930,7 @@ export default function PropertyDetail() {
         <section className="p3-sec7" id="anfragen">
           <div className="container">
             <div className="row">
-              <div className="col-lg-8 col-md-9 col-12 mx-auto">
+              <div className="col-lg-10 col-md-10 col-12 mx-auto">
                 <div className="head-sec-page text-center"><h3>{tr.formTitle}</h3></div>
                 <div className="form-sec1">
                   {sent ? (

@@ -426,6 +426,10 @@ section.page-2-sec4 {
     bottom: 0;
 }
 
+.p3-col-sec .container-fluid.p-0{
+	padding-top: 10px !important;
+}
+
 .p3-col-sec-box1 h5{
 	color: #ffffff;
     font-size: 15px;
@@ -1867,9 +1871,9 @@ a.flip-col-btn:hover{
 	.detail-value{text-align: left; font-size: 14px;}
 	.copyrights-text2{float: unset;}
     .masonry-filter > li{margin-right: 18px;}
-    .pro-dtl-sec2{margin-top: 150px !important;}
+    .pro-dtl-sec2{margin-top: 50px !important;}
     .sub-btn1{margin: 30px 0px;}
-    .p3-col-sec { background-color: #000000b5; height: unset; position: relative; top: 100px; }
+    .p3-col-sec { background-color: #000000b5 !important; height: auto !important; position: static !important; margin-top: 117px !important; }
     .p3-col-sec-box1::before{height: 90px; top: 0px;}
     .p3-col-sec-box1::before{display: none;}
     .p3-col-sec .row > div:last-child .p3-col-sec-box1::after{display: none;}
@@ -1989,6 +1993,7 @@ a.flip-col-btn:hover{
     border: 1px solid #e8e8e8;
     padding: 32px 28px;
     height: 100%;
+    border-radius: 5px;
 }
 .imp-card-icon {
     width: 46px;
@@ -2026,7 +2031,7 @@ a.flip-col-btn:hover{
 }
 .kontakt-info-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 18px;
 }
 .kontakt-icon {

@@ -269,10 +269,10 @@ function PropertyCard({ p, tr }) {
               {isHouse && (
                 <span><i className="fa fa-map-o" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.plot_size ?? '-'}</strong> m² {tr.plotAreaLabel || 'Grundstück'}</span>
               )}
-              <span><i className="fa fa-tree" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.outdoor_area ?? '-'}</strong> m² {tr.outdoorAreaLabel || 'Freifläche'}</span>
+              <span><img src="/assets/img/icons/balcony-icon.png" alt="" style={{ width: '14px', height: '14px', marginRight: '5px', verticalAlign: '-2px' }} /><strong>{p.outdoor_area ?? '-'}</strong> m² {tr.outdoorAreaLabel || 'Freifläche'}</span>
               <span><i className="fa fa-th-large" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.rooms}</strong> {tr.roomsLabel || 'Zimmer'}</span>
               <span><i className="fa fa-bed" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bedrooms}</strong> {tr.bedroomsLabel || 'Schlafzimmer'}</span>
-              <span><i className="fa fa-bath" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Bäder'}</span>
+              <span><i className="fa fa-bath" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Freifläche'}</span>
             </>
           )}
         </div>

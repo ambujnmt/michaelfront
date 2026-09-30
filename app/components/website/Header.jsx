@@ -79,7 +79,7 @@ export default function Header({ className = '' }) {
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
   return (
-    <header className={`site-header header-style-1 mobile-sider-drawer-menu ${className}`}
+    <header className={`site-header header-style-1 mobile-sider-drawer-menu ${menuOpen ? 'active' : ''} ${className}`}
       style={{ background: scrolled ? '#000' : undefined, transition: 'background 0.3s ease' }}>
       <style>{`
         .hh-dropdown { position: relative; }
@@ -113,7 +113,26 @@ export default function Header({ className = '' }) {
 
         @media (max-width: 991px) {
           .header-nav.navbar-collapse { display: none; }
-          .header-nav.navbar-collapse.show { display: block; }
+          .header-nav.navbar-collapse.show { display: block; padding-top: 60px; }
+
+          .row.align-items-center { position: relative; }
+          .logo-col {
+            flex: 0 0 100%;
+            max-width: 100%;
+          }
+          .lang-col {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            width: auto;
+            flex: none;
+            max-width: none;
+          }
+          .lang-col .top-lang-col {
+            margin-top: 0;
+            float: none;
+          }
         }
       `}</style>
 
@@ -127,7 +146,7 @@ export default function Header({ className = '' }) {
             </div>
           </div>
 
-          <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center">
+          <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center logo-col">
             <div className="logo-header text-center">
               <Link href="/">
                 <img src="/assets/img/new-logo.svg" alt="image" />
@@ -135,7 +154,7 @@ export default function Header({ className = '' }) {
             </div>
           </div>
 
-          <div className="col-lg-4 col-md-6 col-6">
+          <div className="col-lg-4 col-md-6 col-6 lang-col">
             <div className="top-lang-col">
               <h5>
                 <span

@@ -49,11 +49,15 @@ export default function Impressum() {
       </section>
 
       {/* Content */}
-      <section className="section-padding" style={{paddingBottom: '90px' }}>
+      <section className="section-padding impressum-content-sec">
         <div className="container">
 
         {/* Cards Row */}
         <style>{`
+          .impressum-content-sec { padding-bottom: 90px !important; }
+          @media (max-width: 767px) {
+            .impressum-content-sec { padding-bottom: 55px !important; }
+          }
           .impressum-card-text * { max-width: 100%; overflow-wrap: break-word; white-space: normal; }
           .impressum-card-text p { margin: 0; }
           .impressum-card-text p + p { margin-top: 10px; }

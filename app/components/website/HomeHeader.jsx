@@ -96,12 +96,31 @@ export default function HomeHeader() {
         .hh-sub li a:hover { color: #fff !important; }
 
         @media (max-width: 991px) {
-          .header-nav.navbar-collapse { display: none; }
+          .header-nav.navbar-collapse { display: none; padding-top: 60px; }
           .header-nav.navbar-collapse.show { display: block; }
+
+          .vdo-header .row.align-items-center { position: relative; }
+          .vdo-header .logo-col {
+            flex: 0 0 100%;
+            max-width: 100%;
+          }
+          .vdo-header .lang-col {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            width: auto;
+            flex: none;
+            max-width: none;
+          }
+          .vdo-header .lang-col .top-lang-col {
+            margin-top: 0;
+            float: none;
+          }
         }
       `}</style>
 
-      <header className="site-header header-style-1 vdo-header mobile-sider-drawer-menu"
+      <header className={`site-header header-style-1 vdo-header mobile-sider-drawer-menu ${menuOpen ? 'active' : ''}`}
         style={{ background: scrolled ? '#000' : 'transparent', transition: 'background 0.3s ease' }}>
         <div className="container">
           <div className="row align-items-center">
@@ -119,7 +138,7 @@ export default function HomeHeader() {
             </div>
 
             {/* LOGO */}
-            <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center">
+            <div className="col-lg-4 col-md-6 col-6 d-flex justify-content-center logo-col">
               <div className="logo-header text-center">
                 <Link href="/">
                   <img src="/assets/img/new-logo.svg" alt="image" />
@@ -128,7 +147,7 @@ export default function HomeHeader() {
             </div>
 
             {/* LANGUAGE */}
-            <div className="col-lg-4 col-md-6 col-6">
+            <div className="col-lg-4 col-md-6 col-6 lang-col">
               <div className="top-lang-col">
                 <h5>
                   <span onClick={() => setLang('de')} style={{ cursor: 'pointer', fontWeight: lang === 'de' ? '900' : '400' }}>DE</span>

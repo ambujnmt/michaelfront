@@ -35,7 +35,7 @@ img { max-width: 100%; height: auto; }
 }
 @media (max-width: 767px) {
   .top-col1    { display: none; }
-  .logo-header img { max-width: 100px; }
+  .logo-header img { max-width: 140px; }
   .toggle-bar  { margin-left: 16px; }
   .header-nav  { margin-top: 0; }
   .header-nav .nav > li { margin: 0; }
@@ -48,7 +48,7 @@ img { max-width: 100%; height: auto; }
 }
 @media (max-width: 767px) {
   .p8-head-col { display: none; }
-  .head-2 .logo-header img { max-width: 100px; }
+  .head-2 .logo-header img { max-width: 140px; }
   .head-2 .top-lang-col { margin-top: 0; }
 }
 

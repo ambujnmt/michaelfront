@@ -54,7 +54,7 @@ export default function Datenschutz() {
       </section>
 
       {/* Content */}
-      <section className="section-padding" style={{paddingBottom: '90px' }}>
+      <section className="section-padding datenschutz-content-sec">
         <div className="container">
 
           {/* Cards */}
@@ -62,6 +62,10 @@ export default function Datenschutz() {
             .privacy-card-text * { max-width: 100%; overflow-wrap: break-word; white-space: normal; }
             .privacy-card-text p { margin: 0; }
             .privacy-card-text p + p { margin-top: 10px; }
+            .datenschutz-content-sec { padding-bottom: 90px !important; }
+            @media (max-width: 767px) {
+              .datenschutz-content-sec { padding-bottom: 55px !important; }
+            }
           `}</style>
           <div className="row g-4">
             {sections.map((sec, i) => (
