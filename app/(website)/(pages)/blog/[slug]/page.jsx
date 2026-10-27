@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import websiteApi from '@/lib/websiteApi'
@@ -138,7 +139,7 @@ export default function BlogDetail() {
           <div className="col-12">
             <div
               className="blog-content"
-              dangerouslySetInnerHTML={{ __html: post.content || '' }}
+              dangerouslySetInnerHTML={{ __html: cleanRichHtml(post.content) }}
               style={{ fontFamily: 'var(--pera-font)', fontSize: '16px', lineHeight: '1.9', color: '#333' }}
             />
           </div>

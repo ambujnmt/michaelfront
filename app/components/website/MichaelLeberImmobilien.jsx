@@ -41,7 +41,7 @@ export default function MichaelLeberImmobilien() {
 
       <div className="container">
         <div className="row">
-          <div className="col-lg-10 col-md-10 mx-auto">
+          <div className="col-lg-12 col-md-12 mx-auto">
             <div className="head-sec text-center" style={{ width: '100%', margin: '0 auto', padding: '0 15px' }}>
               <h2 className="ml-heading">{mlHeading}</h2>
               <p style={{ marginBottom: '12px', color: '#666', lineHeight: 1.75, textAlign: 'justify' }}>{mlIntro1}</p>

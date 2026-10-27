@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 const pageTitles = {
   '/admin/dashboard':  'Dashboard',
   '/admin/properties': 'Properties',
+  '/admin/premium':    'Premium Properties',
   '/admin/inquiries':  'Inquiries',
   '/admin/settings':   'Settings',
   '/admin/subscribers':'Subscribers',

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useSiteInfo } from '@/lib/SiteInfoContext'
@@ -32,22 +33,9 @@ export default function Kontakt() {
   const pick = (dbVal, fallback) => (dbVal && dbVal.trim()) ? dbVal : fallback
   const stripEmptyBlocks = (html) => html.replace(/<(p|li)>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
 
-  const defaultOfficeP1 = t.officeP1 || (lang === 'de'
-    ? 'Lorem Ipsum ist einfach ein Blindtext der Druck- und Satzindustrie. Willkommen in unserem Büro — wir freuen uns, Sie persönlich kennenzulernen.'
-    : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Welcome to our office — we look forward to meeting you in person.')
-  const defaultOfficeP2 = t.officeP2 || (lang === 'de'
-    ? 'Unser Team steht Ihnen bei all Ihren Immobilienanliegen jederzeit gerne zur Seite.'
-    : 'Our team is always happy to help with all your property needs.')
-  const defaultOfficeLi = [
-    t.officeLi1 || (lang === 'de' ? 'Persönliche Beratung vor Ort' : 'Personal on-site consultation'),
-    t.officeLi2 || (lang === 'de' ? 'Erfahrenes Maklerteam' : 'Experienced broker team'),
-    t.officeLi3 || (lang === 'de' ? 'Individuelle Betreuung' : 'Individual support'),
-  ]
-  const fallbackContent = `<p>${defaultOfficeP1}</p><p>${defaultOfficeP2}</p><ul>${defaultOfficeLi.map(l => `<li>${l}</li>`).join('')}</ul>`
-
   const titleText    = pick(kontaktPage?.[`title_${lang}`], t.bannerTitle)
-  const contentHtml  = stripEmptyBlocks(pick(kontaktPage?.[`content_${lang}`], fallbackContent))
-  const officeImage  = kontaktPage?.image ? `${API}${kontaktPage.image}` : '/assets/img/p5-right-img.png'
+  const contentHtml  = stripEmptyBlocks(pick(kontaktPage?.[`content_${lang}`], ''))
+  const officeImage  = kontaktPage?.image ? `${API}${kontaktPage.image}` : ''
 
   const showFlash = (type, msg) => {
     if (type === 'success') setSuccess(msg)
@@ -95,28 +83,38 @@ export default function Kontakt() {
 
           {/* Office Photo full-width, content below (matches /unternehmen) */}
           <style>{`
+            @media (max-width: 767px) {
+              .inner-page-banner h1 { font-size: 24px !important; line-height: 34px; }
+              .kontakt-sub-heading { font-size: 24px !important; }
+            }
             .kontakt-img-full {
               width: 100%;
-              height: 420px;
-              object-fit: cover;
+              height: auto;
+              object-fit: contain;
               border-radius: 10px;
               border: 1px solid #ece6db;
               margin-bottom: 40px;
             }
             @media (max-width: 767px) {
-              .kontakt-img-full { height: 240px; margin-bottom: 28px; }
+              .kontakt-img-full { height: auto; object-fit: contain; margin-bottom: 28px; }
             }
             .kontakt-content {
               // max-width: 1000px;
+              max-width: 100% !important;
               margin: 0 auto;
+              overflow-wrap: normal;
               // text-align: center;
             }
             .kontakt-content * {
-              max-width: 100%;
-              white-space: normal;
-              overflow-wrap: normal;
-              word-wrap: normal;
-              word-break: normal;
+              max-width: 100% !important;
+              white-space: normal !important;
+              /* Only break at spaces — never mid-word (DE + EN).
+                 !important beats inline styles (e.g. white-space: pre) that
+                 pasted admin content can carry, which otherwise push the
+                 text off the right edge of the page. */
+              overflow-wrap: normal !important;
+              word-wrap: normal !important;
+              word-break: normal !important;
               hyphens: none;
             }
             .kontakt-content p { margin-bottom: 16px; }
@@ -137,20 +135,26 @@ export default function Kontakt() {
               color: rgb(68, 68, 68);
             }
           `}</style>
-          <div className="row mb-5">
-            <div className="col-12">
-              <img src={officeImage} alt="Office" className="kontakt-img-full" />
+          {(officeImage || contentHtml.trim()) && (
+            <div className="row mb-5">
+              {officeImage && (
+                <div className="col-12">
+                  <img src={officeImage} alt="Office" className="kontakt-img-full" />
+                </div>
+              )}
+              {contentHtml.trim() && (
+                <div className="col-lg-12 col-md-12 head-sec mx-auto">
+                  <div className="kontakt-content" dangerouslySetInnerHTML={{ __html: cleanRichHtml(contentHtml) }} />
+                </div>
+              )}
             </div>
-            <div className="col-lg-12 col-md-12 head-sec mx-auto">
-              <div className="kontakt-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
-            </div>
-          </div>
+          )}
 
-          <div className="row g-5">
+          <div className="row g-5" style={{ marginBottom: '60px' }}>
 
             {/* Form Column */}
             <div className="col-lg-7">
-              <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
+              <h3 className="kontakt-sub-heading" style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
                 {t.formTitle}
               </h3>
               <form className="home-1-form" onSubmit={handleSubmit}>
@@ -242,7 +246,7 @@ export default function Kontakt() {
 
             {/* Contact Info Column */}
             <div className="col-lg-5">
-              <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
+              <h3 className="kontakt-sub-heading" style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
                 {t.contactTitle}
               </h3>
 

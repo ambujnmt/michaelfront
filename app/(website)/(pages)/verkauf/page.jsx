@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
@@ -73,11 +74,8 @@ export default function Verkauf() {
 
   const heading    = pick(content?.[`heading_${lang}`], tr.heading)
   const title      = pick(content?.[`title_${lang}`], heading)
-  // Only shown when the admin has actually set a subtitle — no static fallback.
-  const subtitle   = content?.[`subtitle_${lang}`]?.trim() || ''
   const textTop    = stripEmptyBlocks(pickHtml(content?.[`text_top_${lang}`], fallbackTop))
   const textBottom = stripEmptyBlocks(pickHtml(content?.[`text_bottom_${lang}`], fallbackBottom))
-  const photoNote  = pick(content?.[`photo_note_${lang}`], tr.photoNote)
   const photoImage = content?.image ? `${API}${content.image}` : ''
 
   return (
@@ -90,14 +88,11 @@ export default function Verkauf() {
           max-width: 100%;
           width: 100%;
           margin: 0 auto;
-          /* Long German compounds must be able to wrap in the narrower
-             column beside the photo — hyphenate at proper syllable
-             points (needs lang="de"/"en" on the element), and hard-break
-             as a last resort so nothing ever overflows / clips. */
-          -webkit-hyphens: auto;
-          hyphens: auto;
-          overflow-wrap: break-word;
-          word-wrap: break-word;
+          /* Wrap only between whole words — no hyphenation, never mid-word. */
+          -webkit-hyphens: none;
+          hyphens: none;
+          overflow-wrap: normal;
+          word-wrap: normal;
         }
         .verkauf-sec .verkauf-body::after {
           content: "";
@@ -147,8 +142,8 @@ export default function Verkauf() {
         .verkauf-photo img {
           display: block;
           width: 100%;
-          height: 480px;
-          object-fit: cover;
+          height: auto;
+          object-fit: contain;
           border-radius: 4px;
         }
         .verkauf-photo-box {
@@ -183,9 +178,16 @@ export default function Verkauf() {
           text-align: center;
         }
         @media (max-width: 767px) {
-          .verkauf-photo img,
+          .verkauf-photo img {
+            height: auto;
+            object-fit: contain;
+          }
           .verkauf-photo-box {
             height: 260px;
+          }
+          .verkauf-form-title {
+            margin-top: 50px;
+            font-size: 24px !important;
           }
         }
       `}</style>
@@ -201,7 +203,6 @@ export default function Verkauf() {
             {lang === 'de' ? 'Zurück' : 'Back'}
           </button>
           <h1 style={{ margin: 0 }}>{title}</h1>
-          {subtitle ? <h4 style={{ margin: '8px 0 0' }}>{subtitle}</h4> : null}
         </div>
       </section>
 
@@ -212,24 +213,18 @@ export default function Verkauf() {
             <div className="col-12 verkauf-body" lang={lang}>
               <div
                 className="verkauf-rte"
-                dangerouslySetInnerHTML={{ __html: textTop }}
+                dangerouslySetInnerHTML={{ __html: cleanRichHtml(textTop) }}
               />
 
-              <figure className="verkauf-photo">
-                {photoImage ? (
+              {photoImage && (
+                <figure className="verkauf-photo">
                   <img src={photoImage} alt={heading} />
-                ) : (
-                  <div className="verkauf-photo-box">
-                    <i className="fa fa-camera" aria-hidden="true" />
-                    <span>{lang === 'de' ? 'Foto' : 'Photo'}</span>
-                  </div>
-                )}
-                {!photoImage && photoNote ? <figcaption>{photoNote}</figcaption> : null}
-              </figure>
+                </figure>
+              )}
 
               <div
                 className="verkauf-rte verkauf-rte-below"
-                dangerouslySetInnerHTML={{ __html: textBottom }}
+                dangerouslySetInnerHTML={{ __html: cleanRichHtml(textBottom) }}
               />
             </div>
           </div>
@@ -242,7 +237,7 @@ export default function Verkauf() {
           <div className="row">
 
             <div className="col-12">
-              <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
+              <h3 className="verkauf-form-title" style={{ fontSize: '28px', fontWeight: '700', marginBottom: '28px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'var(--head-font)' }}>
                 {t.formTitle}
               </h3>
               <form className="home-1-form" onSubmit={handleSubmit}>

@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 const menuItems = [
   { label: 'Dashboard',    path: '/admin/dashboard',    icon: 'fa-tachometer' },
   { label: 'Properties',   path: '/admin/properties',   icon: 'fa-building' },
+  { label: 'Premium',      path: '/admin/premium',      icon: 'fa-diamond' },
   { label: 'Inquiries',    path: '/admin/inquiries',    icon: 'fa-envelope' },
   { label: 'Contacts',     path: '/admin/contacts',     icon: 'fa-comment' },
   // { label: 'Search Agent', path: '/admin/suchagent',    icon: 'fa-search' },

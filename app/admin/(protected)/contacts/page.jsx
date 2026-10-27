@@ -132,7 +132,7 @@ export default function Contacts() {
   const [search,     setSearch]     = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [page, setPage] = useState(1)
-  const PER_PAGE = 10
+  const PER_PAGE = 20
 
   const fetchContacts = () =>
     adminApi.getContacts().then(d => { if (d.success) setContacts(d.data) })
