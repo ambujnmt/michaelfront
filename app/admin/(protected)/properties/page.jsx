@@ -7,7 +7,7 @@ import PropertyForm from './PropertyForm'
 import Swal from 'sweetalert2'
 
 import { API_URL as API } from '@/service/config'
-const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false, show_on_homepage: false, location_details: '', features: '', information: '', title_en: '', location_en: '', description_en: '', location_details_en: '', features_en: '', information_en: '', floor: '', commission: '', extras: '' }
+const emptyForm = { title: '', location: '', price: '', size: '', plot_size: '', outdoor_area: '', rooms: '', bedrooms: '', bathrooms: '', status: 'Active', property_type: 'villa', description: '', image: '', show_in_sales: false, show_on_homepage: false, show_in_premium: false, location_details: '', features: '', information: '', title_en: '', location_en: '', description_en: '', location_details_en: '', features_en: '', information_en: '', floor: '', commission: '', extras: '' }
 const statusColor = { Active: '#34d399', Sold: '#94a3b8', Pending: '#fbbf24' }
 const thStyle = { padding: '14px 18px', color: '#94a3b8', fontWeight: '700', textAlign: 'left', fontSize: '12px', letterSpacing: '0.8px', textTransform: 'uppercase' }
 const tdStyle = (extra = {}) => ({ padding: '15px 18px', fontSize: '14px', color: '#cbd5e1', ...extra })
@@ -177,7 +177,11 @@ function SalesToggle({ property, field, onChange }) {
     setBusy(true)
     const next = !on
     setOn(next)
-    await adminApi.updateProperty(property.id, { ...property, [field]: next })
+    const res = await adminApi.updateProperty(property.id, { ...property, [field]: next })
+    if (!res.success) {
+      setOn(!next)
+      Swal.fire({ icon: 'warning', title: 'Not allowed', text: res.message || 'Failed to update', background: '#1a1f2e', color: '#f1f5f9', confirmButtonColor: '#2563eb' })
+    }
     onChange()
     setBusy(false)
   }
@@ -206,6 +210,36 @@ function SalesToggle({ property, field, onChange }) {
   )
 }
 
+// ── Homepage Order Input ──────────────────────────────────────
+// Position in the homepage showcase (1 = first). Empty = no order (shown after
+// the ordered ones, newest-first). Saves on blur / Enter.
+function HomepageOrderInput({ property, onChange }) {
+  const saved = Number(property.homepage_order) > 0 ? String(property.homepage_order) : ''
+  const [value, setValue] = useState(saved)
+  const [busy, setBusy] = useState(false)
+  const enabled = property.show_on_homepage == 1
+
+  useEffect(() => { setValue(saved) }, [saved])
+
+  const save = async () => {
+    if (busy || value === saved) return
+    setBusy(true)
+    const res = await adminApi.updateHomepageOrder(property.id, value === '' ? 0 : Number(value))
+    if (!res.success) setValue(saved)
+    onChange()
+    setBusy(false)
+  }
+
+  return (
+    <input type="number" min="1" placeholder="—" value={value} disabled={!enabled || busy}
+      title={enabled ? 'Homepage position (1 = first)' : 'Enable "Homepage" first'}
+      onChange={e => setValue(e.target.value.replace(/[^0-9]/g, ''))}
+      onBlur={save}
+      onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
+      style={{ width: '64px', padding: '6px 8px', background: '#141824', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', color: '#f1f5f9', fontSize: '13px', textAlign: 'center', outline: 'none', opacity: enabled ? (busy ? 0.6 : 1) : 0.35, cursor: enabled ? 'text' : 'not-allowed' }} />
+  )
+}
+
 // ── Main Page ────────────────────────────────────────────────
 export default function Properties() {
   const [properties, setProperties] = useState([])
@@ -214,7 +248,7 @@ export default function Properties() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [page, setPage] = useState(1)
-  const PER_PAGE = 10
+  const PER_PAGE = 20
 
   // Modal state
   const [modal, setModal] = useState(null) // 'add' | 'edit' | 'view'
@@ -276,7 +310,7 @@ export default function Properties() {
     ])
     if (propRes.success) {
       const p = propRes.data
-      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, plot_size: p.plot_size ?? '', outdoor_area: p.outdoor_area ?? '', rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1, show_on_homepage: p.show_on_homepage == 1, location_details: p.location_details || '', features: p.features || '', information: p.information || '', title_en: p.title_en || '', location_en: p.location_en || '', description_en: p.description_en || '', location_details_en: p.location_details_en || '', features_en: p.features_en || '', information_en: p.information_en || '', floor: p.floor || '', commission: p.commission || '', extras: p.extras || '' })
+      setForm({ title: p.title, location: p.location, price: p.price, size: p.size, plot_size: p.plot_size ?? '', outdoor_area: p.outdoor_area ?? '', rooms: p.rooms, bedrooms: p.bedrooms || 0, bathrooms: p.bathrooms || 0, status: p.status, property_type: p.property_type || 'villa', description: p.description || '', image: p.image || '', show_in_sales: p.show_in_sales == 1, show_on_homepage: p.show_on_homepage == 1, show_in_premium: p.show_in_premium == 1, location_details: p.location_details || '', features: p.features || '', information: p.information || '', title_en: p.title_en || '', location_en: p.location_en || '', description_en: p.description_en || '', location_details_en: p.location_details_en || '', features_en: p.features_en || '', information_en: p.information_en || '', floor: p.floor || '', commission: p.commission || '', extras: p.extras || '' })
     }
     if (imgRes.success) setExistingGallery(imgRes.data)
     if (aptRes.success) setExistingApartmentImages(aptRes.data)
@@ -391,14 +425,14 @@ export default function Properties() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: '#141824' }}>
-              {['#', 'Banner', 'Title', 'Location', 'Sales', 'Homepage', 'Status', 'Actions'].map(h => (
+              {['#', 'Property', 'Sales', 'Homepage', 'Order', 'Premium', 'Status', 'Actions'].map(h => (
                 <th key={h} style={thStyle}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan="8" style={{ padding: '60px', textAlign: 'center', color: '#64748b', fontSize: '15px' }}>
+              <tr><td colSpan="8"style={{ padding: '60px', textAlign: 'center', color: '#64748b', fontSize: '15px' }}>
                 <i className="fa fa-search" style={{ fontSize: '32px', display: 'block', marginBottom: '12px', color: '#334155' }} />
                 {search || statusFilter !== 'All' ? 'No matching properties found' : 'No properties found'}
               </td></tr>
@@ -407,27 +441,35 @@ export default function Properties() {
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <td style={tdStyle({ color: '#64748b', fontWeight: '600' })}>{(page - 1) * PER_PAGE + i + 1}</td>
-                <td style={tdStyle()}>
+                <td style={tdStyle({ color: '#f1f5f9', fontWeight: '700' })}>
                   {p.image
                     ? <img src={`${API}${p.image}`} alt="banner" style={{ width: '72px', height: '48px', objectFit: 'cover', borderRadius: '6px', display: 'block' }} />
                     : <div style={{ width: '72px', height: '48px', background: '#1e293b', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <i className="fa fa-image" style={{ color: '#334155', fontSize: '18px' }} />
                       </div>
                   }
-                </td>
-                <td style={tdStyle({ color: '#f1f5f9', fontWeight: '700' })}>
-                  <Link href={`/immobilien/${p.slug}`} target="_blank" style={{ color: '#f1f5f9', textDecoration: 'none' }}
+                  <Link href={`/immobilien/${p.slug}`} target="_blank" style={{ color: '#f1f5f9', textDecoration: 'none', display: 'block', marginTop: '8px', maxWidth: '220px' }}
                     onMouseEnter={e => e.currentTarget.style.color = '#60a5fa'}
                     onMouseLeave={e => e.currentTarget.style.color = '#f1f5f9'}>
                     {p.title}
                   </Link>
+                  {p.location && (
+                    <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: '400', marginTop: '4px', maxWidth: '220px' }}>
+                      <i className="fa fa-map-marker" style={{ marginRight: '6px', color: '#60a5fa' }} />{p.location}
+                    </div>
+                  )}
                 </td>
-                <td style={tdStyle()}><i className="fa fa-map-marker" style={{ marginRight: '7px', color: '#60a5fa' }} />{p.location}</td>
                 <td style={tdStyle()}>
                   <SalesToggle property={p} field="show_in_sales" onChange={fetchProperties} />
                 </td>
                 <td style={tdStyle()}>
                   <SalesToggle property={p} field="show_on_homepage" onChange={fetchProperties} />
+                </td>
+                <td style={tdStyle()}>
+                  <HomepageOrderInput property={p} onChange={fetchProperties} />
+                </td>
+                <td style={tdStyle()}>
+                  <SalesToggle property={p} field="show_in_premium" onChange={fetchProperties} />
                 </td>
                 <td style={tdStyle()}>
                   <span style={{ background: statusColor[p.status] + '20', color: statusColor[p.status], border: `1px solid ${statusColor[p.status]}50`, padding: '5px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: '700' }}>{p.status}</span>

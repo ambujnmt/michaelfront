@@ -129,15 +129,32 @@ export default function HeroSlider() {
                 letterSpacing: '-3px', marginBottom: '24px',
                 overflow: 'hidden',
               }}>
-                {slide.title.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className="hero-char"
-                    style={{ animationDelay: `${0.3 + i * 0.045}s` }}
-                  >
-                    {char === ' ' ? ' ' : char}
-                  </span>
-                ))}
+                {/* Chars are grouped per word inside a nowrap span, with a real
+                    space between words — so a line can only wrap between whole
+                    words, never mid-word. Delay still counts every character. */}
+                {(() => {
+                  let idx = 0
+                  return slide.title.split(' ').map((word, w, words) => {
+                    const wordEl = (
+                      <span key={w} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+                        {word.split('').map((char) => {
+                          const i = idx++
+                          return (
+                            <span
+                              key={i}
+                              className="hero-char"
+                              style={{ animationDelay: `${0.3 + i * 0.045}s` }}
+                            >
+                              {char}
+                            </span>
+                          )
+                        })}
+                      </span>
+                    )
+                    idx++ // the space between words keeps the original timing
+                    return w < words.length - 1 ? [wordEl, ' '] : wordEl
+                  })
+                })()}
               </h1>
             )}
             {slide.subtitle && (

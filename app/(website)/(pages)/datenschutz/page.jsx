@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
@@ -59,7 +60,7 @@ export default function Datenschutz() {
 
           {/* Cards */}
           <style>{`
-            .privacy-card-text * { max-width: 100%; overflow-wrap: break-word; white-space: normal; }
+            .privacy-card-text * { max-width: 100%; overflow-wrap: normal; white-space: normal; }
             .privacy-card-text p { margin: 0; }
             .privacy-card-text p + p { margin-top: 10px; }
             .datenschutz-content-sec { padding-bottom: 90px !important; }
@@ -75,7 +76,7 @@ export default function Datenschutz() {
                     <i className={`fa ${icons[i % icons.length]}`}></i>
                   </div>
                   <h4>{sec.title}</h4>
-                  <div className="privacy-card-text" dangerouslySetInnerHTML={{ __html: sec.html }} />
+                  <div className="privacy-card-text" dangerouslySetInnerHTML={{ __html: cleanRichHtml(sec.html) }} />
                 </div>
               </div>
             ))}

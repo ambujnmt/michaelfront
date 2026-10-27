@@ -272,7 +272,7 @@ function PropertyCard({ p, tr }) {
               <span><img src="/assets/img/icons/balcony-icon.png" alt="" style={{ width: '14px', height: '14px', marginRight: '5px', verticalAlign: '-2px' }} /><strong>{p.outdoor_area ?? '-'}</strong> m² {tr.outdoorAreaLabel || 'Freifläche'}</span>
               <span><i className="fa fa-th-large" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.rooms}</strong> {tr.roomsLabel || 'Zimmer'}</span>
               <span><i className="fa fa-bed" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bedrooms}</strong> {tr.bedroomsLabel || 'Schlafzimmer'}</span>
-              <span><i className="fa fa-bath" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Freifläche'}</span>
+              <span><i className="fa fa-bath" style={{ color: '#000', marginRight: '5px' }} /><strong>{p.bathrooms}</strong> {tr.bathroomsLabel || 'Badezimmer'}</span>
             </>
           )}
         </div>

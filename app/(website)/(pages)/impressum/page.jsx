@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useSiteInfo } from '@/lib/SiteInfoContext'
@@ -58,7 +59,7 @@ export default function Impressum() {
           @media (max-width: 767px) {
             .impressum-content-sec { padding-bottom: 55px !important; }
           }
-          .impressum-card-text * { max-width: 100%; overflow-wrap: break-word; white-space: normal; }
+          .impressum-card-text * { max-width: 100%; overflow-wrap: normal; white-space: normal; }
           .impressum-card-text p { margin: 0; }
           .impressum-card-text p + p { margin-top: 10px; }
           .impressum-card-text ul { list-style: none; margin: 10px 0 0; padding: 0; }
@@ -112,7 +113,7 @@ export default function Impressum() {
                   <i className={`fa ${sectionIcons[i % sectionIcons.length]}`}></i>
                 </div>
                 <h4>{sec.title}</h4>
-                <div className="impressum-card-text" dangerouslySetInnerHTML={{ __html: sec.html }} />
+                <div className="impressum-card-text" dangerouslySetInnerHTML={{ __html: cleanRichHtml(sec.html) }} />
               </div>
             </div>
           ))}

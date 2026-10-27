@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
@@ -103,17 +104,19 @@ export default function UberUns() {
               .team-card-img { height: 330px; }
               .team-heading { font-size: 24px !important; line-height: 34px; }
             }
-            .about-content { max-width: 100% !important; text-align: justify; overflow-wrap: break-word; }
+            .about-content { max-width: 100% !important; text-align: left; overflow-wrap: normal; }
+            /* also neutralise justify coming from the admin editor (class or inline style) */
+            .about-content .ql-align-justify,
+            .about-content [style*="justify"] { text-align: left !important; }
             .about-content * {
               max-width: 100% !important;
               white-space: normal !important;
-              /* Never break in the middle of a word — only wrap at spaces,
-                 unless a single unbroken string is too long to fit at all
-                 (overflow-wrap acts as a safety net there). Pasted admin
+              /* Never break in the middle of a word — only wrap at spaces
+                 (DE + EN, including long German compounds). Pasted admin
                  content can carry inline styles (e.g. white-space: pre from
                  Word/Quill) that would otherwise defeat this and push the
                  text off the right edge of the page — !important beats them. */
-              overflow-wrap: break-word !important;
+              overflow-wrap: normal !important;
               word-break: normal !important;
               hyphens: none;
             }
@@ -145,7 +148,7 @@ export default function UberUns() {
 
             {contentHtml && (
             <div className="col-12 head-sec">
-              <div className="about-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
+              <div className="about-content" dangerouslySetInnerHTML={{ __html: cleanRichHtml(contentHtml) }} />
             </div>
             )}
           </div>
@@ -224,7 +227,7 @@ export default function UberUns() {
                         {m.email && (
                           <a
                             href={`mailto:${m.email}`}
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#444', fontSize: '13px', textDecoration: 'none', wordBreak: 'break-all' }}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#444', fontSize: '13px', textDecoration: 'none', overflowWrap: 'anywhere' }}
                           >
                             <i className="fa fa-envelope" style={{ fontSize: '13px', color: '#444' }} />
                             <span>{m.email}</span>

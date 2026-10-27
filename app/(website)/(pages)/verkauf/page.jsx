@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/LanguageContext'
 import translations from '@/lib/translations'
@@ -87,14 +88,11 @@ export default function Verkauf() {
           max-width: 100%;
           width: 100%;
           margin: 0 auto;
-          /* Long German compounds must be able to wrap in the narrower
-             column beside the photo — hyphenate at proper syllable
-             points (needs lang="de"/"en" on the element), and hard-break
-             as a last resort so nothing ever overflows / clips. */
-          -webkit-hyphens: auto;
-          hyphens: auto;
-          overflow-wrap: break-word;
-          word-wrap: break-word;
+          /* Wrap only between whole words — no hyphenation, never mid-word. */
+          -webkit-hyphens: none;
+          hyphens: none;
+          overflow-wrap: normal;
+          word-wrap: normal;
         }
         .verkauf-sec .verkauf-body::after {
           content: "";
@@ -215,7 +213,7 @@ export default function Verkauf() {
             <div className="col-12 verkauf-body" lang={lang}>
               <div
                 className="verkauf-rte"
-                dangerouslySetInnerHTML={{ __html: textTop }}
+                dangerouslySetInnerHTML={{ __html: cleanRichHtml(textTop) }}
               />
 
               {photoImage && (
@@ -226,7 +224,7 @@ export default function Verkauf() {
 
               <div
                 className="verkauf-rte verkauf-rte-below"
-                dangerouslySetInnerHTML={{ __html: textBottom }}
+                dangerouslySetInnerHTML={{ __html: cleanRichHtml(textBottom) }}
               />
             </div>
           </div>

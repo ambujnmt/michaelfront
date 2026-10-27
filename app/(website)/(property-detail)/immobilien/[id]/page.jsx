@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import cleanRichHtml from '@/lib/cleanRichHtml'
 import { useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Footer from '@/app/components/website/Footer'
@@ -18,7 +19,6 @@ import { API_URL as API } from '@/service/config'
 function hasRichContent(html) {
   return !!html && html.replace(/<[^>]*>/g, '').trim().length > 0
 }
-
 function OtherPropertiesSlider({ properties }) {
   useEffect(() => {
     if (!properties.length) return
@@ -111,8 +111,7 @@ export default function PropertyDetail() {
             setApartmentImages([])
           }
           if (allRes.success) {
-            const currentType = propRes.data.property_type || 'villa'
-            setOthers(allRes.data.filter(p => p.slug !== slug && (p.property_type || 'villa') === currentType))
+            setOthers(allRes.data.filter(p => p.slug !== slug && p.show_in_premium == 1))
           } else {
             setOthers([])
           }
@@ -467,6 +466,11 @@ export default function PropertyDetail() {
               font-size: 12px;
             }
 
+            /* Let the wrapper wrap header + slider exactly, so the stats bar
+               sits flush under the image (no 117px margin hack / gap). */
+            #rev_slider_149_1_wrapper.fullscreen-container { height: auto !important; }
+            .p3-col-sec { margin-top: 0 !important; }
+
             .p3-col-sec-box1 {
               margin-bottom: 14px;
               padding: 12px 8px;
@@ -642,12 +646,12 @@ export default function PropertyDetail() {
                 <div className="head-sec-page text-center"><h1>{property.title}</h1></div>
               </div>
               {property.description && (
-                <div className="col-lg-12 col-md-12">
+                <div className="col-lg-10 col-md-12 mx-auto">
                   <div className="pera2" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                     <div
                       className="rich-content"
                       style={{ textAlign: 'justify' }}
-                      dangerouslySetInnerHTML={{ __html: property.description }}
+                      dangerouslySetInnerHTML={{ __html: cleanRichHtml(property.description) }}
                     />
                     <div className="mt-5"></div>
                     <div className="text-center">
@@ -669,32 +673,61 @@ export default function PropertyDetail() {
             them inside the column so nothing is clipped or pushed off-screen
             on mobile. Body copy is justified in a narrow column (LAGE / AUSSTATTUNG / INFORMATIONEN). */}
         <style>{`
+          /* Typography matches /unternehmen (.about-content): site body font,
+             18px / 28px black paragraphs, 15px / 24px on mobile. */
           .rich-content {
             text-align: justify;
             max-width: 100%;
-            overflow-wrap: break-word;
+            overflow-wrap: normal;
             word-break: normal;
-            font-family: var(--head-font);
+            font-family: "Montserrat", sans-serif;
             font-size: 18px;
-            line-height: 1.75;
-            color: #828282;
+            line-height: 28px;
+            color: #000;
           }
           .rich-content > *:first-child { margin-top: 0; }
-          .rich-content * { max-width: 100%; }
-          .rich-content p { margin: 0 0 15px; color: #828282; }
+          /* Wrap only between whole words — !important beats inline
+             word-break / white-space styles carried by pasted content. */
+          .rich-content, .rich-content * {
+            max-width: 100%;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+            white-space: normal !important;
+            hyphens: none !important;
+          }
+          .rich-content p,
+          .p3-sec3 .pera2 p, .p3-sec4 .pera2 p {
+            font-family: "Montserrat", sans-serif;
+            font-size: 18px; line-height: 28px; color: #000;
+            margin: 0 0 16px;
+          }
           .rich-content h1, .rich-content h2, .rich-content h3,
           .rich-content h4, .rich-content h5, .rich-content h6 {
             color: #3d474a; line-height: 1.3; margin: 26px 0 12px;
           }
-          .rich-content ul, .rich-content ol {
-            text-align: left; padding-left: 1.4em; margin: 0 0 15px;
+          .rich-content ol {
+            text-align: left; padding-left: 1.4em; margin: 0 0 16px;
           }
-          /* Static fallback copy (no rich content saved yet) — justified to match */
-          .p3-sec3 .pera2 p, .p3-sec4 .pera2 p {
-            // text-align: justify;
+          .rich-content ol li { margin-bottom: 10px; color: rgb(68, 68, 68); }
+          /* bullet lists: check-icon style, same as /unternehmen */
+          .rich-content ul { list-style: none; margin: 16px 0; padding: 0; text-align: left; }
+          .rich-content ul li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 10px;
+            color: rgb(68, 68, 68);
           }
-          .rich-content li { margin-bottom: 8px; color: #828282; }
-          .rich-content a { color: #8a6b3f; word-break: break-all; }
+          .rich-content ul li::before {
+            content: "\\f058";
+            font-family: "FontAwesome";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 16px;
+            color: rgb(68, 68, 68);
+          }
+          /* long URLs are the one thing allowed to break mid-string, else they overflow on mobile */
+          .rich-content a { color: #8a6b3f; overflow-wrap: anywhere !important; }
           .rich-content img { height: auto; border-radius: 6px; }
           .rich-content blockquote {
             border-left: 3px solid #8a6b3f; margin: 0 0 15px;
@@ -719,18 +752,26 @@ export default function PropertyDetail() {
           .rich-content .ql-indent-2 { padding-left: 6em; }
           .rich-content .ql-indent-3 { padding-left: 9em; }
           @media (max-width: 767px) {
-            .rich-content { font-size: 15px; line-height: 1.7; }
+            .rich-content,
+            .rich-content p,
+            .p3-sec3 .pera2 p, .p3-sec4 .pera2 p { font-size: 15px; line-height: 24px; }
+            /* No justify on mobile — narrow column leaves big gaps between words.
+               !important beats the inline style and the editor's justify class. */
+            .rich-content,
+            .rich-content .ql-align-justify,
+            .rich-content [style*="justify"],
+            .p3-sec3 .pera2 p, .p3-sec4 .pera2 p { text-align: left !important; }
           }
         `}</style>
 
         <section className="p3-sec3">
-          <div className="container-fluid">
+          <div className="container">
             <div className="row">
-              <div className="col-lg-12 col-md-12 mx-auto">
+              <div className="col-lg-10 col-md-12 mx-auto">
                 <div className="head-sec pera2" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 className='text-center'>{tr.lageTitle}</h3>
                   {hasRichContent(property.location_details) ? (
-                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.location_details }} />
+                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: cleanRichHtml(property.location_details) }} />
                   ) : (
                     <><p>{tr.lage1}</p><p>{tr.lage2}</p><p>{tr.lage3}</p><p>{tr.lage4}</p></>
                   )}
@@ -738,7 +779,7 @@ export default function PropertyDetail() {
                 <div className="head-sec pera2 mt-5" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 className="text-center">{tr.ausstattungTitle}</h3>
                   {hasRichContent(property.features) ? (
-                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.features }} />
+                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: cleanRichHtml(property.features) }} />
                   ) : (
                     <><p>{tr.aus1}</p><p>{tr.aus2}</p><p>{tr.aus3}</p><p>{tr.aus4}</p><p>{tr.aus5}</p></>
                   )}
@@ -751,11 +792,11 @@ export default function PropertyDetail() {
         <section className="p3-sec4">
           <div className="container">
             <div className="row">
-              <div className="col-lg-12 col-md-12">
+              <div className="col-lg-10 col-md-12 mx-auto">
                 <div className="head-sec pera2" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 className='text-center'>{tr.infoTitle}</h3>
                   {hasRichContent(property.information) ? (
-                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: property.information }} />
+                    <div className="rich-content" dangerouslySetInnerHTML={{ __html: cleanRichHtml(property.information) }} />
                   ) : (
                     <><p>{tr.info1}</p><p>{tr.info2}</p></>
                   )}
